@@ -11,10 +11,7 @@
 
     @include('partials.sidebar')
 
-    {{-- Page Content --}}
-    <div class="flex-1 p-6">
-        @yield('content')
-    </div>
+    
 
     @stack('scripts')
 </body>

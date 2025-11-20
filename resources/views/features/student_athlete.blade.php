@@ -18,20 +18,14 @@
     </div>
 
     <div class="flex items-end space-x-2">
-        <!-- Full Name -->
+        <!-- Search -->
         <div class="">
-            <label class=" text-gray-700 font-medium mb-1" for="full_name">Full Name</label>
-            <input type="text" id="full_name" name="full_name" placeholder="Enter full name"
+            <label class=" text-gray-700 font-medium mb-1" for="search">Search</label>
+            <input type="text" id="search" name="search" placeholder="Enter full name"
                 class="w-64 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
                 autocomplete="off">
-        </div>
-
-        <!-- Athlete ID -->
-        <div class="flex-1">
-            <label class=" text-gray-700 font-medium mb-1" for="athlete_id">Athlete ID</label>
-            <input type="text" id="athlete_id" name="athlete_id" placeholder="Enter athlete ID"
-                class="w-64 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
-                autocomplete="off">
+            <!-- Live search results -->
+            <div id="searchResults" class="mt-2 w-64 bg-white border border-gray-200 rounded shadow-sm hidden"></div>
         </div>
     </div>
 
@@ -87,6 +81,11 @@
             <div class="flex items-stretch gap-6">
                 <form id="athleteForm" method="POST" action="{{ route('athletes.store') }}" class="student-form flex items-stretch gap-6 w-full" autocomplete="off">
                     @csrf
+
+                    <!-- method spoofing input: stay POST by default, switched to PUT when updating -->
+                    <input type="hidden" name="_method" id="_method" value="POST">
+                    <!-- selected athlete id (for reference) -->
+                    <input type="hidden" name="selected_athlete_id" id="selected_athlete_id" value="">
 
                     <!-- LEFT SIDE: Main Form -->
                     <div class="gap-4 mb-6">
@@ -370,7 +369,7 @@
                         <!-- RIGHT SIDE: Sports Event / Picture Section -->
                         <div class="bg-gray-100 rounded-lg p-4 shadow-inner flex flex-col h-full">
 
-                            <div class="flex flex-col items-center border border-dashed border-gray-400 rounded-lg p-3 bg-white mb-4">
+                            <div class="flex flex-col items-center border border-dashed border-gray-400 rounded-lg p-3 bg-white mb-4">  
                                 <span id="selected_name" class="mt-2 text-gray-800 font-semibold">
                                     {{ $selectedAthlete->name ?? 'No athlete selected' }}
                                 </span>
@@ -444,9 +443,14 @@
 
                             <!-- CENTERED BUTTONS BELOW THE RIGHT SIDE PANEL -->
                             <div class="flex justify-center space-x-2 mt-4">
-                                <button type="submit" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition">
+                                <button id="saveBtn" type="submit" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition">
                                     Save Athlete
                                 </button>
+
+                                <button id="updateBtn" type="submit" class="hidden px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition">
+                                    Update Athlete
+                                </button>
+
                                 <button type="button" onclick="resetForm()" class="px-4 py-2 rounded bg-gray-300 text-gray-800 hover:bg-gray-400 transition">
                                     Cancel New
                                 </button>
@@ -597,9 +601,9 @@
                             </tr>
                         </thead>
 
-                    <tbody id="gradesTable" class="text-gray-700">
-                        <!-- Dynamic Records Here -->
-                    </tbody>
+                        <tbody id="gradesTable" class="text-gray-700">
+                            <!-- Dynamic Records Here -->
+                        </tbody>
                     </table>
 
                     <!-- IF EMPTY -->
@@ -652,22 +656,256 @@
                         </div>
 
                         <!-- Submit -->
-                        <button class="bg-green-600 text-white w-full py-2 rounded-lg hover:bg-green-700">
+                        <button type="submit" class="bg-green-600 text-white w-full py-2 rounded-lg hover:bg-green-700">
                             Save Record
                         </button>
 
+                    </form> 
+
+                </div> 
+
+            </div> 
+
+        </div> 
+
+
+        <!-- ============================================================================= -->
         <!-- Fees and Discounts Tab -->
         <div id="fees-discounts" class="tab-pane hidden">
-            <!-- Add Achievements form or table here -->
-            <p>fees and discounts content goes here...</p>
+            <div class="bg-white rounded-lg shadow p-4">
+               <div class="bg-white p-6 shadow flex items-center justify-between">
+                    <h1 class="text-2xl font-bold text-gray-800">Fees and Discounts</h1>
+
+                    <!-- ADD BUTTON -->
+                    <button onclick="toggleFeeModal(true)"
+                        class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow">
+                        + Add Fee / Discount
+                    </button>
+                </div>
+
+                <!-- Table -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-300 text-sm text-gray-700">
+                        <thead class="bg-green-100">
+                            <tr>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Academic Term and Year</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Total Units Enrolled</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Tuition Fee</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Miscellaneous Fee</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Other Charges</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Total Assessment</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Total Discount</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 20 Empty Rows -->
+                            @for ($i = 0; $i < 20; $i++)
+                            <tr class="{{ $i % 2 == 0 ? 'bg-white' : 'bg-gray-50' }}">
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                            </tr>
+                            @endfor
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ADD FEE / DISCOUNT MODAL -->
+            <div id="feeModal" 
+                class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+
+                <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 relative">
+
+                    <!-- CLOSE BUTTON -->
+                    <button type="button" onclick="toggleFeeModal(false)" 
+                            class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
+                        ✕
+                    </button>
+
+                    <h2 class="text-xl font-bold mb-4">Add Fee / Discount</h2>
+
+                    <form id="feeForm" class="space-y-4">
+
+                        <!-- Academic Year -->
+                        <div>
+                            <label class="text-gray-700 font-medium">Academic Year</label>
+                            <input type="text" name="academic_year" placeholder="Ex: 2025-2026"
+                                class="w-full border rounded px-3 py-2">
+                        </div>
+
+                        <!-- Term -->
+                        <div>
+                            <label class="text-gray-700 font-medium">Term</label>
+                            <input type="text" name="term" placeholder="Ex: 1st Term"
+                                class="w-full border rounded px-3 py-2">
+                        </div>
+
+                        <!-- Fee Type -->
+                        <div>
+                            <label class="text-gray-700 font-medium">Fee Type</label>
+                            <input type="text" name="fee_type" placeholder="Ex: Tuition Fee"
+                                class="w-full border rounded px-3 py-2">
+                        </div>
+
+                        <!-- Discount Type -->
+                        <div>
+                            <label class="text-gray-700 font-medium">Discount Type</label>
+                            <input type="text" name="discount_type" placeholder="Ex: Scholarship"
+                                class="w-full border rounded px-3 py-2">
+                        </div>
+
+                        <!-- Amount -->
+                        <div>
+                            <label class="text-gray-700 font-medium">Amount</label>
+                            <input type="number" name="amount" placeholder="Ex: 5000"
+                                class="w-full border rounded px-3 py-2">
+                        </div>
+
+                        <!-- Notes -->
+                        <div>
+                            <label class="text-gray-700 font-medium">Notes</label>
+                            <textarea name="notes" class="w-full border rounded px-3 py-2" rows="2"></textarea>
+                        </div>
+
+                        <!-- Remarks -->
+                        <div>
+                            <label class="text-gray-700 font-medium">Remarks</label>
+                            <select name="remarks" class="w-full border rounded px-3 py-2">
+                                <option value="">Select</option>
+                                <option>Paid</option>
+                                <option>Pending</option>
+                                <option>Waived</option>
+                            </select>
+                        </div>
+
+                        <!-- Submit -->
+                        <button type="submit" 
+                            class="bg-green-600 text-white w-full py-2 rounded-lg hover:bg-green-700">
+                            Save Record
+                        </button>
+
+                    </form>
+
+                </div>
+            </div>
+
         </div>
 
+        <!-- ========================================================================================== -->
         <!-- Work History Tab -->
         <div id="work-history" class="tab-pane hidden">
-            <!-- Add Achievements form or table here -->
-            <p>Work History content goes here...</p>
-        </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="bg-white p-6 shadow flex items-center justify-between">
+                    <h1 class="text-2xl font-bold text-gray-800">Work History</h1>
 
+                    <!-- ADD BUTTON -->
+                    <button onclick="toggleWorkModal(true)"
+                        class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow">
+                        + Add Work History
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-300 text-sm text-gray-700">
+                        <thead class="bg-green-100">
+                            <tr>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Year</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Date</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Work Position</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Name of Company</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 20 Empty Rows -->
+                            @for ($i = 0; $i < 20; $i++)
+                            <tr class="{{ $i % 2 == 0 ? 'bg-white' : 'bg-gray-50' }}">
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                            </tr>
+                            @endfor
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ADD WORK HISTORY MODAL -->
+            <div id="workModal" 
+                class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+
+                <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 relative">
+
+                    <button type="button" onclick="toggleWorkModal(false)" 
+                            class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
+                        ✕
+                    </button>
+
+                    <h2 class="text-xl font-bold mb-4">Add Work History</h2>
+
+                    <form id="workForm" class="space-y-4">
+
+                        
+                        <div>
+                            <label class="text-gray-700 font-medium">Year</label>
+                            <input type="text" name="year" placeholder="Ex: 2025"
+                                class="w-full border rounded px-3 py-2">
+                        </div>
+
+                        
+                        <div>
+                            <label class="text-gray-700 font-medium">Date</label>
+                            <input type="date" name="date" class="w-full border rounded px-3 py-2">
+                        </div>
+
+                        
+                        <div>
+                            <label class="text-gray-700 font-medium">Work Position</label>
+                            <input type="text" name="position" placeholder="Ex: Coach"
+                                class="w-full border rounded px-3 py-2">
+                        </div>
+
+                        
+                        <div>
+                            <label class="text-gray-700 font-medium">Name of Company</label>
+                            <input type="text" name="company" placeholder="Ex: ABC Sports Academy"
+                                class="w-full border rounded px-3 py-2">
+                        </div>
+
+                        
+                        <div>
+                            <label class="text-gray-700 font-medium">Remarks</label>
+                            <select name="remarks" class="w-full border rounded px-3 py-2">
+                                <option value="">Select</option>
+                                <option>Active</option>
+                                <option>Resigned</option>
+                                <option>Retired</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+
+                        
+                        <button type="submit" 
+                            class="bg-green-600 text-white w-full py-2 rounded-lg hover:bg-green-700">
+                            Save Record
+                        </button>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+        <!-- ================================================================================================ -->
         <!-- Student ID Tab -->
         <div id="student-id" class="tab-pane hidden">
             <!-- Add Achievements form or table here -->
@@ -870,9 +1108,155 @@
         }
 // ===============================================================================
 
-// script for the student athlete classes nav
+        // --- Live search (debounced) ---
+        (function () {
+            const searchInput = document.getElementById('search');
+            const resultsBox = document.getElementById('searchResults');
+            const searchUrl = '{{ route('athletes.search') }}';
+
+            if (!searchInput || !resultsBox) return;
+
+            let timer = null;
+            let selectedFromSearch = false;
+            let selectedId = null;
+
+            // form and action helpers
+            const form = document.getElementById('athleteForm');
+            const defaultAction = form ? form.getAttribute('action') : '{{ route('athletes.store') }}';
+            const methodInput = document.getElementById('_method');
+            const selectedIdInput = document.getElementById('selected_athlete_id');
+            const saveBtn = document.getElementById('saveBtn');
+            const updateBtn = document.getElementById('updateBtn');
+            const updateBase = '{{ url('/athletes') }}';
+
+            function clearResults() {
+                resultsBox.innerHTML = '';
+                resultsBox.classList.add('hidden');
+            }
+
+            function clearSelection() {
+                // only clear fields that were populated by the search
+                const last = document.getElementById('last_name');
+                const first = document.getElementById('first_name');
+                const sid = document.getElementById('student_id');
+                const selectedName = document.getElementById('selected_name');
+                const sportSel = document.querySelector('select[name="sport_event"]');
+
+                if (last) last.value = '';
+                if (first) first.value = '';
+                if (sid) sid.value = '';
+                if (selectedName) selectedName.textContent = 'No athlete selected';
+                if (sportSel) sportSel.selectedIndex = 0;
+
+                selectedFromSearch = false;
+                selectedId = null;
+
+                // restore form to create mode
+                if (form) form.setAttribute('action', defaultAction);
+                if (methodInput) methodInput.value = 'POST';
+                if (selectedIdInput) selectedIdInput.value = '';
+                if (saveBtn) saveBtn.classList.remove('hidden');
+                if (updateBtn) updateBtn.classList.add('hidden');
+            }
+
+            function renderResults(items) {
+                if (!items || items.length === 0) {
+                    clearResults();
+                    return;
+                }
+
+                resultsBox.innerHTML = '';
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm';
+                    const name = (item.full_name && item.full_name.trim() !== '') ? item.full_name : (item.first_name + ' ' + item.last_name);
+                    div.textContent = name + (item.student_id ? ' — ' + item.student_id : '');
+                    div.addEventListener('click', () => {
+                        // fill basic fields on the form
+                        if (item.last_name) document.getElementById('last_name').value = item.last_name;
+                        if (item.first_name) document.getElementById('first_name').value = item.first_name;
+                        if (item.student_id) document.getElementById('student_id').value = item.student_id;
+                        if (item.sport) {
+                            const sel = document.querySelector('select[name="sport_event"]');
+                            if (sel) {
+                                for (let i = 0; i < sel.options.length; i++) {
+                                    if (sel.options[i].value.toLowerCase() === item.sport.toLowerCase()) { sel.selectedIndex = i; break; }
+                                }
+                            }
+                        }
+                        const selectedName = document.getElementById('selected_name');
+                        if (selectedName) selectedName.textContent = name;
+
+                        // mark that the current populated fields came from a search selection
+                        selectedFromSearch = true;
+                        selectedId = item.id || null;
+
+                        if (selectedIdInput) selectedIdInput.value = selectedId;
+
+                        // switch form into update mode
+                        if (form && selectedId) {
+                            form.setAttribute('action', updateBase + '/' + selectedId);
+                            if (methodInput) methodInput.value = 'PUT';
+                        }
+                        if (saveBtn) saveBtn.classList.add('hidden');
+                        if (updateBtn) updateBtn.classList.remove('hidden');
+
+                        clearResults();
+                    });
+                    resultsBox.appendChild(div);
+                });
+                resultsBox.classList.remove('hidden');
+            }
+
+            function doSearch(q) {
+                if (!q || q.trim().length < 1) { clearResults(); return; }
+                fetch(searchUrl + '?q=' + encodeURIComponent(q), { headers: { 'Accept': 'application/json' } })
+                    .then(r => r.json())
+                    .then(data => renderResults(data))
+                    .catch(() => clearResults());
+            }
+
+            searchInput.addEventListener('input', (e) => {
+                const v = e.target.value;
+                if (timer) clearTimeout(timer);
+
+                // if user erased the search input and the form was populated from a search, clear selection
+                if (!v || v.trim() === '') {
+                    if (selectedFromSearch) {
+                        clearSelection();
+                    }
+                    clearResults();
+                    return;
+                }
+
+                timer = setTimeout(() => doSearch(v), 300);
+            });
+
+        })();
+
+        // script for the student athlete classes nav
         function toggleModal(show) {
             document.getElementById('classModal').classList.toggle('hidden', !show);
+        }
+
+        //student athlete Work and fee modal
+        function toggleFeeModal(show) {
+            const modal = document.getElementById('feeModal');
+            if(show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        //student athlete Work and fee modal
+        function toggleWorkModal(show) {
+            const modal = document.getElementById('workModal');
+            if(show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
         }
 
     </script>
