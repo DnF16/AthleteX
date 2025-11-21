@@ -443,11 +443,11 @@
 
                             <!-- CENTERED BUTTONS BELOW THE RIGHT SIDE PANEL -->
                             <div class="flex justify-center space-x-2 mt-4">
-                                <button id="saveBtn" type="submit" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition">
+                                <button id="saveBtn" type="submit" class="px-4 py-2 rounded bg-green-600 text-white bg-green-700 hover:bg-green-700 transition">
                                     Save Athlete
                                 </button>
 
-                                <button id="updateBtn" type="submit" class="hidden px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition">
+                                <button id="updateBtn" type="submit" class="hidden px-4 py-2 rounded bg-blue-600 text-white bg-green-700 hover:bg-blue-700 transition">
                                     Update Athlete
                                 </button>
 
@@ -477,101 +477,108 @@
 
         <!-- ============================================================================================================================= -->
         
-        <!-- Achievements Tab -->
+        <!-- Achievement Tab -->
         <div id="achievements" class="tab-pane hidden">
-            <div class="space-y-6 w-full">
+            <div class="space-y-6">
 
-                <!-- Header -->
-                <div class="bg-white p-6 flex items-center justify-between rounded shadow">
-                    <h1 class="text-3xl font-bold text-gray-800">🏅 Achievements</h1>
-                    <button onclick="toggleModal(true)" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                        + Add Achievement
+                <!-- PAGE HEADER -->
+                <div class="bg-white p-6 shadow flex items-center justify-between">
+                    <h1 class="text-2xl font-bold text-gray-800">🏅 Achievements</h1>
+
+                    <button onclick="toggleAchievementModal(true)"
+                        class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow">
+                        + Add Achievemen
                     </button>
-                </div>
-
-                <!-- Stats Overview -->
-                <div class="grid grid-cols-4 gap-4">
-                    <div id="goldCount" class="bg-green-100 border border-green-300 p-4 rounded-lg shadow-sm text-center">
-                        <p class="text-2xl font-bold text-green-800">0</p>
-                        <p class="text-sm text-green-700">Gold Medals</p>
-                    </div>
-                    <div id="silverCount" class="bg-yellow-100 border border-yellow-300 p-4 rounded-lg shadow-sm text-center">
-                        <p class="text-2xl font-bold text-yellow-800">0</p>
-                        <p class="text-sm text-yellow-700">Silver Medals</p>
-                    </div>
-                    <div id="bronzeCount" class="bg-gray-100 border border-gray-300 p-4 rounded-lg shadow-sm text-center">
-                        <p class="text-2xl font-bold text-gray-800">0</p>
-                        <p class="text-sm text-gray-700">Bronze Medals</p>
-                    </div>
-                    <div id="totalCount" class="bg-blue-100 border border-blue-300 p-4 rounded-lg shadow-sm text-center">
-                        <p class="text-2xl font-bold text-blue-800">0</p>
-                        <p class="text-sm text-blue-700">Total Awards</p>
-                    </div>
                 </div>
 
                 <!-- Achievements Table -->
                 <div class="bg-white rounded-lg shadow overflow-hidden">
                     <table id="achievementsTable" class="min-w-full text-sm text-left">
-                        <thead class="bg-green-600 text-white">
+                        <thead class="bg-green-600 text-white text-center">
                             <tr>
-                                <th class="px-6 py-3 font-medium">#</th>
-                                <th class="px-6 py-3 font-medium">Event Name</th>
+                                <th class="px-6 py-3 font-medium">Year</th>
+                                <th class="px-6 py-3 font-medium">Month-Day</th>
+                                <th class="px-6 py-3 font-medium">Sports Event</th>
+                                <th class="px-6 py-3 font-medium">Venue</th>
+                                <th class="px-6 py-3 font-medium">Award</th>
                                 <th class="px-6 py-3 font-medium">Category</th>
-                                <th class="px-6 py-3 font-medium">Rank</th>
-                                <th class="px-6 py-3 font-medium">Date</th>
                                 <th class="px-6 py-3 font-medium">Remarks</th>
-                                <th class="px-6 py-3 font-medium text-center">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="achievementBody" class="divide-y divide-gray-200">
-                            <tr id="noDataRow">
-                                <td colspan="7" class="px-6 py-6 text-center text-gray-400">
-                                    No achievements added yet.
-                                </td>
+                        <tbody>
+                            <!-- 20 Empty Rows -->
+                            @for ($i = 0; $i < 20; $i++)
+                            <tr class="{{ $i % 2 == 0 ? 'bg-white' : 'bg-gray-50' }}">
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
                             </tr>
+                            @endfor
                         </tbody>
                     </table>
                 </div>
+            </div>
 
                 <!-- Modal Background -->
-                <div id="addAchievementModal" class="hidden fixed inset-0 flex items-start sm:items-center justify-center z-50 overflow-y-auto bg-gray-200 bg-opacity-20">
-                    <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 mx-4 my-6 sm:my-0 relative">
-                        <button id="closeModalBtn" class="absolute top-3 right-3 text-white hover:text-gray-700 text-xl">&times;</button>
-                        <h2 class="text-2xl font-semibold text-white mb-4">Add Achievement</h2>
+                <div id="AchievementModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
+                        
+                        <button onclick="toggleAchievementModal(false)" 
+                                class="absolute top-3 right-3 text-white hover:text-grey-700">
+                            ✕
+                        </button>
+                        
+                        <h2 class="text-2xl font-semibold text-white text-center mb-4">Add Achievement</h2>
                         <form id="achievementForm">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="title" class="block text-sm font-medium text-white mb-1">Title</label>
-                                    <input type="text" id="title" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
+                                    <label for="year" class="block text-sm font-medium text-white mb-1">Year</label>
+                                    <input type="text" id="year" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
                                 </div>
                                 <div>
-                                    <label for="sport" class="block text-sm font-medium text-white mb-1">Sport</label>
-                                    <input type="text" id="sport" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
+                                    <label for="Month-Day" class="block text-sm font-medium text-white mb-1">Month-Day</label>
+                                    <input type="text" id="month_day" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
                                 </div>
                                 <div>
-                                    <label for="rank" class="block text-sm font-medium text-white mb-1">Rank</label>
-                                    <input type="text" id="rank" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
+                                    <label for="event" class="block text-sm font-medium text-white mb-1">Sports Event</label>
+                                    <input type="text" id="event" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
                                 </div>
                                 <div>
-                                    <label for="date" class="block text-sm font-medium text-white mb-1">Date</label>
-                                    <input type="date" id="date" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
+                                    <label for="venue" class="block text-sm font-medium text-white mb-1">Venue</label>
+                                    <input type="text" id="venue" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
+                                </div>
+                                <div>
+                                    <label for="award" class="block text-sm font-medium text-white mb-1">Award</label>
+                                    <select id="award" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
+                                        <option value="">Select Award</option>
+                                        <option value="Gold">Gold</option>
+                                        <option value="Silver">Silver</option>
+                                        <option value="Bronze">Bronze</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="category" class="block text-sm font-medium text-white mb-1">Category</label>
+                                    <input type="text" id="category" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
+                                </div>
+                                <div class="mt-4">
+                                    <label for="remarks" class="block text-sm font-medium text-white mb-1">Remarks</label>
+                                    <textarea id="remarks" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none"></textarea>
                                 </div>
                             </div>
-                            <div class="mt-4">
-                                <label for="remarks" class="block text-sm font-medium text-white mb-1">Remarks</label>
-                                <textarea id="remarks" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none"></textarea>
-                            </div>
-                            <div class="mt-6 flex justify-end space-x-3">
-                                <button type="button" id="cancelModalBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Cancel</button>
-                                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Save</button>
-                            </div>
+                            <!-- Submit -->
+                            <button type="submit" class="bg-green-600 text-white w-full py-2 rounded-lg hover:bg-green-700">
+                                Save Achievement
+                            </button>
                         </form>
                     </div>
                 </div>
 
-
-            </div>
-        </div>
+        </div> 
 
         <!-- ============================================================================================================================= -->
 
@@ -583,7 +590,7 @@
                 <div class="bg-white p-6 shadow flex items-center justify-between">
                     <h1 class="text-2xl font-bold text-gray-800">Academic Evaluation</h1>
 
-                    <button onclick="toggleModal(true)"
+                    <button onclick="toggleAcademicModal(true)"
                         class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow">
                         + Add Record
                     </button>
@@ -592,60 +599,66 @@
                 <!-- SUBJECT TABLE -->
                 <div>
                     <table class="w-full text-left">
-                        <thead class="border-b text-gray-600">
+                        <thead class="bg-green-600 text-white text-center">
                             <tr>
                                 <th class="py-3">Units Passed</th>
                                 <th class="py-3">Units Enrolled</th>
                                 <th class="py-3">Percentage</th>
-                                <th class="py-3 text-right">Remarks</th>
+                                <th class="py-3">Remarks</th>
                             </tr>
                         </thead>
 
                         <tbody id="gradesTable" class="text-gray-700">
-                            <!-- Dynamic Records Here -->
+                            <!-- 20 Empty Rows -->
+                            @for ($i = 0; $i < 20; $i++)
+                            <tr class="{{ $i % 2 == 0 ? 'bg-white' : 'bg-gray-50' }}">
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                                <td class="border border-gray-300 px-4 py-2"></td>
+                            </tr>
+                            @endfor
                         </tbody>
                     </table>
-
-                    <!-- IF EMPTY -->
-                    <p id="emptyMsg" class="text-center py-6 text-gray-500">
-                        No academic records yet.
-                    </p>
                 </div>
 
             </div>
 
             <!-- ADD SUBJECT MODAL -->
-            <div id="addModal" 
+            <div id="academicModal" 
                 class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 
-                <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 relative">
+                <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
 
-                    <button onclick="toggleModal(false)" 
-                            class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
+                    <button onclick="toggleAcademicModal(false)" 
+                            class="absolute top-3 right-3 text-white hover:text-red-700">
                         ✕
                     </button>
 
-                    <h2 class="text-xl font-bold mb-4">Add Academic Record</h2>
+                    <h2 class="text-xl font-bold mb-4 text-white">Add Academic Record</h2>
 
-                    <form id="academicForm" class="space-y-4">
+                    <form id="academicForm" class="space-y-4 text-white">
 
-                        <!-- Subject -->
                         <div>
-                            <label class="text-gray-700 font-medium">Subject</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="subject" placeholder="Ex: NSTP 1">
-                        </div>
-
-                        <!-- Grade -->
-                        <div>
-                            <label class="text-gray-700 font-medium">Grade</label>
+                            <label class=" font-medium">Units Passed</label>
                             <input type="number" class="w-full border rounded px-3 py-2" 
-                                step="0.01" min="1.00" max="5.00" name="grade" placeholder="Ex: 1.75">
+                                name="Passed" placeholder="Units Passed">
                         </div>
 
-                        <!-- Remarks -->
                         <div>
-                            <label class="text-gray-700 font-medium">Remark</label>
+                            <label class=" font-medium">Units enrolled</label>
+                            <input type="number" class="w-full border rounded px-3 py-2" 
+                                step="0.01" min="1.00" max="5.00" name="enrolled" placeholder="Enter Units Enrolled">
+                        </div>
+
+                        <div>
+                            <label class=" font-medium">Percentage</label>
+                            <input type="text" class="w-full border rounded px-3 py-2" 
+                                name="percentage" placeholder="Enter Percentage">
+                        </div>
+
+                        <div>
+                            <label class=" font-medium">Remark</label>
                             <select name="remark" class="w-full border rounded px-3 py-2">
                                 <option value="">Select</option>
                                 <option>Passed</option>
@@ -686,16 +699,16 @@
                 <!-- Table -->
                 <div class="overflow-x-auto">
                     <table class="min-w-full border border-gray-300 text-sm text-gray-700">
-                        <thead class="bg-green-100">
+                        <thead class="bg-green-600 text-white text-center">
                             <tr>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Academic Term and Year</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Total Units Enrolled</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Tuition Fee</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Miscellaneous Fee</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Other Charges</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Total Assessment</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Total Discount</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Remarks</th>
+                                <th class="border border-gray-300 px-4 py-2 ">Academic Term and Year</th>
+                                <th class="border border-gray-300 px-4 py-2 ">Total Units Enrolled</th>
+                                <th class="border border-gray-300 px-4 py-2 ">Tuition Fee</th>
+                                <th class="border border-gray-300 px-4 py-2 ">Miscellaneous Fee</th>
+                                <th class="border border-gray-300 px-4 py-2 ">Other Charges</th>
+                                <th class="border border-gray-300 px-4 py-2 ">Total Assessment</th>
+                                <th class="border border-gray-300 px-4 py-2 ">Total Discount</th>
+                                <th class="border border-gray-300 px-4 py-2 ">Remarks</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -721,62 +734,62 @@
             <div id="feeModal" 
                 class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 
-                <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 relative">
+                <div class="bg-[#2e4e1f] text-white rounded-xl shadow-xl w-full max-w-lg p-6 relative">
 
                     <!-- CLOSE BUTTON -->
                     <button type="button" onclick="toggleFeeModal(false)" 
-                            class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
+                            class="absolute top-3 right-3 text-white hover:text-white">
                         ✕
                     </button>
 
-                    <h2 class="text-xl font-bold mb-4">Add Fee / Discount</h2>
+                    <h2 class="text-xl font-bold mb-4 text-center">Add Fee / Discount</h2>
 
                     <form id="feeForm" class="space-y-4">
 
                         <!-- Academic Year -->
                         <div>
-                            <label class="text-gray-700 font-medium">Academic Year</label>
+                            <label class=" font-medium">Academic Year</label>
                             <input type="text" name="academic_year" placeholder="Ex: 2025-2026"
                                 class="w-full border rounded px-3 py-2">
                         </div>
 
                         <!-- Term -->
                         <div>
-                            <label class="text-gray-700 font-medium">Term</label>
+                            <label class=" font-medium">Term</label>
                             <input type="text" name="term" placeholder="Ex: 1st Term"
                                 class="w-full border rounded px-3 py-2">
                         </div>
 
                         <!-- Fee Type -->
                         <div>
-                            <label class="text-gray-700 font-medium">Fee Type</label>
+                            <label class=" font-medium">Fee Type</label>
                             <input type="text" name="fee_type" placeholder="Ex: Tuition Fee"
                                 class="w-full border rounded px-3 py-2">
                         </div>
 
                         <!-- Discount Type -->
                         <div>
-                            <label class="text-gray-700 font-medium">Discount Type</label>
+                            <label class=" font-medium">Discount Type</label>
                             <input type="text" name="discount_type" placeholder="Ex: Scholarship"
                                 class="w-full border rounded px-3 py-2">
                         </div>
 
                         <!-- Amount -->
                         <div>
-                            <label class="text-gray-700 font-medium">Amount</label>
+                            <label class=" font-medium">Amount</label>
                             <input type="number" name="amount" placeholder="Ex: 5000"
                                 class="w-full border rounded px-3 py-2">
                         </div>
 
                         <!-- Notes -->
                         <div>
-                            <label class="text-gray-700 font-medium">Notes</label>
+                            <label class=" font-medium">Notes</label>
                             <textarea name="notes" class="w-full border rounded px-3 py-2" rows="2"></textarea>
                         </div>
 
                         <!-- Remarks -->
                         <div>
-                            <label class="text-gray-700 font-medium">Remarks</label>
+                            <label class=" font-medium">Remarks</label>
                             <select name="remarks" class="w-full border rounded px-3 py-2">
                                 <option value="">Select</option>
                                 <option>Paid</option>
@@ -814,13 +827,13 @@
 
                 <div class="overflow-x-auto">
                     <table class="min-w-full border border-gray-300 text-sm text-gray-700">
-                        <thead class="bg-green-100">
+                        <thead class="bg-green-600 text-white text-center">
                             <tr>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Year</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Date</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Work Position</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Name of Company</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">Remarks</th>
+                                <th class="border border-gray-300 px-4 py-2 ">Year</th>
+                                <th class="border border-gray-300 px-4 py-2 ">Date</th>
+                                <th class="border border-gray-300 px-4 py-2 ">Work Position</th>
+                                <th class="border border-gray-300 px-4 py-2 ">Name of Company</th>
+                                <th class="border border-gray-300 px-4 py-2 ">Remarks</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -843,47 +856,47 @@
             <div id="workModal" 
                 class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 
-                <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 relative">
+                <div class="bg-[#2e4e1f] text-white rounded-xl shadow-xl w-full max-w-lg p-6 relative">
 
                     <button type="button" onclick="toggleWorkModal(false)" 
-                            class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
+                            class="absolute top-3 right-3 text-white hover:text-white">
                         ✕
                     </button>
 
-                    <h2 class="text-xl font-bold mb-4">Add Work History</h2>
+                    <h2 class="text-xl font-bold mb-4 text-center">Add Work History</h2>
 
                     <form id="workForm" class="space-y-4">
 
                         
                         <div>
-                            <label class="text-gray-700 font-medium">Year</label>
+                            <label class=" font-medium">Year</label>
                             <input type="text" name="year" placeholder="Ex: 2025"
                                 class="w-full border rounded px-3 py-2">
                         </div>
 
                         
                         <div>
-                            <label class="text-gray-700 font-medium">Date</label>
+                            <label class=" font-medium">Date</label>
                             <input type="date" name="date" class="w-full border rounded px-3 py-2">
                         </div>
 
                         
                         <div>
-                            <label class="text-gray-700 font-medium">Work Position</label>
+                            <label class=" font-medium">Work Position</label>
                             <input type="text" name="position" placeholder="Ex: Coach"
                                 class="w-full border rounded px-3 py-2">
                         </div>
 
                         
                         <div>
-                            <label class="text-gray-700 font-medium">Name of Company</label>
+                            <label class=" font-medium">Name of Company</label>
                             <input type="text" name="company" placeholder="Ex: ABC Sports Academy"
                                 class="w-full border rounded px-3 py-2">
                         </div>
 
                         
                         <div>
-                            <label class="text-gray-700 font-medium">Remarks</label>
+                            <label class=" font-medium">Remarks</label>
                             <select name="remarks" class="w-full border rounded px-3 py-2">
                                 <option value="">Select</option>
                                 <option>Active</option>
@@ -959,68 +972,94 @@
         let achievementCount = 0;
         let gold = 0, silver = 0, bronze = 0;
 
-        // Modal toggle
+        // Modal toggle (safe guards)
         function toggleModal(show) {
-            document.getElementById('addAchievementModal').classList.toggle('hidden', !show);
+            const modal = document.getElementById('addAchievementModal');
+            if (!modal) return;
+            modal.classList.toggle('hidden', !show);
         }
 
-        // Open modal
-        document.querySelector('button[onclick="toggleModal(true)"]').addEventListener('click', () => toggleModal(true));
+        // Open modal (guarded)
+        const modalToggleBtn = document.querySelector('button[onclick="toggleModal(true)"]');
+        if (modalToggleBtn) modalToggleBtn.addEventListener('click', () => toggleModal(true));
 
-        // Close modal buttons
-        document.getElementById('closeModalBtn').addEventListener('click', () => toggleModal(false));
-        document.getElementById('cancelModalBtn').addEventListener('click', () => toggleModal(false));
+        // Close modal buttons (guarded)
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        if (closeModalBtn) closeModalBtn.addEventListener('click', () => toggleModal(false));
+        const cancelModalBtn = document.getElementById('cancelModalBtn');
+        if (cancelModalBtn) cancelModalBtn.addEventListener('click', () => toggleModal(false));
 
-        // Form submission
-        document.getElementById('achievementForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Form submission (guarded and tolerant)
+        const achievementFormEl = document.getElementById('achievementForm');
+        if (achievementFormEl) {
+            achievementFormEl.addEventListener('submit', function(e) {
+                e.preventDefault();
+                try {
+                    const titleEl = document.getElementById('title');
+                    const sportEl = document.getElementById('sport');
+                    const rankEl = document.getElementById('rank');
+                    const dateEl = document.getElementById('date');
+                    const remarksEl = document.getElementById('remarks');
 
-            const eventName = document.getElementById('title').value;
-            const category = document.getElementById('sport').value;
-            const rank = document.getElementById('rank').value;
-            const date = document.getElementById('date').value;
-            const remarks = document.getElementById('remarks').value;
+                    if (!titleEl || !sportEl || !rankEl || !dateEl) {
+                        // required fields not present in this template — skip processing
+                        achievementFormEl.reset();
+                        toggleModal(false);
+                        return;
+                    }
 
-            if (!eventName || !category || !rank || !date) {
-                alert('Please fill in all required fields.');
-                return;
-            }
+                    const eventName = titleEl.value;
+                    const category = sportEl.value;
+                    const rank = rankEl.value;
+                    const date = dateEl.value;
+                    const remarks = remarksEl ? remarksEl.value : '';
 
-            // Update medal counters
-            if (rank.includes('1st')) gold++;
-            else if (rank.includes('2nd')) silver++;
-            else if (rank.includes('3rd')) bronze++;
+                    if (!eventName || !category || !rank || !date) {
+                        alert('Please fill in all required fields.');
+                        return;
+                    }
 
-            // Hide "No Data" message
-            const noDataRow = document.getElementById('noDataRow');
-            if (noDataRow) noDataRow.remove();
+                    // Update medal counters
+                    if (rank.includes('1st')) gold++;
+                    else if (rank.includes('2nd')) silver++;
+                    else if (rank.includes('3rd')) bronze++;
 
-            // Add new row
-            achievementCount++;
-            const tbody = document.getElementById('achievementBody');
-            const tr = document.createElement('tr');
-            tr.className = 'hover:bg-gray-50';
-            tr.innerHTML = `
-                <td class="px-6 py-3">${achievementCount}</td>
-                <td class="px-6 py-3 font-semibold text-gray-800">${eventName}</td>
-                <td class="px-6 py-3">${category}</td>
-                <td class="px-6 py-3 text-green-700 font-bold">${rank}</td>
-                <td class="px-6 py-3">${date}</td>
-                <td class="px-6 py-3 text-gray-600">${remarks}</td>
-                <td class="px-6 py-3 text-center space-x-2">
-                    <button class="text-blue-600 hover:text-blue-800 font-medium" onclick="editRow(this)">Edit</button>
-                    <button class="text-red-600 hover:text-red-800 font-medium" onclick="deleteRow(this)">Delete</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
+                    // Hide "No Data" message
+                    const noDataRow = document.getElementById('noDataRow');
+                    if (noDataRow) noDataRow.remove();
 
-            // Update stats
-            updateStats();
+                    // Add new row
+                    achievementCount++;
+                    const tbody = document.getElementById('achievementBody');
+                    if (tbody) {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-gray-50';
+                        tr.innerHTML = `
+                            <td class="px-6 py-3">${achievementCount}</td>
+                            <td class="px-6 py-3 font-semibold text-gray-800">${eventName}</td>
+                            <td class="px-6 py-3">${category}</td>
+                            <td class="px-6 py-3 text-green-700 font-bold">${rank}</td>
+                            <td class="px-6 py-3">${date}</td>
+                            <td class="px-6 py-3 text-gray-600">${remarks}</td>
+                            <td class="px-6 py-3 text-center space-x-2">
+                                <button class="text-blue-600 hover:text-blue-800 font-medium" onclick="editRow(this)">Edit</button>
+                                <button class="text-red-600 hover:text-red-800 font-medium" onclick="deleteRow(this)">Delete</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    }
 
-            // Reset form and close modal
-            e.target.reset();
-            toggleModal(false);
-        });
+                    // Update stats
+                    updateStats();
+
+                    // Reset form and close modal
+                    achievementFormEl.reset();
+                    toggleModal(false);
+                } catch (err) {
+                    console.error('Achievement form handler error:', err);
+                }
+            });
+        }
 
         function updateStats() {
             document.querySelector('#goldCount p').textContent = gold;
@@ -1109,6 +1148,7 @@
 // ===============================================================================
 
         // --- Live search (debounced) ---
+        // --- Live search (debounced) ---
         (function () {
             const searchInput = document.getElementById('search');
             const resultsBox = document.getElementById('searchResults');
@@ -1120,7 +1160,6 @@
             let selectedFromSearch = false;
             let selectedId = null;
 
-            // form and action helpers
             const form = document.getElementById('athleteForm');
             const defaultAction = form ? form.getAttribute('action') : '{{ route('athletes.store') }}';
             const methodInput = document.getElementById('_method');
@@ -1135,18 +1174,25 @@
             }
 
             function clearSelection() {
-                // only clear fields that were populated by the search
-                const last = document.getElementById('last_name');
-                const first = document.getElementById('first_name');
-                const sid = document.getElementById('student_id');
-                const selectedName = document.getElementById('selected_name');
-                const sportSel = document.querySelector('select[name="sport_event"]');
+                // reset all input/select/textarea fields
+                const allFields = form.querySelectorAll('input, select, textarea');
+                allFields.forEach(el => {
+                    if (el.tagName === 'SELECT') {
+                        el.selectedIndex = 0;
+                    } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.value = '';
+                    }
+                });
 
-                if (last) last.value = '';
-                if (first) first.value = '';
-                if (sid) sid.value = '';
+                // reset picture preview
+                const preview = document.getElementById('picturePreview');
+                const noPic = document.getElementById('noPictureText');
+                if (preview) preview.src = '';
+                if (noPic) noPic.classList.remove('hidden');
+
+                // reset selected name
+                const selectedName = document.getElementById('selected_name');
                 if (selectedName) selectedName.textContent = 'No athlete selected';
-                if (sportSel) sportSel.selectedIndex = 0;
 
                 selectedFromSearch = false;
                 selectedId = null;
@@ -1171,29 +1217,44 @@
                     div.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm';
                     const name = (item.full_name && item.full_name.trim() !== '') ? item.full_name : (item.first_name + ' ' + item.last_name);
                     div.textContent = name + (item.student_id ? ' — ' + item.student_id : '');
+                    
                     div.addEventListener('click', () => {
-                        // fill basic fields on the form
-                        if (item.last_name) document.getElementById('last_name').value = item.last_name;
-                        if (item.first_name) document.getElementById('first_name').value = item.first_name;
-                        if (item.student_id) document.getElementById('student_id').value = item.student_id;
-                        if (item.sport) {
-                            const sel = document.querySelector('select[name="sport_event"]');
-                            if (sel) {
-                                for (let i = 0; i < sel.options.length; i++) {
-                                    if (sel.options[i].value.toLowerCase() === item.sport.toLowerCase()) { sel.selectedIndex = i; break; }
+                        // dynamically populate all fields
+                        for (const key in item) {
+                            const el = form.querySelector(`[name="${key}"]`);
+                            if (!el) continue;
+
+                            if (el.tagName === 'SELECT') {
+                                for (let i = 0; i < el.options.length; i++) {
+                                    if (el.options[i].value.trim().toLowerCase() === String(item[key]).trim().toLowerCase()) {
+                                        el.selectedIndex = i;
+                                        break;
+                                    }
                                 }
+                            } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                                el.value = item[key];
                             }
                         }
+
+                        // special case: picture
+                        if (item.picture_url) {
+                            const preview = document.getElementById('picturePreview');
+                            const noPic = document.getElementById('noPictureText');
+                            preview.src = item.picture_url;
+                            preview.classList.remove('hidden');
+                            if (noPic) noPic.classList.add('hidden');
+                        }
+
+                        // selected name display
                         const selectedName = document.getElementById('selected_name');
                         if (selectedName) selectedName.textContent = name;
 
-                        // mark that the current populated fields came from a search selection
+                        // mark that selection came from search
                         selectedFromSearch = true;
                         selectedId = item.id || null;
-
                         if (selectedIdInput) selectedIdInput.value = selectedId;
 
-                        // switch form into update mode
+                        // switch form to update mode
                         if (form && selectedId) {
                             form.setAttribute('action', updateBase + '/' + selectedId);
                             if (methodInput) methodInput.value = 'PUT';
@@ -1203,6 +1264,7 @@
 
                         clearResults();
                     });
+
                     resultsBox.appendChild(div);
                 });
                 resultsBox.classList.remove('hidden');
@@ -1231,13 +1293,34 @@
 
                 timer = setTimeout(() => doSearch(v), 300);
             });
-
         })();
+
 
         // script for the student athlete classes nav
         function toggleModal(show) {
             document.getElementById('classModal').classList.toggle('hidden', !show);
         }
+
+        // Achievement modal
+        function toggleAchievementModal(show) {
+            const modal = document.getElementById('AchievementModal');
+            if(show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Academic Evolution modal
+        function toggleAcademicModal(show) {
+            const modal = document.getElementById('academicModal');
+            if(show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
 
         //student athlete Work and fee modal
         function toggleFeeModal(show) {

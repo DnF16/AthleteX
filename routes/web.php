@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AthleteController;
+use App\Http\Controllers\AcademicEvaluationController;
+use App\Http\Controllers\FeesDiscountController;
+use App\Http\Controllers\WorkHistoryController;
 
 Route::get('/', function () {
 	return view('features.dashboard');
@@ -31,6 +34,7 @@ Route::get('/student-athlete', function () {
 
 Route::get('/student-athletes', [AthleteController::class, 'index'])->name('student.athletes');
 
+// ==============================================================
 // Athlete CRUD routes
 Route::get('/athletes', [AthleteController::class, 'index'])->name('athletes.index');
 Route::get('/athletes/create', [AthleteController::class, 'create'])->name('athletes.create');
@@ -39,3 +43,24 @@ Route::post('/athletes', [AthleteController::class, 'store'])->name('athletes.st
 Route::get('/athletes/search', [AthleteController::class, 'search'])->name('athletes.search');
 // Update athlete
 Route::put('/athletes/{athlete}', [AthleteController::class, 'update'])->name('athletes.update');
+
+// =================================================================
+// Achievement CRUD routes
+Route::get('/athletes/{id}/achievements', [AchievementController::class, 'index']);
+Route::post('/achievements/store', [AchievementController::class, 'store']);
+Route::put('/achievements/{id}', [AchievementController::class, 'update']);
+Route::delete('/achievements/{id}', [AchievementController::class, 'destroy']);
+
+// =================================================================
+// Academic Evaluation routes
+Route::post('/academic-evaluation', [AcademicEvaluationController::class, 'store']);
+Route::get('/academic-evaluation/{athlete_id}', [AcademicEvaluationController::class, 'show']);
+
+// =================================================================
+// Fees and Discounts routes
+Route::post('/fees-discounts', [FeesDiscountController::class, 'store']);
+Route::get('/fees-discounts/{athlete_id}', [FeesDiscountController::class, 'show']);
+
+// =================================================================
+Route::post('/work-history', [WorkHistoryController::class, 'store']);
+Route::get('/work-history/{athlete_id}', [WorkHistoryController::class, 'show']);

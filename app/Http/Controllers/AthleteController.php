@@ -43,24 +43,73 @@ class AthleteController extends Controller
      * Returns JSON array of matches (limit 15).
      */
     public function search(Request $request)
-    {
-        $term = trim($request->get('q', ''));
+{
+    $term = trim($request->get('q', ''));
 
-        $query = Athlete::query();
+    $query = Athlete::query();
 
-        if ($term !== '') {
-            $query->where(function ($q) use ($term) {
-                $q->where('first_name', 'like', "%{$term}%")
-                  ->orWhere('last_name', 'like', "%{$term}%")
-                  ->orWhere('full_name', 'like', "%{$term}%")
-                  ->orWhere('student_id', 'like', "%{$term}%");
-            });
-        }
-
-        $results = $query->limit(15)->get(['id', 'student_id', 'first_name', 'last_name', 'full_name', 'sport']);
-
-        return response()->json($results);
+    if ($term !== '') {
+        $query->where(function ($q) use ($term) {
+            $q->where('first_name', 'like', "%{$term}%")
+              ->orWhere('last_name', 'like', "%{$term}%")
+              ->orWhere('full_name', 'like', "%{$term}%")
+              ->orWhere('student_id', 'like', "%{$term}%");
+        });
     }
+
+    $results = $query->limit(15)->get()->map(function ($a) {
+        return [
+            'id' => $a->id,
+            'student_id' => $a->student_id,
+            'first_name' => $a->first_name,
+            'last_name' => $a->last_name,
+            'full_name' => $a->full_name,
+            'age' => $a->age,
+            'gender' => $a->gender,
+            'birthdate' => $a->birthdate,
+            'blood_type' => $a->blood_type,
+            'course' => $a->course,
+            'year_level' => $a->year_level,
+            'email' => $a->email,
+            'facebook' => $a->facebook,
+            'marital_status' => $a->marital_status,
+            'contact_number' => $a->contact_number,
+            'address' => $a->address,
+            'city_municipality' => $a->city_municipality,
+            'province_state' => $a->province_state,
+            'zip_code' => $a->zip_code,
+            'emergency_person' => $a->emergency_person,
+            'emergency_contact' => $a->emergency_contact,
+            'coach_name' => $a->coach_name,
+            'date_joined' => $a->date_joined,
+            'term_graduated' => $a->term_graduated,
+            'asst_coach' => $a->asst_coach,
+            'total_unit' => $a->total_unit,
+            'year_graduated' => $a->year_graduated,
+            'tuition_fee' => $a->tuition_fee,
+            'misc_fee' => $a->misc_fee,
+            'other_charges' => $a->other_charges,
+            'total_assessment' => $a->total_assessment,
+            'total_discount' => $a->total_discount,
+            'balance' => $a->balance,
+            'current_work' => $a->current_work,
+            'current_company' => $a->current_company,
+
+            // right-side fields
+            'sport_event' => $a->sport_event,
+            'status' => $a->status,
+            'classification' => $a->classification,
+            'inactive_date' => $a->inactive_date,
+
+            // picture
+            'picture_url' => $a->picture ? asset('storage/' . $a->picture) : null,
+        ];
+    });
+
+    return response()->json($results);
+}
+
+
 
     /**
      * Update an existing athlete.

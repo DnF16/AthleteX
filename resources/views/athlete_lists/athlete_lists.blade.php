@@ -116,12 +116,28 @@
                         <td class="border px-4 py-2">{{ $athlete->gender }}</td>
                         <td class="border px-4 py-2">{{ $athlete->birthdate }}</td>
                         <td class="border px-4 py-2 text-center">{{ $athlete->age }}</td>
-                        <!-- Add the rest of the columns similarly -->
-                        <!-- <td class="border px-4 py-2 text-center">
-                            <button class="px-2 py-1 bg-blue-600 text-white rounded text-xs">View</button>
-                            <button class="px-2 py-1 bg-yellow-500 text-white rounded text-xs">Edit</button>
-                            <button class="px-2 py-1 bg-red-600 text-white rounded text-xs">Delete</button>
-                        </td> -->
+                        <td class="border px-4 py-2 text-center">{{ $athlete->blood_type }}</td>
+                        <td class="border px-4 py-2">{{ $athlete->course }}</td>
+                        <td class="border px-4 py-2 text-center">{{ $athlete->year }}</td>
+                        <td class="border px-4 py-2">{{ $athlete->email }}</td>
+                        <td class="border px-4 py-2">{{ $athlete->fb_link }}</td>
+                        <td class="border px-4 py-2">{{ $athlete->marital_status }}</td>
+                        <td class="border px-4 py-2">{{ $athlete->contact_number}}</td>
+                        <td class="border px-4 py-2">{{ $athlete->address }}</td>
+                        <td class="border px-4 py-2">{{ $athlete->city }}</td>
+                        <td class="border px-4 py-2">{{ $athlete->province }}</td>
+                        <td class="border px-4 py-2">{{ $athlete->zip_code }}</td>
+                        <td class="border px-4 py-2">{{ $athlete->emergency_contact_person }}</td>
+                        <td class="border px-4 py-2">{{ $athlete->emergency_number }}</td>
+                        <td class="border px-4 py-2">{{ $athlete->coach_name }}</td>
+                        <td class="border px-4 py-2">{{ $athlete->date_joined }}</td>
+                        <td class="border px-4 py-2">{{ $athlete->term_graduated }}</td>
+                        <td class="border px-4 py-2">{{ $athlete->asst_coach }}</td>
+                        <td class="border px-4 py-2 text-center">{{ $athlete->units_enrolled }}</td>
+                        <td class="border px-4 py-2 text-center">{{ $athlete->year_graduated }}</td>
+                        <td class="border px-4 py-2 text-right">{{ $athlete->tuition_fee }}</td>
+                        <td class="border px-4 py-2 text-right">{{ $athlete->misc_fee }}</td>
+                        <td class="border px-4 py-2 text-right">{{ $athlete->other_charges }}</td>
                     </tr>
                 @endforeach
             </tbody>
