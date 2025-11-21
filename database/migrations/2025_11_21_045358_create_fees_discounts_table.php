@@ -9,26 +9,29 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('fees_discounts', function (Blueprint $table) {
             $table->id();
 
+            // FK → athlete
             $table->unsignedBigInteger('athlete_id');
+            $table->foreign('athlete_id')
+                ->references('id')
+                ->on('athletes')
+                ->onDelete('cascade');
 
-            $table->string('academic_year')->nullable();
-            $table->string('term')->nullable();
-            $table->string('fee_type')->nullable();
-            $table->string('discount_type')->nullable();
-            $table->decimal('amount', 10, 2)->nullable();
-            $table->text('notes')->nullable();
-            $table->string('remarks')->nullable();
+            // Form fields
+            $table->string('academic_year');        // Example: 2025–2026
+            $table->integer('total_units')->nullable();
+            $table->decimal('tuition_fee', 12, 2)->nullable();
+            $table->decimal('miscellaneous_fee', 12, 2)->nullable();
+            $table->decimal('other_charges', 12, 2)->nullable();
+            $table->decimal('total_assessment', 12, 2)->nullable();
+            $table->decimal('total_discount', 12, 2)->nullable();
+            $table->string('remarks')->nullable(); // Paid, Pending, Waived
 
             $table->timestamps();
-
-            $table->foreign('athlete_id')
-                ->references('id')->on('athletes')
-                ->onDelete('cascade');
         });
     }
 

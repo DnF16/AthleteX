@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Athlete;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class AthleteController extends Controller
 {
@@ -20,8 +22,36 @@ class AthleteController extends Controller
 
     public function store(Request $request)
     {
-        // mass-assign all known fields from the form (no validation added here)
-        $data = $request->only([
+        // If frontend sends an aggregated JSON payload, fields may be nested
+        // under `generalInfo`. Normalize so validation and create use the
+        // same flat structure.
+        $payload = $request->all();
+        $general = is_array($payload) && array_key_exists('generalInfo', $payload) && is_array($payload['generalInfo'])
+            ? $payload['generalInfo']
+            : $payload;
+
+        // validate required fields before attempting create
+        $rules = [
+            'student_id' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+        ];
+
+        $validator = Validator::make($general, $rules);
+
+        if ($validator->fails()) {
+            Log::warning('Athlete store validation failed', ['errors' => $validator->errors()->toArray(), 'payload' => $payload]);
+
+            if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+
+            return back()->withErrors($validator)->withInput();
+        }
+
+        // mass-assign all known fields from the (possibly nested) general info
+        $data = [];
+        $fields = [
             'student_id', 'first_name', 'last_name', 'course', 'year_level', 'sport',
             'full_name', 'athlete_id', 'middle_initial', 'sport_event', 'status', 'classification',
             'gender', 'birthdate', 'age', 'blood_type', 'email', 'facebook', 'marital_status',
@@ -30,12 +60,44 @@ class AthleteController extends Controller
             'asst_coach', 'total_unit', 'year_graduated', 'tuition_fee', 'misc_fee', 'other_charges',
             'total_assessment', 'total_discount', 'balance', 'current_work', 'current_company',
             'picture_path', 'notes', 'inactive_date'
-        ]);
+        ];
 
-        Athlete::create($data);
+        foreach ($fields as $f) {
+            if (array_key_exists($f, $general)) {
+                $data[$f] = $general[$f];
+            }
+        }
+        
 
-        return redirect()->route('athletes.index')
+        try {
+            $athlete = Athlete::create($data);
+
+            if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
+                return response()->json([
+                    'success' => true,
+                    'athlete' => $athlete,
+                ], 201);
+            }
+
+            return redirect()->route('athletes.index')
                          ->with('success', 'Athlete added successfully!');
+
+        } catch (\Throwable $e) {
+            Log::error('Athlete store error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'payload' => $data,
+            ]);
+
+            if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to create athlete',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+
+            return back()->withErrors('Failed to create athlete.');
+        }
     }
 
     /**
@@ -102,7 +164,8 @@ class AthleteController extends Controller
             'inactive_date' => $a->inactive_date,
 
             // picture
-            'picture_url' => $a->picture ? asset('storage/' . $a->picture) : null,
+            'picture_url' => $a->picture_path ? asset('storage/' . $a->picture_path) : null,
+
         ];
     });
 
@@ -127,9 +190,24 @@ class AthleteController extends Controller
             'picture_path', 'notes', 'inactive_date'
         ]);
 
-        $athlete->update($data);
+        try {
+            $athlete->update($data);
 
-        return redirect()->route('athletes.index')
-                         ->with('success', 'Athlete updated successfully!');
+            if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
+                return response()->json(['success' => true, 'athlete' => $athlete]);
+            }
+
+            return redirect()->route('athletes.index')
+                             ->with('success', 'Athlete updated successfully!');
+
+        } catch (\Throwable $e) {
+            Log::error('Athlete update error: ' . $e->getMessage(), ['exception' => $e, 'id' => $athlete->id]);
+
+            if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
+                return response()->json(['success' => false, 'message' => 'Failed to update athlete', 'error' => $e->getMessage()], 500);
+            }
+
+            return back()->withErrors('Failed to update athlete.');
+        }
     }
 }

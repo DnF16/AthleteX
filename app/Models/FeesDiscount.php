@@ -12,11 +12,12 @@ class FeesDiscount extends Model
     protected $fillable = [
         'athlete_id',
         'academic_year',
-        'term',
-        'fee_type',
-        'discount_type',
-        'amount',
-        'notes',
+        'total_units',
+        'tuition_fee',
+        'miscellaneous_fee',
+        'other_charges',
+        'total_assessment',
+        'total_discount',
         'remarks',
     ];
 

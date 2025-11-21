@@ -27,6 +27,20 @@
             <!-- Live search results -->
             <div id="searchResults" class="mt-2 w-64 bg-white border border-gray-200 rounded shadow-sm hidden"></div>
         </div>
+        <!-- Save All Button -->
+        <div class="flex justify-center space-x-2 mt-4">
+            <button id="saveBtn" type="submit" class="px-4 py-2 rounded bg-green-600 text-white bg-green-700 hover:bg-green-700 transition">
+                Save Athlete
+            </button>
+
+            <button id="updateBtn" type="submit" class="hidden px-4 py-2 rounded bg-blue-600 text-white bg-green-700 hover:bg-blue-700 transition">
+                Update Athlete
+            </button>
+
+            <button type="button" onclick="resetForm()" class="px-4 py-2 rounded bg-gray-300 text-gray-800 hover:bg-gray-400 transition">
+                Cancel New
+            </button>
+        </div>
     </div>
 
     <!-- Navigation Tabs -->
@@ -441,7 +455,7 @@
                                 </div>
                             </div>
 
-                            <!-- CENTERED BUTTONS BELOW THE RIGHT SIDE PANEL -->
+                            <!-- CENTERED BUTTONS BELOW THE RIGHT SIDE PANEL
                             <div class="flex justify-center space-x-2 mt-4">
                                 <button id="saveBtn" type="submit" class="px-4 py-2 rounded bg-green-600 text-white bg-green-700 hover:bg-green-700 transition">
                                     Save Athlete
@@ -454,7 +468,7 @@
                                 <button type="button" onclick="resetForm()" class="px-4 py-2 rounded bg-gray-300 text-gray-800 hover:bg-gray-400 transition">
                                     Cancel New
                                 </button>
-                            </div>
+                            </div> -->
                         </div>
 
                     </form>
@@ -505,19 +519,8 @@
                                 <th class="px-6 py-3 font-medium">Remarks</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <!-- 20 Empty Rows -->
-                            @for ($i = 0; $i < 20; $i++)
-                            <tr class="{{ $i % 2 == 0 ? 'bg-white' : 'bg-gray-50' }}">
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                            </tr>
-                            @endfor
+                        <tbody id="achievementsTableBody">
+                            
                         </tbody>
                     </table>
                 </div>
@@ -609,15 +612,7 @@
                         </thead>
 
                         <tbody id="gradesTable" class="text-gray-700">
-                            <!-- 20 Empty Rows -->
-                            @for ($i = 0; $i < 20; $i++)
-                            <tr class="{{ $i % 2 == 0 ? 'bg-white' : 'bg-gray-50' }}">
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                            </tr>
-                            @endfor
+                            
                         </tbody>
                     </table>
                 </div>
@@ -637,28 +632,28 @@
 
                     <h2 class="text-xl font-bold mb-4 text-white">Add Academic Record</h2>
 
-                    <form id="academicForm" class="space-y-4 text-white">
+                    <form id="academicForm" class="space-y-4">
 
                         <div>
-                            <label class=" font-medium">Units Passed</label>
+                            <label class="text-white font-medium">Units Passed</label>
                             <input type="number" class="w-full border rounded px-3 py-2" 
                                 name="Passed" placeholder="Units Passed">
                         </div>
 
                         <div>
-                            <label class=" font-medium">Units enrolled</label>
+                            <label class="text-white font-medium">Units enrolled</label>
                             <input type="number" class="w-full border rounded px-3 py-2" 
-                                step="0.01" min="1.00" max="5.00" name="enrolled" placeholder="Enter Units Enrolled">
+                                step="0.01" name="enrolled" placeholder="Enter Units Enrolled">
                         </div>
 
                         <div>
-                            <label class=" font-medium">Percentage</label>
+                            <label class="text-white font-medium">Percentage</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
                                 name="percentage" placeholder="Enter Percentage">
                         </div>
 
                         <div>
-                            <label class=" font-medium">Remark</label>
+                            <label class="text-white font-medium">Remark</label>
                             <select name="remark" class="w-full border rounded px-3 py-2">
                                 <option value="">Select</option>
                                 <option>Passed</option>
@@ -711,20 +706,8 @@
                                 <th class="border border-gray-300 px-4 py-2 ">Remarks</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <!-- 20 Empty Rows -->
-                            @for ($i = 0; $i < 20; $i++)
-                            <tr class="{{ $i % 2 == 0 ? 'bg-white' : 'bg-gray-50' }}">
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                            </tr>
-                            @endfor
+                        <tbody id="fees-discounts-table-body">
+                            
                         </tbody>
                     </table>
                 </div>
@@ -734,7 +717,7 @@
             <div id="feeModal" 
                 class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 
-                <div class="bg-[#2e4e1f] text-white rounded-xl shadow-xl w-full max-w-lg p-6 relative">
+                <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
 
                     <!-- CLOSE BUTTON -->
                     <button type="button" onclick="toggleFeeModal(false)" 
@@ -748,48 +731,43 @@
 
                         <!-- Academic Year -->
                         <div>
-                            <label class=" font-medium">Academic Year</label>
+                            <label class="text-white font-medium">Academic Term and Year</label>
                             <input type="text" name="academic_year" placeholder="Ex: 2025-2026"
                                 class="w-full border rounded px-3 py-2">
                         </div>
 
-                        <!-- Term -->
                         <div>
-                            <label class=" font-medium">Term</label>
-                            <input type="text" name="term" placeholder="Ex: 1st Term"
-                                class="w-full border rounded px-3 py-2">
+                            <label class="text-white font-medium">Total Units Enrolled</label>
+                            <input type="number" name="total_units" class="w-full border rounded px-3 py-2">
                         </div>
 
-                        <!-- Fee Type -->
                         <div>
-                            <label class=" font-medium">Fee Type</label>
-                            <input type="text" name="fee_type" placeholder="Ex: Tuition Fee"
-                                class="w-full border rounded px-3 py-2">
+                            <label class="text-white font-medium">Tuition Fee</label>
+                            <input type="number" name="tuition_fee" class="w-full border rounded px-3 py-2">
                         </div>
 
-                        <!-- Discount Type -->
                         <div>
-                            <label class=" font-medium">Discount Type</label>
-                            <input type="text" name="discount_type" placeholder="Ex: Scholarship"
-                                class="w-full border rounded px-3 py-2">
+                            <label class="text-white font-medium">Miscellaneous Fee</label>
+                            <input type="number" name="miscellaneous_fee" class="w-full border rounded px-3 py-2">
                         </div>
 
-                        <!-- Amount -->
                         <div>
-                            <label class=" font-medium">Amount</label>
-                            <input type="number" name="amount" placeholder="Ex: 5000"
-                                class="w-full border rounded px-3 py-2">
+                            <label class="text-white font-medium">Other Charges</label>
+                            <input type="number" name="other_charges" class="w-full border rounded px-3 py-2">
                         </div>
 
-                        <!-- Notes -->
                         <div>
-                            <label class=" font-medium">Notes</label>
-                            <textarea name="notes" class="w-full border rounded px-3 py-2" rows="2"></textarea>
+                            <label class="text-white font-medium">Total Assessment</label>
+                            <input type="number" name="total_assessment" class="w-full border rounded px-3 py-2">
                         </div>
 
-                        <!-- Remarks -->
                         <div>
-                            <label class=" font-medium">Remarks</label>
+                            <label class="text-white font-medium">Total Discount</label>
+                            <input type="number" name="total_discount" class="w-full border rounded px-3 py-2">
+                        </div>
+
+                        <div>
+                            <label class="text-white font-medium">Remarks</label>
                             <select name="remarks" class="w-full border rounded px-3 py-2">
                                 <option value="">Select</option>
                                 <option>Paid</option>
@@ -837,16 +815,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- 20 Empty Rows -->
-                            @for ($i = 0; $i < 20; $i++)
-                            <tr class="{{ $i % 2 == 0 ? 'bg-white' : 'bg-gray-50' }}">
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                                <td class="border border-gray-300 px-4 py-2"></td>
-                            </tr>
-                            @endfor
+                            
                         </tbody>
                     </table>
                 </div>
@@ -928,420 +897,474 @@
     </div> <!-- End of Content Area -->
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const tabs = document.querySelectorAll('.tab-link');
-            const contents = document.querySelectorAll('.tab-pane');
+document.addEventListener('DOMContentLoaded', () => {
+    // -----------------------
+    // Helpers
+    // -----------------------
+    const byId = id => document.getElementById(id);
+    const q = sel => document.querySelector(sel);
 
-            // --- Default active tab setup ---
-            const defaultTab = document.querySelector('.tab-link[href="#general-info"]');
-            const defaultContent = document.querySelector('#general-info');
+    // Safe-get tbody or fallback selectors
+    const getAchievementsTbody = () => byId('achievementsTableBody') || byId('achievementsTable')?.querySelector('tbody') || q('#achievements table tbody');
+    const getGradesTbody = () => byId('gradesTable') || q('#academic-evolution table tbody');
+    const getFeesTbody = () => byId('fees-discounts-table-body') || q('#fees-discounts table tbody');
+    const getWorkTbody = () => q('#work-history table tbody');
 
-            if (defaultTab && defaultContent) {
-                // Remove all active styles first
+    // -----------------------
+    // Globals
+    // -----------------------
+    window.newAthleteData = {
+        generalInfo: {},
+        achievements: [],
+        academicRecords: [],
+        fees: [],
+        workHistory: []
+    };
+
+    // -----------------------
+    // TAB SWITCHING
+    // -----------------------
+    (function initTabs(){
+        const tabs = document.querySelectorAll('.tab-link');
+        const contents = document.querySelectorAll('.tab-pane');
+
+        const defaultTab = document.querySelector('.tab-link[href="#general-info"]');
+        const defaultContent = byId('general-info');
+
+        if (defaultTab && defaultContent) {
+            tabs.forEach(t => t.classList.remove('border-b-2', 'border-green-600', 'text-green-600'));
+            contents.forEach(c => c.classList.add('hidden'));
+            defaultTab.classList.add('border-b-2', 'border-green-600', 'text-green-600');
+            defaultContent.classList.remove('hidden');
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', e => {
+                e.preventDefault();
                 tabs.forEach(t => t.classList.remove('border-b-2', 'border-green-600', 'text-green-600'));
                 contents.forEach(c => c.classList.add('hidden'));
-
-                // Set "General Information" as active
-                defaultTab.classList.add('border-b-2', 'border-green-600', 'text-green-600');
-                defaultContent.classList.remove('hidden');
-            }
-
-            // --- Tab switching behavior ---
-            tabs.forEach(tab => {
-                tab.addEventListener('click', e => {
-                    e.preventDefault();
-
-                    // Remove active styles from all tabs
-                    tabs.forEach(t => t.classList.remove('border-b-2', 'border-green-600', 'text-green-600'));
-                    // Hide all content sections
-                    contents.forEach(c => c.classList.add('hidden'));
-
-                    // Add active styles to the clicked tab
-                    tab.classList.add('border-b-2', 'border-green-600', 'text-green-600');
-
-                    // Show the matching content
-                    const target = document.querySelector(tab.getAttribute('href'));
-                    target.classList.remove('hidden');
-                });
+                tab.classList.add('border-b-2', 'border-green-600', 'text-green-600');
+                const target = document.querySelector(tab.getAttribute('href'));
+                if (target) target.classList.remove('hidden');
             });
         });
+    })();
 
-        // ==============================================================================
+    // -----------------------
+    // GENERAL INFO (collect only)
+    // -----------------------
+    const generalForm = byId('athleteForm');
+    const saveBtn = byId('saveBtn');
+    const updateBtn = byId('updateBtn');
+    const selectedIdInput = byId('selected_athlete_id');
+    const methodInput = byId('_method');
 
-        // script for the student athlete general info
-        let achievementCount = 0;
-        let gold = 0, silver = 0, bronze = 0;
+    function collectGeneralInfo() {
+        if (!generalForm) return;
+        const inputs = generalForm.querySelectorAll('input[name], select[name], textarea[name]');
+        inputs.forEach(input => {
+            newAthleteData.generalInfo[input.name] = input.value;
+        });
+    }
 
-        // Modal toggle (safe guards)
-        function toggleModal(show) {
-            const modal = document.getElementById('addAchievementModal');
+    // Save button (final local-save feedback)
+    if (saveBtn) {
+        saveBtn.addEventListener('click', e => {
+            e.preventDefault();
+            collectGeneralInfo();
+            // feedback
+            alert('General information saved locally. Click "Save Athlete" to persist everything.');
+        });
+    }
+
+    // -----------------------
+    // LIVE SEARCH (search + populate form)
+    // -----------------------
+    (function initLiveSearch() {
+        const searchInput = byId('search');
+        const resultsBox = byId('searchResults');
+        // If not present, skip live search
+        if (!searchInput || !resultsBox) return;
+
+        const searchUrl = '{{ route('athletes.search') }}'; // Blade route (should produce URL)
+        let timer = null;
+        let selectedFromSearch = false;
+        let selectedId = null;
+
+        const defaultAction = generalForm ? generalForm.getAttribute('action') : '{{ route('athletes.store') }}';
+        const updateBase = '{{ url('/athletes') }}';
+
+        function clearResults() {
+            resultsBox.innerHTML = '';
+            resultsBox.classList.add('hidden');
+        }
+
+        function clearSelection() {
+            if (!generalForm) return;
+            // clear inputs
+            generalForm.querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.name === '_method') return;
+                if (el.type === 'file') {
+                    el.value = '';
+                    const preview = byId('picturePreview');
+                    if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+                    const noPic = byId('noPictureText');
+                    if (noPic) noPic.classList.remove('hidden');
+                } else if (el.tagName === 'SELECT') {
+                    el.selectedIndex = 0;
+                } else {
+                    el.value = '';
+                }
+            });
+
+            // reset selected display
+            const selectedName = byId('selected_name');
+            if (selectedName) selectedName.textContent = 'No athlete selected';
+
+            selectedFromSearch = false;
+            selectedId = null;
+            if (generalForm) generalForm.setAttribute('action', defaultAction);
+            if (methodInput) methodInput.value = 'POST';
+            if (selectedIdInput) selectedIdInput.value = '';
+            if (saveBtn) saveBtn.classList.remove('hidden');
+            if (updateBtn) updateBtn.classList.add('hidden');
+        }
+
+        function renderResults(items) {
+            if (!items || items.length === 0) {
+                clearResults();
+                return;
+            }
+            resultsBox.innerHTML = '';
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm';
+                const name = (item.full_name && item.full_name.trim() !== '') ? item.full_name : (item.first_name + ' ' + (item.last_name || ''));
+                div.textContent = name + (item.student_id ? ' — ' + item.student_id : '');
+                div.addEventListener('click', () => {
+                    if (!generalForm) return;
+                    // populate
+                    for (const key in item) {
+                        const el = generalForm.querySelector(`[name="${key}"]`);
+                        if (!el) continue;
+                        if (el.tagName === 'SELECT') {
+                            for (let i = 0; i < el.options.length; i++) {
+                                if (String(el.options[i].value).trim().toLowerCase() === String(item[key]).trim().toLowerCase()) {
+                                    el.selectedIndex = i;
+                                    break;
+                                }
+                            }
+                        } else if (el.type === 'file') {
+                            // skip
+                        } else {
+                            el.value = item[key];
+                        }
+                    }
+
+                    // picture
+                    if (item.picture_url) {
+                        const preview = byId('picturePreview');
+                        const noPic = byId('noPictureText');
+                        if (preview) { preview.src = item.picture_url; preview.classList.remove('hidden'); }
+                        if (noPic) noPic.classList.add('hidden');
+                    }
+
+                    const selectedName = byId('selected_name');
+                    if (selectedName) selectedName.textContent = name;
+
+                    selectedFromSearch = true;
+                    selectedId = item.id || null;
+                    if (selectedIdInput) selectedIdInput.value = selectedId;
+
+                    if (generalForm && selectedId) {
+                        generalForm.setAttribute('action', updateBase + '/' + selectedId);
+                        if (methodInput) methodInput.value = 'PUT';
+                    }
+                    if (saveBtn) saveBtn.classList.add('hidden');
+                    if (updateBtn) updateBtn.classList.remove('hidden');
+
+                    clearResults();
+                });
+                resultsBox.appendChild(div);
+            });
+            resultsBox.classList.remove('hidden');
+        }
+
+        function doSearch(qv) {
+            if (!qv || qv.trim().length < 1) { clearResults(); return; }
+            fetch(searchUrl + '?q=' + encodeURIComponent(qv), { headers: { 'Accept': 'application/json' } })
+                .then(r => r.json())
+                .then(data => renderResults(data))
+                .catch(() => clearResults());
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const v = e.target.value;
+            if (timer) clearTimeout(timer);
+
+            if (!v || v.trim() === '') {
+                if (selectedFromSearch) clearSelection();
+                clearResults();
+                return;
+            }
+
+            timer = setTimeout(() => doSearch(v), 300);
+        });
+    })();
+
+    // -----------------------
+    // ACHIEVEMENTS
+    // -----------------------
+    (function achievementsModule(){
+        const form = byId('achievementForm');
+        const tbody = getAchievementsTbody();
+        let count = 0;
+
+        window.toggleAchievementModal = function(show) {
+            const modal = byId('AchievementModal');
             if (!modal) return;
             modal.classList.toggle('hidden', !show);
+        };
+
+        if (!form || !tbody) return;
+
+        form.addEventListener('submit', function(e){
+            e.preventDefault();
+            const year = (byId('year') || {}).value || '';
+            const monthDay = (byId('month_day') || {}).value || '';
+            const eventName = (byId('event') || {}).value || '';
+            const venue = (byId('venue') || {}).value || '';
+            const award = (byId('award') || {}).value || '';
+            const category = (byId('category') || {}).value || '';
+            const remarks = (byId('remarks') || {}).value || '';
+
+            if (!year || !monthDay || !eventName || !venue || !award) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            const record = { year, monthDay, event: eventName, venue, award, category, remarks };
+            newAthleteData.achievements.push(record);
+
+            // add row
+            count++;
+            const tr = document.createElement('tr');
+            tr.className = count % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+            tr.innerHTML = `
+                <td class="px-6 py-3">${year}</td>
+                <td class="px-6 py-3">${monthDay}</td>
+                <td class="px-6 py-3">${eventName}</td>
+                <td class="px-6 py-3">${venue}</td>
+                <td class="px-6 py-3 text-green-700 font-bold">${award}</td>
+                <td class="px-6 py-3">${category}</td>
+                <td class="px-6 py-3">${remarks}</td>
+            `;
+            tbody.appendChild(tr);
+
+            form.reset();
+            toggleAchievementModal(false);
+        });
+    })();
+
+    // -----------------------
+    // ACADEMIC RECORDS
+    // -----------------------
+    (function academicModule(){
+        const form = byId('academicForm');
+        const tbody = getGradesTbody();
+        let count = 0;
+
+        window.toggleAcademicModal = function(show) {
+            const modal = byId('academicModal');
+            if (!modal) return;
+            modal.classList.toggle('hidden', !show);
+        };
+
+        if (!form || !tbody) return;
+
+        form.addEventListener('submit', function(e){
+            e.preventDefault();
+            const passed = form.querySelector('input[name="Passed"]').value || '';
+            const enrolled = form.querySelector('input[name="enrolled"]').value || '';
+            const percentage = form.querySelector('input[name="percentage"]').value || '';
+            const remark = form.querySelector('select[name="remark"]').value || '';
+
+            if (!passed || !enrolled || !percentage || !remark) {
+                alert('Please fill all required fields.');
+                return;
+            }
+
+            const rec = { passed, enrolled, percentage, remark };
+            newAthleteData.academicRecords.push(rec);
+
+            count++;
+            const tr = document.createElement('tr');
+            tr.className = count % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+            tr.innerHTML = `
+                <td class="px-6 py-3 text-center">${passed}</td>
+                <td class="px-6 py-3 text-center">${enrolled}</td>
+                <td class="px-6 py-3 text-center">${percentage}</td>
+                <td class="px-6 py-3 text-center">${remark}</td>
+            `;
+            tbody.appendChild(tr);
+
+            form.reset();
+            toggleAcademicModal(false);
+        });
+    })();
+
+    // -----------------------
+    // FEES & DISCOUNTS
+    // -----------------------
+    (function feesModule(){
+        const form = byId('feeForm');
+        const tbody = getFeesTbody();
+        let count = 0;
+
+        window.toggleFeeModal = function(show) {
+            const modal = byId('feeModal');
+            if (!modal) return;
+            modal.classList.toggle('hidden', !show);
+        };
+
+        if (!form || !tbody) return;
+
+        form.addEventListener('submit', function(e){
+            e.preventDefault();
+
+            const academic_year = (form.querySelector('[name="academic_year"]') || {}).value || '';
+            const total_units = (form.querySelector('[name="total_units"]') || {}).value || '';
+            const tuition_fee = (form.querySelector('[name="tuition_fee"]') || {}).value || '';
+            const miscellaneous_fee = (form.querySelector('[name="miscellaneous_fee"]') || {}).value || '';
+            const other_charges = (form.querySelector('[name="other_charges"]') || {}).value || '';
+            const total_assessment = (form.querySelector('[name="total_assessment"]') || {}).value || '';
+            const total_discount = (form.querySelector('[name="total_discount"]') || {}).value || '';
+            const remarks = (form.querySelector('[name="remarks"]') || {}).value || '';
+
+            if (!academic_year) {
+                alert('Please fill in Academic Year.');
+                return;
+            }
+
+            const rec = { academic_year, total_units, tuition_fee, miscellaneous_fee, other_charges, total_assessment, total_discount, remarks };
+            newAthleteData.fees.push(rec);
+
+            count++;
+            const tr = document.createElement('tr');
+            tr.className = count % 2 === 0 ? 'bg-gray-50 text-center' : 'bg-white text-center';
+            tr.innerHTML = `
+                <td class="border px-4 py-2">${academic_year}</td>
+                <td class="border px-4 py-2">${total_units}</td>
+                <td class="border px-4 py-2">${tuition_fee}</td>
+                <td class="border px-4 py-2">${miscellaneous_fee}</td>
+                <td class="border px-4 py-2">${other_charges}</td>
+                <td class="border px-4 py-2">${total_assessment}</td>
+                <td class="border px-4 py-2">${total_discount}</td>
+                <td class="border px-4 py-2">${remarks}</td>
+            `;
+            tbody.appendChild(tr);
+
+            form.reset();
+            toggleFeeModal(false);
+        });
+    })();
+
+    // -----------------------
+    // WORK HISTORY
+    // -----------------------
+    (function workModule(){
+        const form = byId('workForm');
+        const tbody = getWorkTbody();
+        let count = 0;
+
+        window.toggleWorkModal = function(show) {
+            const modal = byId('workModal');
+            if (!modal) return;
+            modal.classList.toggle('hidden', !show);
+        };
+
+        if (!form || !tbody) return;
+
+        form.addEventListener('submit', function(e){
+            e.preventDefault();
+
+            const year = (form.querySelector('[name="year"]') || {}).value || '';
+            const date = (form.querySelector('[name="date"]') || {}).value || '';
+            const position = (form.querySelector('[name="position"]') || {}).value || '';
+            const company = (form.querySelector('[name="company"]') || {}).value || '';
+            const remarks = (form.querySelector('[name="remarks"]') || {}).value || '';
+
+            if (!year || !position) {
+                alert('Please fill in Year and Work Position.');
+                return;
+            }
+
+            const rec = { year, date, position, company, remarks };
+            newAthleteData.workHistory.push(rec);
+
+            count++;
+            addWorkRow(rec);
+            form.reset();
+            toggleWorkModal(false);
+        });
+
+        function addWorkRow(data) {
+            const tr = document.createElement('tr');
+            tr.className = 'bg-white';
+            tr.innerHTML = `
+                <td class="border px-4 py-2">${data.year}</td>
+                <td class="border px-4 py-2">${data.date}</td>
+                <td class="border px-4 py-2">${data.position}</td>
+                <td class="border px-4 py-2">${data.company}</td>
+                <td class="border px-4 py-2">${data.remarks}</td>
+            `;
+            tbody.appendChild(tr);
         }
+    })();
 
-        // Open modal (guarded)
-        const modalToggleBtn = document.querySelector('button[onclick="toggleModal(true)"]');
-        if (modalToggleBtn) modalToggleBtn.addEventListener('click', () => toggleModal(true));
+    // -----------------------
+    // FINAL SAVE (Option A)
+    // -----------------------
+    (function finalSave(){
+        const finalSaveBtn = byId('saveFinalBtn') || byId('saveBtn') || byId('submitBtn');
 
-        // Close modal buttons (guarded)
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        if (closeModalBtn) closeModalBtn.addEventListener('click', () => toggleModal(false));
-        const cancelModalBtn = document.getElementById('cancelModalBtn');
-        if (cancelModalBtn) cancelModalBtn.addEventListener('click', () => toggleModal(false));
+        // prefer explicit final save button id 'saveFinalBtn' if you have it; otherwise fallback to saveBtn
+        const submitBtn = finalSaveBtn;
+        if (!submitBtn) return;
 
-        // Form submission (guarded and tolerant)
-        const achievementFormEl = document.getElementById('achievementForm');
-        if (achievementFormEl) {
-            achievementFormEl.addEventListener('submit', function(e) {
-                e.preventDefault();
-                try {
-                    const titleEl = document.getElementById('title');
-                    const sportEl = document.getElementById('sport');
-                    const rankEl = document.getElementById('rank');
-                    const dateEl = document.getElementById('date');
-                    const remarksEl = document.getElementById('remarks');
+        submitBtn.addEventListener('click', function(e){
+            e.preventDefault();
+            // ensure general info is collected
+            collectGeneralInfo();
 
-                    if (!titleEl || !sportEl || !rankEl || !dateEl) {
-                        // required fields not present in this template — skip processing
-                        achievementFormEl.reset();
-                        toggleModal(false);
-                        return;
-                    }
-
-                    const eventName = titleEl.value;
-                    const category = sportEl.value;
-                    const rank = rankEl.value;
-                    const date = dateEl.value;
-                    const remarks = remarksEl ? remarksEl.value : '';
-
-                    if (!eventName || !category || !rank || !date) {
-                        alert('Please fill in all required fields.');
-                        return;
-                    }
-
-                    // Update medal counters
-                    if (rank.includes('1st')) gold++;
-                    else if (rank.includes('2nd')) silver++;
-                    else if (rank.includes('3rd')) bronze++;
-
-                    // Hide "No Data" message
-                    const noDataRow = document.getElementById('noDataRow');
-                    if (noDataRow) noDataRow.remove();
-
-                    // Add new row
-                    achievementCount++;
-                    const tbody = document.getElementById('achievementBody');
-                    if (tbody) {
-                        const tr = document.createElement('tr');
-                        tr.className = 'hover:bg-gray-50';
-                        tr.innerHTML = `
-                            <td class="px-6 py-3">${achievementCount}</td>
-                            <td class="px-6 py-3 font-semibold text-gray-800">${eventName}</td>
-                            <td class="px-6 py-3">${category}</td>
-                            <td class="px-6 py-3 text-green-700 font-bold">${rank}</td>
-                            <td class="px-6 py-3">${date}</td>
-                            <td class="px-6 py-3 text-gray-600">${remarks}</td>
-                            <td class="px-6 py-3 text-center space-x-2">
-                                <button class="text-blue-600 hover:text-blue-800 font-medium" onclick="editRow(this)">Edit</button>
-                                <button class="text-red-600 hover:text-red-800 font-medium" onclick="deleteRow(this)">Delete</button>
-                            </td>
-                        `;
-                        tbody.appendChild(tr);
-                    }
-
-                    // Update stats
-                    updateStats();
-
-                    // Reset form and close modal
-                    achievementFormEl.reset();
-                    toggleModal(false);
-                } catch (err) {
-                    console.error('Achievement form handler error:', err);
-                }
+            // send all data to server
+            fetch('{{ url('/athletes') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify(newAthleteData)
+            })
+            .then(r => {
+                if (!r.ok) throw new Error('Server returned ' + r.status);
+                return r.json();
+            })
+            .then(data => {
+                alert('Athlete saved successfully.');
+                // optionally redirect or reload
+                location.reload();
+            })
+            .catch(err => {
+                console.error('Save error:', err);
+                alert('Failed to save athlete. Check console for details.');
             });
-        }
-
-        function updateStats() {
-            document.querySelector('#goldCount p').textContent = gold;
-            document.querySelector('#silverCount p').textContent = silver;
-            document.querySelector('#bronzeCount p').textContent = bronze;
-            document.querySelector('#totalCount p').textContent = achievementCount;
-        }
-
-        function deleteRow(btn) {
-            const row = btn.closest('tr');
-            const rank = row.children[3].textContent;
-
-            if (rank.includes('1st')) gold--;
-            else if (rank.includes('2nd')) silver--;
-            else if (rank.includes('3rd')) bronze--;
-            achievementCount--;
-
-            row.remove();
-            updateStats();
-
-            const tbody = document.getElementById('achievementBody');
-            if (tbody.children.length === 0) {
-                tbody.innerHTML = `
-                    <tr id="noDataRow">
-                        <td colspan="7" class="px-6 py-6 text-center text-gray-400">
-                            No achievements added yet.
-                        </td>
-                    </tr>
-                `;
-            }
-        }
-
-        function editRow(btn) {
-            alert("Edit feature coming soon!");
-        }
-
-        // add picture js
-        const pictureInput = document.getElementById('pictureInput');
-        const addPictureBtn = document.getElementById('addPictureBtn');
-        const clearPictureBtn = document.getElementById('clearPictureBtn');
-        const preview = document.getElementById('picturePreview');
-
-        // Open file dialog
-        addPictureBtn.addEventListener('click', () => {
-            pictureInput.click();
         });
+    })();
 
-        // Show preview
-        pictureInput.addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                preview.src = URL.createObjectURL(file);
-                preview.classList.remove('hidden');
-            }
-        });
-
-        // Clear picture
-        clearPictureBtn.addEventListener('click', () => {
-            pictureInput.value = "";
-            preview.src = "";
-            preview.classList.add('hidden');
-            const noPicture = document.getElementById('noPictureText');
-            if (noPicture) noPicture.classList.remove('hidden');
-        });
-
-        // contact number limits 11 digits
-        document.querySelectorAll('.contact-number').forEach(function(input) {
-            input.addEventListener('input', function() {
-                this.value = this.value.replace(/\D/g, '').slice(0, 11);
-            });
-        });
-
-        // Reset the entire athlete form and UI elements
-        function resetForm() {
-            const form = document.getElementById('athleteForm');
-            if (form) form.reset();
-
-            // clear picture preview
-            const picInput = document.getElementById('pictureInput');
-            const picPreview = document.getElementById('picturePreview');
-            const noPictureText = document.getElementById('noPictureText');
-            if (picInput) picInput.value = '';
-            if (picPreview) { picPreview.src = ''; picPreview.classList.add('hidden'); }
-            if (noPictureText) noPictureText.classList.remove('hidden');
-        }
-// ===============================================================================
-
-        // --- Live search (debounced) ---
-        // --- Live search (debounced) ---
-        (function () {
-            const searchInput = document.getElementById('search');
-            const resultsBox = document.getElementById('searchResults');
-            const searchUrl = '{{ route('athletes.search') }}';
-
-            if (!searchInput || !resultsBox) return;
-
-            let timer = null;
-            let selectedFromSearch = false;
-            let selectedId = null;
-
-            const form = document.getElementById('athleteForm');
-            const defaultAction = form ? form.getAttribute('action') : '{{ route('athletes.store') }}';
-            const methodInput = document.getElementById('_method');
-            const selectedIdInput = document.getElementById('selected_athlete_id');
-            const saveBtn = document.getElementById('saveBtn');
-            const updateBtn = document.getElementById('updateBtn');
-            const updateBase = '{{ url('/athletes') }}';
-
-            function clearResults() {
-                resultsBox.innerHTML = '';
-                resultsBox.classList.add('hidden');
-            }
-
-            function clearSelection() {
-                // reset all input/select/textarea fields
-                const allFields = form.querySelectorAll('input, select, textarea');
-                allFields.forEach(el => {
-                    if (el.tagName === 'SELECT') {
-                        el.selectedIndex = 0;
-                    } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                        el.value = '';
-                    }
-                });
-
-                // reset picture preview
-                const preview = document.getElementById('picturePreview');
-                const noPic = document.getElementById('noPictureText');
-                if (preview) preview.src = '';
-                if (noPic) noPic.classList.remove('hidden');
-
-                // reset selected name
-                const selectedName = document.getElementById('selected_name');
-                if (selectedName) selectedName.textContent = 'No athlete selected';
-
-                selectedFromSearch = false;
-                selectedId = null;
-
-                // restore form to create mode
-                if (form) form.setAttribute('action', defaultAction);
-                if (methodInput) methodInput.value = 'POST';
-                if (selectedIdInput) selectedIdInput.value = '';
-                if (saveBtn) saveBtn.classList.remove('hidden');
-                if (updateBtn) updateBtn.classList.add('hidden');
-            }
-
-            function renderResults(items) {
-                if (!items || items.length === 0) {
-                    clearResults();
-                    return;
-                }
-
-                resultsBox.innerHTML = '';
-                items.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm';
-                    const name = (item.full_name && item.full_name.trim() !== '') ? item.full_name : (item.first_name + ' ' + item.last_name);
-                    div.textContent = name + (item.student_id ? ' — ' + item.student_id : '');
-                    
-                    div.addEventListener('click', () => {
-                        // dynamically populate all fields
-                        for (const key in item) {
-                            const el = form.querySelector(`[name="${key}"]`);
-                            if (!el) continue;
-
-                            if (el.tagName === 'SELECT') {
-                                for (let i = 0; i < el.options.length; i++) {
-                                    if (el.options[i].value.trim().toLowerCase() === String(item[key]).trim().toLowerCase()) {
-                                        el.selectedIndex = i;
-                                        break;
-                                    }
-                                }
-                            } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                                el.value = item[key];
-                            }
-                        }
-
-                        // special case: picture
-                        if (item.picture_url) {
-                            const preview = document.getElementById('picturePreview');
-                            const noPic = document.getElementById('noPictureText');
-                            preview.src = item.picture_url;
-                            preview.classList.remove('hidden');
-                            if (noPic) noPic.classList.add('hidden');
-                        }
-
-                        // selected name display
-                        const selectedName = document.getElementById('selected_name');
-                        if (selectedName) selectedName.textContent = name;
-
-                        // mark that selection came from search
-                        selectedFromSearch = true;
-                        selectedId = item.id || null;
-                        if (selectedIdInput) selectedIdInput.value = selectedId;
-
-                        // switch form to update mode
-                        if (form && selectedId) {
-                            form.setAttribute('action', updateBase + '/' + selectedId);
-                            if (methodInput) methodInput.value = 'PUT';
-                        }
-                        if (saveBtn) saveBtn.classList.add('hidden');
-                        if (updateBtn) updateBtn.classList.remove('hidden');
-
-                        clearResults();
-                    });
-
-                    resultsBox.appendChild(div);
-                });
-                resultsBox.classList.remove('hidden');
-            }
-
-            function doSearch(q) {
-                if (!q || q.trim().length < 1) { clearResults(); return; }
-                fetch(searchUrl + '?q=' + encodeURIComponent(q), { headers: { 'Accept': 'application/json' } })
-                    .then(r => r.json())
-                    .then(data => renderResults(data))
-                    .catch(() => clearResults());
-            }
-
-            searchInput.addEventListener('input', (e) => {
-                const v = e.target.value;
-                if (timer) clearTimeout(timer);
-
-                // if user erased the search input and the form was populated from a search, clear selection
-                if (!v || v.trim() === '') {
-                    if (selectedFromSearch) {
-                        clearSelection();
-                    }
-                    clearResults();
-                    return;
-                }
-
-                timer = setTimeout(() => doSearch(v), 300);
-            });
-        })();
+}); // DOMContentLoaded end
+</script>
 
 
-        // script for the student athlete classes nav
-        function toggleModal(show) {
-            document.getElementById('classModal').classList.toggle('hidden', !show);
-        }
-
-        // Achievement modal
-        function toggleAchievementModal(show) {
-            const modal = document.getElementById('AchievementModal');
-            if(show) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
-        }
-
-        // Academic Evolution modal
-        function toggleAcademicModal(show) {
-            const modal = document.getElementById('academicModal');
-            if(show) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
-        }
-
-
-        //student athlete Work and fee modal
-        function toggleFeeModal(show) {
-            const modal = document.getElementById('feeModal');
-            if(show) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
-        }
-
-        //student athlete Work and fee modal
-        function toggleWorkModal(show) {
-            const modal = document.getElementById('workModal');
-            if(show) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
-        }
-
-    </script>
 
 @endsection
