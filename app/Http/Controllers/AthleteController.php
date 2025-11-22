@@ -3,6 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Athlete;
+use App\Models\Achievement;
+use App\Models\AcademicEvaluation;
+use App\Models\FeesDiscount;
+use App\Models\WorkHistory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -70,7 +75,71 @@ class AthleteController extends Controller
         
 
         try {
-            $athlete = Athlete::create($data);
+            $athlete = DB::transaction(function () use ($data, $payload) {
+                $a = Athlete::create($data);
+
+                // achievements
+                if (!empty($payload['achievements']) && is_array($payload['achievements'])) {
+                    foreach ($payload['achievements'] as $ach) {
+                        Achievement::create([
+                            'athlete_id' => $a->id,
+                            'year' => $ach['year'] ?? null,
+                            'month_day' => $ach['monthDay'] ?? ($ach['month_day'] ?? null),
+                            'event' => $ach['event'] ?? null,
+                            'venue' => $ach['venue'] ?? null,
+                            'award' => $ach['award'] ?? null,
+                            'category' => $ach['category'] ?? null,
+                            'remarks' => $ach['remarks'] ?? null,
+                        ]);
+                    }
+                }
+
+                // academic records
+                if (!empty($payload['academicRecords']) && is_array($payload['academicRecords'])) {
+                    foreach ($payload['academicRecords'] as $rec) {
+                        AcademicEvaluation::create([
+                            'athlete_id' => $a->id,
+                            'passed' => $rec['passed'] ?? null,
+                            'enrolled' => $rec['enrolled'] ?? null,
+                            'percentage' => $rec['percentage'] ?? null,
+                            'remark' => $rec['remark'] ?? null,
+                        ]);
+                    }
+                }
+
+                // fees / discounts
+                if (!empty($payload['fees']) && is_array($payload['fees'])) {
+                    foreach ($payload['fees'] as $f) {
+                        FeesDiscount::create([
+                            'athlete_id' => $a->id,
+                            'academic_year' => $f['academic_year'] ?? null,
+                            'total_units' => $f['total_units'] ?? null,
+                            'tuition_fee' => $f['tuition_fee'] ?? null,
+                            'miscellaneous_fee' => $f['miscellaneous_fee'] ?? ($f['misc_fee'] ?? null),
+                            'other_charges' => $f['other_charges'] ?? null,
+                            'total_assessment' => $f['total_assessment'] ?? null,
+                            'total_discount' => $f['total_discount'] ?? null,
+                            'remarks' => $f['remarks'] ?? null,
+                        ]);
+                    }
+                }
+
+                // work history
+                if (!empty($payload['workHistory']) && is_array($payload['workHistory'])) {
+                    foreach ($payload['workHistory'] as $w) {
+                        WorkHistory::create([
+                            'athlete_id' => $a->id,
+                            'year' => $w['year'] ?? null,
+                            'date' => $w['date'] ?? null,
+                            'position' => $w['position'] ?? null,
+                            'company' => $w['company'] ?? null,
+                            'remarks' => $w['remarks'] ?? null,
+                        ]);
+                    }
+                }
+
+                return $a;
+            });
 
             if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
                 return response()->json([
@@ -85,7 +154,7 @@ class AthleteController extends Controller
         } catch (\Throwable $e) {
             Log::error('Athlete store error: ' . $e->getMessage(), [
                 'exception' => $e,
-                'payload' => $data,
+                'payload' => $payload,
             ]);
 
             if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
@@ -173,13 +242,34 @@ class AthleteController extends Controller
 }
 
 
+    /**
+     * Return full athlete with related records (achievements, academics, fees, work history)
+     */
+    public function show(Request $request, Athlete $athlete)
+    {
+        // eager load relations
+        $athlete->load(['achievements', 'academicEvaluations', 'feesDiscounts', 'workHistories']);
+
+        // normalize picture url
+        $athlete->picture_url = $athlete->picture_path ? asset('storage/' . $athlete->picture_path) : null;
+
+        return response()->json($athlete);
+    }
+
+
 
     /**
      * Update an existing athlete.
      */
     public function update(Request $request, Athlete $athlete)
     {
-        $data = $request->only([
+        // Accept aggregated JSON payload similar to store()
+        $payload = $request->all();
+        $general = is_array($payload) && array_key_exists('generalInfo', $payload) && is_array($payload['generalInfo'])
+            ? $payload['generalInfo']
+            : $payload;
+
+        $fields = [
             'student_id', 'first_name', 'last_name', 'course', 'year_level', 'sport',
             'full_name', 'athlete_id', 'middle_initial', 'sport_event', 'status', 'classification',
             'gender', 'birthdate', 'age', 'blood_type', 'email', 'facebook', 'marital_status',
@@ -188,10 +278,83 @@ class AthleteController extends Controller
             'asst_coach', 'total_unit', 'year_graduated', 'tuition_fee', 'misc_fee', 'other_charges',
             'total_assessment', 'total_discount', 'balance', 'current_work', 'current_company',
             'picture_path', 'notes', 'inactive_date'
-        ]);
+        ];
+
+        $data = [];
+        foreach ($fields as $f) {
+            if (array_key_exists($f, $general)) {
+                $data[$f] = $general[$f];
+            }
+        }
 
         try {
-            $athlete->update($data);
+            $updated = DB::transaction(function () use ($athlete, $data, $payload) {
+                $athlete->update($data);
+
+                // replace child records: delete existing, then recreate from payload arrays
+                $athlete->achievements()->delete();
+                $athlete->academicEvaluations()->delete();
+                $athlete->feesDiscounts()->delete();
+                $athlete->workHistories()->delete();
+
+                if (!empty($payload['achievements']) && is_array($payload['achievements'])) {
+                    foreach ($payload['achievements'] as $ach) {
+                        Achievement::create([
+                            'athlete_id' => $athlete->id,
+                            'year' => $ach['year'] ?? null,
+                            'month_day' => $ach['monthDay'] ?? ($ach['month_day'] ?? null),
+                            'event' => $ach['event'] ?? null,
+                            'venue' => $ach['venue'] ?? null,
+                            'award' => $ach['award'] ?? null,
+                            'category' => $ach['category'] ?? null,
+                            'remarks' => $ach['remarks'] ?? null,
+                        ]);
+                    }
+                }
+
+                if (!empty($payload['academicRecords']) && is_array($payload['academicRecords'])) {
+                    foreach ($payload['academicRecords'] as $rec) {
+                        AcademicEvaluation::create([
+                            'athlete_id' => $athlete->id,
+                            'passed' => $rec['passed'] ?? null,
+                            'enrolled' => $rec['enrolled'] ?? null,
+                            'percentage' => $rec['percentage'] ?? null,
+                            'remark' => $rec['remark'] ?? null,
+                        ]);
+                    }
+                }
+
+                if (!empty($payload['fees']) && is_array($payload['fees'])) {
+                    foreach ($payload['fees'] as $f) {
+                        FeesDiscount::create([
+                            'athlete_id' => $athlete->id,
+                            'academic_year' => $f['academic_year'] ?? null,
+                            'total_units' => $f['total_units'] ?? null,
+                            'tuition_fee' => $f['tuition_fee'] ?? null,
+                            'miscellaneous_fee' => $f['miscellaneous_fee'] ?? ($f['misc_fee'] ?? null),
+                            'other_charges' => $f['other_charges'] ?? null,
+                            'total_assessment' => $f['total_assessment'] ?? null,
+                            'total_discount' => $f['total_discount'] ?? null,
+                            'remarks' => $f['remarks'] ?? null,
+                        ]);
+                    }
+                }
+
+                if (!empty($payload['workHistory']) && is_array($payload['workHistory'])) {
+                    foreach ($payload['workHistory'] as $w) {
+                        WorkHistory::create([
+                            'athlete_id' => $athlete->id,
+                            'year' => $w['year'] ?? null,
+                            'date' => $w['date'] ?? null,
+                            'position' => $w['position'] ?? null,
+                            'company' => $w['company'] ?? null,
+                            'remarks' => $w['remarks'] ?? null,
+                        ]);
+                    }
+                }
+
+                return true;
+            });
 
             if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
                 return response()->json(['success' => true, 'athlete' => $athlete]);
@@ -201,7 +364,7 @@ class AthleteController extends Controller
                              ->with('success', 'Athlete updated successfully!');
 
         } catch (\Throwable $e) {
-            Log::error('Athlete update error: ' . $e->getMessage(), ['exception' => $e, 'id' => $athlete->id]);
+            Log::error('Athlete update error: ' . $e->getMessage(), ['exception' => $e, 'id' => $athlete->id, 'payload' => $payload]);
 
             if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
                 return response()->json(['success' => false, 'message' => 'Failed to update athlete', 'error' => $e->getMessage()], 500);

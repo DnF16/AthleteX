@@ -41,6 +41,8 @@ Route::get('/athletes/create', [AthleteController::class, 'create'])->name('athl
 Route::post('/athletes', [AthleteController::class, 'store'])->name('athletes.store');
 // Live search endpoint used by the student athlete page (AJAX)
 Route::get('/athletes/search', [AthleteController::class, 'search'])->name('athletes.search');
+// Get full athlete (with related sections)
+Route::get('/athletes/{athlete}', [AthleteController::class, 'show'])->name('athletes.show');
 // Update athlete
 Route::put('/athletes/{athlete}', [AthleteController::class, 'update'])->name('athletes.update');
 

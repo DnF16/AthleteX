@@ -33,7 +33,7 @@
                 Save Athlete
             </button>
 
-            <button id="updateBtn" type="submit" class="hidden px-4 py-2 rounded bg-blue-600 text-white bg-green-700 hover:bg-blue-700 transition">
+            <button id="updateBtn" type="button" class="hidden px-4 py-2 rounded bg-blue-600 text-white bg-green-700 hover:bg-blue-700 transition">
                 Update Athlete
             </button>
 
@@ -1043,34 +1043,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 div.textContent = name + (item.student_id ? ' — ' + item.student_id : '');
                 div.addEventListener('click', () => {
                     if (!generalForm) return;
-                    // populate
-                    for (const key in item) {
-                        const el = generalForm.querySelector(`[name="${key}"]`);
-                        if (!el) continue;
-                        if (el.tagName === 'SELECT') {
-                            for (let i = 0; i < el.options.length; i++) {
-                                if (String(el.options[i].value).trim().toLowerCase() === String(item[key]).trim().toLowerCase()) {
-                                    el.selectedIndex = i;
-                                    break;
-                                }
-                            }
-                        } else if (el.type === 'file') {
-                            // skip
-                        } else {
-                            el.value = item[key];
-                        }
-                    }
-
-                    // picture
-                    if (item.picture_url) {
-                        const preview = byId('picturePreview');
-                        const noPic = byId('noPictureText');
-                        if (preview) { preview.src = item.picture_url; preview.classList.remove('hidden'); }
-                        if (noPic) noPic.classList.add('hidden');
-                    }
-
-                    const selectedName = byId('selected_name');
-                    if (selectedName) selectedName.textContent = name;
 
                     selectedFromSearch = true;
                     selectedId = item.id || null;
@@ -1080,8 +1052,173 @@ document.addEventListener('DOMContentLoaded', () => {
                         generalForm.setAttribute('action', updateBase + '/' + selectedId);
                         if (methodInput) methodInput.value = 'PUT';
                     }
-                    if (saveBtn) saveBtn.classList.add('hidden');
-                    if (updateBtn) updateBtn.classList.remove('hidden');
+
+                    // fetch full athlete (with related sections) and populate UI
+                    fetch(updateBase + '/' + selectedId, { headers: { 'Accept': 'application/json' } })
+                        .then(r => r.json())
+                        .then(full => {
+                            // populate general form fields from returned object
+                            for (const key in full) {
+                                try {
+                                    const el = generalForm.querySelector(`[name="${key}"]`);
+                                    if (!el) continue;
+                                    if (el.tagName === 'SELECT') {
+                                        for (let i = 0; i < el.options.length; i++) {
+                                            if (String(el.options[i].value).trim().toLowerCase() === String(full[key]).trim().toLowerCase()) {
+                                                el.selectedIndex = i;
+                                                break;
+                                            }
+                                        }
+                                    } else if (el.type === 'file') {
+                                        // skip
+                                    } else {
+                                        el.value = full[key] ?? '';
+                                    }
+                                } catch (err) { /* ignore DOM mismatches */ }
+                            }
+
+                            // picture
+                            if (full.picture_url) {
+                                const preview = byId('picturePreview');
+                                const noPic = byId('noPictureText');
+                                if (preview) { preview.src = full.picture_url; preview.classList.remove('hidden'); }
+                                if (noPic) noPic.classList.add('hidden');
+                            }
+
+                            const selectedName = byId('selected_name');
+                            if (selectedName) selectedName.textContent = (full.full_name || (full.first_name + ' ' + (full.last_name || '')));
+
+                            // populate achievements table
+                            newAthleteData.achievements = Array.isArray(full.achievements) ? full.achievements.map(a => ({
+                                year: a.year ?? '',
+                                monthDay: a.month_day ?? a.monthDay ?? '',
+                                event: a.event ?? '',
+                                venue: a.venue ?? '',
+                                award: a.award ?? '',
+                                category: a.category ?? '',
+                                remarks: a.remarks ?? ''
+                            })) : [];
+
+                            const achTbody = getAchievementsTbody();
+                            if (achTbody) achTbody.innerHTML = '';
+                            newAthleteData.achievements.forEach((a, idx) => {
+                                const tr = document.createElement('tr');
+                                tr.className = idx % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                                tr.innerHTML = `
+                                    <td class="px-6 py-3">${a.year}</td>
+                                    <td class="px-6 py-3">${a.monthDay}</td>
+                                    <td class="px-6 py-3">${a.event}</td>
+                                    <td class="px-6 py-3">${a.venue}</td>
+                                    <td class="px-6 py-3 text-green-700 font-bold">${a.award}</td>
+                                    <td class="px-6 py-3">${a.category}</td>
+                                    <td class="px-6 py-3">${a.remarks}</td>
+                                `;
+                                if (achTbody) achTbody.appendChild(tr);
+                            });
+
+                            // academic records
+                            newAthleteData.academicRecords = Array.isArray(full.academic_evaluations) ? full.academic_evaluations.map(r => ({
+                                passed: r.passed ?? '',
+                                enrolled: r.enrolled ?? '',
+                                percentage: r.percentage ?? '',
+                                remark: r.remark ?? r.remarks ?? ''
+                            })) : (Array.isArray(full.academicEvaluations) ? full.academicEvaluations.map(r => ({
+                                passed: r.passed ?? '',
+                                enrolled: r.enrolled ?? '',
+                                percentage: r.percentage ?? '',
+                                remark: r.remark ?? r.remarks ?? ''
+                            })) : []);
+
+                            const gradesTbody = getGradesTbody();
+                            if (gradesTbody) gradesTbody.innerHTML = '';
+                            newAthleteData.academicRecords.forEach((r, idx) => {
+                                const tr = document.createElement('tr');
+                                tr.className = idx % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                                tr.innerHTML = `
+                                    <td class="px-6 py-3 text-center">${r.passed}</td>
+                                    <td class="px-6 py-3 text-center">${r.enrolled}</td>
+                                    <td class="px-6 py-3 text-center">${r.percentage}</td>
+                                    <td class="px-6 py-3 text-center">${r.remark}</td>
+                                `;
+                                if (gradesTbody) gradesTbody.appendChild(tr);
+                            });
+
+                            // fees
+                            newAthleteData.fees = Array.isArray(full.fees_discounts) ? full.fees_discounts.map(f => ({
+                                academic_year: f.academic_year ?? '',
+                                total_units: f.total_units ?? '',
+                                tuition_fee: f.tuition_fee ?? '',
+                                miscellaneous_fee: f.miscellaneous_fee ?? f.misc_fee ?? '',
+                                other_charges: f.other_charges ?? '',
+                                total_assessment: f.total_assessment ?? '',
+                                total_discount: f.total_discount ?? '',
+                                remarks: f.remarks ?? ''
+                            })) : (Array.isArray(full.feesDiscounts) ? full.feesDiscounts.map(f => ({
+                                academic_year: f.academic_year ?? '',
+                                total_units: f.total_units ?? '',
+                                tuition_fee: f.tuition_fee ?? '',
+                                miscellaneous_fee: f.miscellaneous_fee ?? f.misc_fee ?? '',
+                                other_charges: f.other_charges ?? '',
+                                total_assessment: f.total_assessment ?? '',
+                                total_discount: f.total_discount ?? '',
+                                remarks: f.remarks ?? ''
+                            })) : []);
+
+                            const feesTbody = getFeesTbody();
+                            if (feesTbody) feesTbody.innerHTML = '';
+                            newAthleteData.fees.forEach((f, idx) => {
+                                const tr = document.createElement('tr');
+                                tr.className = idx % 2 === 0 ? 'bg-gray-50 text-center' : 'bg-white text-center';
+                                tr.innerHTML = `
+                                    <td class="border px-4 py-2">${f.academic_year}</td>
+                                    <td class="border px-4 py-2">${f.total_units}</td>
+                                    <td class="border px-4 py-2">${f.tuition_fee}</td>
+                                    <td class="border px-4 py-2">${f.miscellaneous_fee}</td>
+                                    <td class="border px-4 py-2">${f.other_charges}</td>
+                                    <td class="border px-4 py-2">${f.total_assessment}</td>
+                                    <td class="border px-4 py-2">${f.total_discount}</td>
+                                    <td class="border px-4 py-2">${f.remarks}</td>
+                                `;
+                                if (feesTbody) feesTbody.appendChild(tr);
+                            });
+
+                            // work history
+                            newAthleteData.workHistory = Array.isArray(full.work_histories) ? full.work_histories.map(w => ({
+                                year: w.year ?? '',
+                                date: w.date ?? '',
+                                position: w.position ?? '',
+                                company: w.company ?? '',
+                                remarks: w.remarks ?? ''
+                            })) : (Array.isArray(full.workHistories) ? full.workHistories.map(w => ({
+                                year: w.year ?? '',
+                                date: w.date ?? '',
+                                position: w.position ?? '',
+                                company: w.company ?? '',
+                                remarks: w.remarks ?? ''
+                            })) : []);
+
+                            const workTbody = getWorkTbody();
+                            if (workTbody) workTbody.innerHTML = '';
+                            newAthleteData.workHistory.forEach((w, idx) => {
+                                const tr = document.createElement('tr');
+                                tr.className = 'bg-white';
+                                tr.innerHTML = `
+                                    <td class="border px-4 py-2">${w.year}</td>
+                                    <td class="border px-4 py-2">${w.date}</td>
+                                    <td class="border px-4 py-2">${w.position}</td>
+                                    <td class="border px-4 py-2">${w.company}</td>
+                                    <td class="border px-4 py-2">${w.remarks}</td>
+                                `;
+                                if (workTbody) workTbody.appendChild(tr);
+                            });
+
+                            // show update button state
+                            if (saveBtn) saveBtn.classList.add('hidden');
+                            if (updateBtn) updateBtn.classList.remove('hidden');
+                        })
+                        .catch(err => {
+                            console.error('Failed to load athlete details', err);
+                        });
 
                     clearResults();
                 });
@@ -1323,43 +1460,63 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
 
     // -----------------------
-    // FINAL SAVE (Option A)
+    // FINAL SAVE (handles both Create and Update)
     // -----------------------
     (function finalSave(){
         const finalSaveBtn = byId('saveFinalBtn') || byId('saveBtn') || byId('submitBtn');
-
-        // prefer explicit final save button id 'saveFinalBtn' if you have it; otherwise fallback to saveBtn
         const submitBtn = finalSaveBtn;
-        if (!submitBtn) return;
+        if (!submitBtn && !updateBtn) return;
 
-        submitBtn.addEventListener('click', function(e){
-            e.preventDefault();
+        function performFinalSave(e) {
+            if (e && e.preventDefault) e.preventDefault();
             // ensure general info is collected
             collectGeneralInfo();
 
-            // send all data to server
-            fetch('{{ url('/athletes') }}', {
-                method: 'POST',
+            // decide endpoint and method based on whether an athlete is selected
+            const updateBase = '{{ url('/athletes') }}';
+            const selectedId = (selectedIdInput && selectedIdInput.value) ? selectedIdInput.value : '';
+            const endpoint = selectedId ? (updateBase + '/' + selectedId) : updateBase;
+            const method = selectedId ? 'PUT' : 'POST';
+
+            // include selected id in payload generalInfo for clarity
+            if (!newAthleteData.generalInfo) newAthleteData.generalInfo = {};
+            if (selectedId) newAthleteData.generalInfo.selected_athlete_id = selectedId;
+
+            fetch(endpoint, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify(newAthleteData)
             })
-            .then(r => {
-                if (!r.ok) throw new Error('Server returned ' + r.status);
-                return r.json();
+            .then(async r => {
+                const text = await r.text();
+                let data = null;
+                try { data = JSON.parse(text); } catch (e) { /* ignore parse error */ }
+                if (!r.ok) {
+                    console.error('Server error', r.status, data || text);
+                    if (r.status === 422 && data && data.errors) {
+                        alert('Validation error: ' + JSON.stringify(data.errors));
+                        return;
+                    }
+                    throw new Error('Server returned ' + r.status);
+                }
+                return data;
             })
             .then(data => {
                 alert('Athlete saved successfully.');
-                // optionally redirect or reload
                 location.reload();
             })
             .catch(err => {
                 console.error('Save error:', err);
                 alert('Failed to save athlete. Check console for details.');
             });
-        });
+        }
+
+        if (submitBtn) submitBtn.addEventListener('click', performFinalSave);
+        if (updateBtn) updateBtn.addEventListener('click', performFinalSave);
     })();
 
 }); // DOMContentLoaded end

@@ -56,4 +56,25 @@ class Athlete extends Model
         'notes',
         'inactive_date',
     ];
+
+    // Relationships
+    public function achievements()
+    {
+        return $this->hasMany(Achievement::class);
+    }
+
+    public function academicEvaluations()
+    {
+        return $this->hasMany(AcademicEvaluation::class);
+    }
+
+    public function feesDiscounts()
+    {
+        return $this->hasMany(FeesDiscount::class);
+    }
+
+    public function workHistories()
+    {
+        return $this->hasMany(WorkHistory::class);
+    }
 }
