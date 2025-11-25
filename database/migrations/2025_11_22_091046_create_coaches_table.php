@@ -50,7 +50,6 @@ return new class extends Migration
             $table->string('coach_selected_name')->nullable();
             $table->string('coach_picturePreview')->nullable();
             $table->string('coach_noPictureText')->nullable();
-            $table->string('coach_sport_event')->nullable();
         });
     }
 

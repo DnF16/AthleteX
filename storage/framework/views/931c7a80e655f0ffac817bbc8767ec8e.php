@@ -14,7 +14,7 @@
         <nav class="flex-1">
             <ul class="space-y-2">
                 <li>
-                    <a href="{{ route('dashboard') }}"
+                    <a href="<?php echo e(route('dashboard')); ?>"
                        class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors">
                         <i class="bi bi-speedometer2 mr-2"></i>
                         Dashboard
@@ -22,7 +22,7 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('student.athlete') }}"
+                    <a href="<?php echo e(route('student.athlete')); ?>"
                        class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors">
                         <i class="bi bi-person-walking mr-2"></i>
                         Student–Athletes
@@ -30,7 +30,7 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('coach') }}"
+                    <a href="<?php echo e(route('coach')); ?>"
                        class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors">
                         <i class="bi bi-people-fill mr-2"></i>
                         Coaches
@@ -38,7 +38,7 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('schedule') }}"
+                    <a href="<?php echo e(route('schedule')); ?>"
                        class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors">
                         <i class="bi bi-calendar2-week mr-2"></i>
                         Schedule
@@ -86,7 +86,7 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('admin.general') }}"
+                    <a href="<?php echo e(route('admin.general')); ?>"
                        class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors">
                         <i class="bi bi-person-gear mr-2"></i>
                         Admin
@@ -96,7 +96,7 @@
 
             <!-- Logout button at the bottom -->
             <div class="mt-auto">
-    <a href="{{ route('log.login') }}"
+    <a href="<?php echo e(route('log.login')); ?>"
        class="w-full block text-center px-4 py-2 rounded bg-red-600 hover:bg-red-700 transition">
         Logout
     </a>
@@ -107,9 +107,10 @@
 
     <!-- Main content placeholder -->
     <main class="ml-64 flex-1 bg-gray-50 p-6 overflow-y-auto h-screen">
-        @yield('content')
+        <?php echo $__env->yieldContent('content'); ?>
     </main>
 </div>
 
 <!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<?php /**PATH C:\xampp\htdocs\caps\athletix\AthleteX\resources\views/partials/sidebar.blade.php ENDPATH**/ ?>

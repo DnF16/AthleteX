@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'AthleteX')</title>
+    <title><?php echo $__env->yieldContent('title', 'AthleteX'); ?></title>
     
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -22,15 +22,15 @@
 </head>
 <body class="bg-gray-50">
 
-    @include('partials.sidebar')
+    <?php echo $__env->make('partials.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <main class="ml-64 flex-1 p-0 overflow-y-auto min-h-screen"> 
         <div class="content-area-wrapper">
-             @yield('content') 
+             <?php echo $__env->yieldContent('content'); ?> 
         </div>
     </main>
 
-    @stack('scripts')
+    <?php echo $__env->yieldPushContent('scripts'); ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>
+</html><?php /**PATH C:\xampp\htdocs\caps\athletix\AthleteX\resources\views\layouts\app.blade.php ENDPATH**/ ?>

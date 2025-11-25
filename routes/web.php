@@ -5,6 +5,8 @@ use App\Http\Controllers\AthleteController;
 use App\Http\Controllers\AcademicEvaluationController;
 use App\Http\Controllers\FeesDiscountController;
 use App\Http\Controllers\WorkHistoryController;
+use App\Http\Controllers\AdminController;
+use Illuminate\Support\Facades\Route as Router;
 
 Route::get('/', function () {
 	return view('features.dashboard');
@@ -33,6 +35,7 @@ Route::get('/student-athlete', function () {
 })->name('student.athlete');
 
 Route::get('/student-athletes', [AthleteController::class, 'index'])->name('student.athletes');
+
 
 // ==============================================================
 // Athlete CRUD routes
@@ -66,3 +69,25 @@ Route::get('/fees-discounts/{athlete_id}', [FeesDiscountController::class, 'show
 // =================================================================
 Route::post('/work-history', [WorkHistoryController::class, 'store']);
 Route::get('/work-history/{athlete_id}', [WorkHistoryController::class, 'show']);
+
+
+//==================================================================
+// Admin
+Route::prefix('admin')->name('admin.')->group(function () {
+    
+    // View Routes (The 8 Screens)
+    Route::get('/general', [AdminController::class, 'general'])->name('general');
+    Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/classes', [AdminController::class, 'classes'])->name('classes');
+    Route::get('/scheduling', [AdminController::class, 'scheduling'])->name('scheduling');
+    Route::get('/certificates', [AdminController::class, 'certificates'])->name('certificates');
+    Route::get('/grades', [AdminController::class, 'grades'])->name('grades');
+    Route::get('/transactions', [AdminController::class, 'transactions'])->name('transactions');
+
+    // Action Routes (Form Submissions)
+    Route::post('/save-settings', [AdminController::class, 'saveSettings'])->name('saveSettings');
+    Route::post('/add-class', [AdminController::class, 'addClass'])->name('addClass');
+    Route::post('/add-transaction', [AdminController::class, 'addTransaction'])->name('addTransaction');
+    Route::post('/users/update', [AdminController::class, 'updateUserPermissions'])->name('updateUserPermissions');
+});
