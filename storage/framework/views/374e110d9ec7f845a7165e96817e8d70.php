@@ -19,7 +19,7 @@
 
     <?php $__currentLoopData = $admin_links; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $route_name => $link): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <a href="<?php echo e(route('admin.' . $route_name)); ?>" 
-       class="list-group-item list-group-item-action border-0 py-2 fw-semibold border-start border-5 ps-3 
+       class="list-group-item list-group-item-action border-0 py-2 fw-semibold border-start ps-3 
        <?php echo e(request()->routeIs('admin.' . $route_name) ? 'bg-light text-success border-success' : 'bg-transparent text-secondary border-transparent'); ?>"
        style="border-bottom: 1px solid #eee; font-size: 0.9rem; transition: all 0.15s;">
        <i class="<?php echo e($link['icon']); ?> me-2" style="width: 20px; text-align: center;"></i> <?php echo e($link['name']); ?>

@@ -19,7 +19,7 @@
 
     @foreach($admin_links as $route_name => $link)
     <a href="{{ route('admin.' . $route_name) }}" 
-       class="list-group-item list-group-item-action border-0 py-2 fw-semibold border-start border-5 ps-3 
+       class="list-group-item list-group-item-action border-0 py-2 fw-semibold border-start ps-3 
        {{ request()->routeIs('admin.' . $route_name) ? 'bg-light text-success border-success' : 'bg-transparent text-secondary border-transparent' }}"
        style="border-bottom: 1px solid #eee; font-size: 0.9rem; transition: all 0.15s;">
        <i class="{{ $link['icon'] }} me-2" style="width: 20px; text-align: center;"></i> {{ $link['name'] }}
