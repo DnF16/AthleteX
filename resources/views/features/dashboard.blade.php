@@ -1,89 +1,73 @@
-
 @extends('layouts.app')
 
-@section('title', 'Dasboard')
+@section('title', 'Dashboard')
 
 @section('content')
-    <div class="flex bg-gray-100 min-h-screen">
+<div class="flex bg-gray-100 h-full">
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col">
+    <div class="flex-1 flex flex-col h-full">
 
         <!-- Dashboard Content -->
-        <main class="p-6 flex-1 overflow-y-auto">
+        <main class="p-6 flex-1 overflow-y-auto h-full">
 
             <!-- KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+
+                <!-- Total Athletes -->
                 <div class="bg-white p-5 rounded-xl shadow hover:shadow-lg transition">
                     <p class="text-gray-500">Total Athletes</p>
-                    <h2 class="text-3xl font-bold">1,245</h2>
+                    <h2 class="text-3xl font-bold text-green-600">
+                        {{ $athletesCount ?? 0 }}
+                    </h2>
                 </div>
+
+                <!-- Total Coaches -->
                 <div class="bg-white p-5 rounded-xl shadow hover:shadow-lg transition">
-                    <p class="text-gray-500">Active Sessions</p>
-                    <h2 class="text-3xl font-bold">856</h2>
+                    <p class="text-gray-500">Total Coaches</p>
+                    <h2 class="text-3xl font-bold text-blue-600">
+                        {{ $coachesCount ?? 0 }}
+                    </h2>
                 </div>
+
+                <!-- Total Achievements -->
                 <div class="bg-white p-5 rounded-xl shadow hover:shadow-lg transition">
-                    <p class="text-gray-500">Completed Workouts</p>
-                    <h2 class="text-3xl font-bold">3,412</h2>
+                    <p class="text-gray-500">Achievements Recorded</p>
+                    <h2 class="text-3xl font-bold text-purple-600">
+                        {{ $totalAchievements ?? 0 }}
+                    </h2>
                 </div>
+
+                <!-- Top Sports Count -->
                 <div class="bg-white p-5 rounded-xl shadow hover:shadow-lg transition">
-                    <p class="text-gray-500">New Signups</p>
-                    <h2 class="text-3xl font-bold">78</h2>
+                    <p class="text-gray-500">Total of Inactive Athletes and Coach's</p>
+                    <h2 class="text-3xl font-bold text-orange-600">
+                        {{ $inactive ?? 0 }}
+                    </h2>
                 </div>
             </div>
 
             <!-- Charts Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
-                <!-- Line Chart -->
-                <div class="bg-white p-6 rounded-xl shadow">
-                    <h3 class="font-semibold text-lg mb-4">Weekly Activity</h3>
-                    <canvas id="lineChart"></canvas>
-                </div>
+    <!-- Monthly Achievements -->
+    <div class="bg-white p-6 rounded-xl shadow h-96">
+        <h3 class="font-semibold text-lg mb-4">Achievements Per Month</h3>
+        <div class="h-[85%]">
+            <canvas id="achievementChart" class="w-full h-full"></canvas>
+        </div>
+    </div>
 
-                <!-- Pie Chart -->
-                <div class="bg-white p-6 rounded-xl shadow">
-                    <h3 class="font-semibold text-lg mb-4">Athletes by Category</h3>
-                    <canvas id="pieChart"></canvas>
-                </div>
-            </div>
+    <!-- Athlete Distribution by Category -->
+    <div class="bg-white p-6 rounded-xl shadow h-96">
+        <h3 class="font-semibold text-lg mb-4">Expenses</h3>
+        <div class="h-[85%]">
+            <canvas id="pieChart" class="w-full h-full"></canvas>
+        </div>
+    </div>
 
-            <!-- Recent Activity Table -->
-            <div class="bg-white p-6 rounded-xl shadow">
-                <h3 class="font-semibold text-lg mb-4">Recent Atttendance</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead>
-                            <tr class="bg-gray-50">
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Athlete</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Activity</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            <tr>
-                                <td class="px-6 py-4">John Doe</td>
-                                <td class="px-6 py-4">Workout Session</td>
-                                <td class="px-6 py-4">Nov 10, 2025</td>
-                                <td class="px-6 py-4"><span class="text-green-600 font-semibold">Present</span></td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4">Jane Smith</td>
-                                <td class="px-6 py-4">Yoga Class</td>
-                                <td class="px-6 py-4">Nov 10, 2025</td>
-                                <td class="px-6 py-4"><span class="text-green-600 font-semibold">Present</span></td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4">Mark Lee</td>
-                                <td class="px-6 py-4">Swimming</td>
-                                <td class="px-6 py-4">Nov 9, 2025</td>
-                                <td class="px-6 py-4"><span class="text-green-600 font-semibold">Present</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+</div>
+
 
         </main>
     </div>
@@ -91,37 +75,87 @@
 
 {{-- Chart.js --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
-    // Line Chart
-    const ctxLine = document.getElementById('lineChart').getContext('2d');
-    new Chart(ctxLine, {
-        type: 'line',
+    /* -------------------------------
+       Convert PHP → JS safely
+    --------------------------------*/
+
+    // Achievements monthly (ensure 12 months)
+    let rawAchievements = @json($achievementsMonthly ?? []);
+
+    // Build array of 12 months, fill missing with 0
+    let monthlyAchievements = Array.from({ length: 12 }, (_, i) => rawAchievements[i + 1] ?? 0);
+
+    // Expense data (renamed from athleteCategories)
+    let expensesData = @json(array_values($athleteCategories ?? []));
+    let expensesLabels = @json(array_keys($athleteCategories ?? []));
+
+    // If empty, avoid chart errors
+    if (expensesLabels.length === 0) {
+        expensesLabels = ["No Data"];
+        expensesData = [1];
+    }
+
+    const monthlyLabels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+
+    /* -------------------------------
+       BAR CHART – Monthly Achievements 
+    --------------------------------*/
+    new Chart(document.getElementById('achievementChart'), {
+        type: 'bar',
         data: {
-            labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+            labels: monthlyLabels,
             datasets: [{
-                label: 'Sessions',
-                data: [12,19,14,17,20,23,18],
-                borderColor: 'rgba(34,197,94,1)',
-                backgroundColor: 'rgba(34,197,94,0.2)',
-                tension: 0.4,
-                fill: true
+                label: 'Achievements',
+                data: monthlyAchievements,
+                backgroundColor: 'rgba(99,102,241,0.6)',
+                borderColor: 'rgba(99,102,241,1)',
+                borderWidth: 2
             }]
         },
-        options: { responsive: true }
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
     });
 
-    // Pie Chart
-    const ctxPie = document.getElementById('pieChart').getContext('2d');
-    new Chart(ctxPie, {
+
+    /* -------------------------------
+       PIE CHART – Expenses
+    --------------------------------*/
+    new Chart(document.getElementById('pieChart'), {
         type: 'pie',
         data: {
-            labels: ['Beginner','Intermediate','Advanced'],
+            labels: expensesLabels,
             datasets: [{
-                data: [45,35,20],
-                backgroundColor: ['#22c55e','#16a34a','#4ade80']
+                data: expensesData,
+                backgroundColor: [
+                    '#22c55e','#16a34a','#4ade80',
+                    '#86efac','#15803d','#10b981'
+                ]
             }]
         },
-        options: { responsive: true }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => `${ctx.label}: ${ctx.raw}`
+                    }
+                }
+            }
+        }
+
     });
 </script>
+
 @endsection

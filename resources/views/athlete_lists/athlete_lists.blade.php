@@ -66,7 +66,7 @@
                     <th class="px-4 py-3 border">Age</th>
                     <th class="px-4 py-3 border">Blood Type</th>
                     <th class="px-4 py-3 border">Course</th>
-                    <th class="px-4 py-3 border">Year</th>
+                    <th class="px-4 py-3 border">Year / Level</th>
                     <th class="px-4 py-3 border">Email</th>
                     <th class="px-4 py-3 border">FB Link</th>
                     <th class="px-4 py-3 border">Marital Status</th>

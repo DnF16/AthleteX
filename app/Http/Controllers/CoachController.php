@@ -191,31 +191,31 @@ class CoachController extends Controller
         }
     }
 
-    public function show(Request $request, Coach $coach)
-    {
-        $coach->load(['achievements', 'workHistories', 'memberships', 'schedule', 'expenses', 'seminars']);
+    // public function show(Request $request, Coach $coach)
+    // {
+    //     $coach->load(['achievements', 'workHistories', 'memberships', 'schedule', 'expenses', 'seminars']);
 
-        $coach->picture_url = $coach->coach_picture ? asset('storage/' . $coach->coach_picture) : null;
+    //     $coach->picture_url = $coach->coach_picture ? asset('storage/' . $coach->coach_picture) : null;
 
-        return response()->json([
-            'id' => $coach->id,
-            'coach_first_name' => $coach->coach_first_name,
-            'coach_last_name' => $coach->coach_last_name,
-            'coach_middle_initial' => $coach->coach_middle_initial,
-            'coach_gender' => $coach->coach_gender,
-            'coach_birthdate' => $coach->coach_birthdate,
-            'coach_email' => $coach->coach_email,
-            'coach_contact_number' => $coach->coach_contact_number,
-            'coach_sport_event' => $coach->coach_sport_event,
-            'coach_picture' => $coach->coach_picture,
-            'achievements' => $coach->achievements->toArray(),
-            'workHistories' => $coach->workHistories->toArray(),
-            'memberships' => $coach->memberships->toArray(),
-            'schedule' => $coach->schedule->toArray(),
-            'expenses' => $coach->expenses->toArray(),
-            'seminars' => $coach->seminars->toArray(),
-        ]);
-    }
+    //     return response()->json([
+    //         'id' => $coach->id,
+    //         'coach_first_name' => $coach->coach_first_name,
+    //         'coach_last_name' => $coach->coach_last_name,
+    //         'coach_middle_initial' => $coach->coach_middle_initial,
+    //         'coach_gender' => $coach->coach_gender,
+    //         'coach_birthdate' => $coach->coach_birthdate,
+    //         'coach_email' => $coach->coach_email,
+    //         'coach_contact_number' => $coach->coach_contact_number,
+    //         'coach_sport_event' => $coach->coach_sport_event,
+    //         'coach_picture' => $coach->coach_picture,
+    //         'achievements' => $coach->achievements->toArray(),
+    //         'workHistories' => $coach->workHistories->toArray(),
+    //         'memberships' => $coach->memberships->toArray(),
+    //         'schedule' => $coach->schedule->toArray(),
+    //         'expenses' => $coach->expenses->toArray(),
+    //         'seminars' => $coach->seminars->toArray(),
+    //     ]);
+    // }
 
 
     public function update(Request $request, Coach $coach)
@@ -395,24 +395,35 @@ class CoachController extends Controller
      * Search coaches (AJAX endpoint).
      */
     public function search(Request $request)
-    {
-        $query = $request->input('q', '');
+{
+    $query = $request->input('q', '');
 
-        if (strlen($query) < 2) {
-            return response()->json([]);
-        }
-
-        $coaches = Coach::where('coach_first_name', 'like', "%{$query}%")
-            ->orWhere('coach_last_name', 'like', "%{$query}%")
-            ->limit(10)
-            ->get(['id', 'coach_first_name', 'coach_last_name', 'coach_sport_event']);
-
-        return response()->json($coaches->map(function ($coach) {
-            return [
-                'id' => $coach->id,
-                'name' => $coach->coach_first_name . ' ' . $coach->coach_last_name,
-                'sport_event' => $coach->coach_sport_event,
-            ];
-        }));
+    if (strlen($query) < 2) {
+        return response()->json([]);
     }
+
+    return Coach::where('coach_first_name', 'like', "%{$query}%")
+        ->orWhere('coach_last_name', 'like', "%{$query}%")
+        ->orWhereRaw("CONCAT(coach_first_name, ' ', coach_last_name) LIKE ?", ["%{$query}%"])
+        ->limit(10)
+        ->get(['id', 'coach_first_name', 'coach_last_name', 'coach_sport_event']);
+}
+
+public function show(Request $request, Coach $coach)
+{
+    // Load relationships - use exact method names from Coach model
+    $coach->load([
+        'achievements', 
+        'schedule',       // This will be 'schedule' in JSON
+        'expenses', 
+        'memberships', 
+        'seminars', 
+        'workHistories'   // This will be 'workHistories' in JSON (plural)
+    ]);
+
+    $coach->picture_url = $coach->coach_picture ? asset('storage/' . $coach->coach_picture) : null;
+
+    // Return the model - Laravel auto-includes all loaded relationships
+    return response()->json($coach);
+}
 }

@@ -45,15 +45,7 @@
                     </a>
                 </li>
 
-                <li>
-                    <a href="#"
-                       class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors">
-                        <i class="bi bi-journal-text mr-2"></i>
-                        Classes
-                    </a>
-                </li>
-
-                <li>
+                <!-- <li>
                     <a href="#"
                        class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors">
                         <i class="bi bi-trophy-fill mr-2 text-yellow-400"></i>
@@ -83,7 +75,7 @@
                         <i class="bi bi-bell-fill mr-2"></i>
                         Notifications
                     </a>
-                </li>
+                </li> -->
 
                 <li>
                     <a href="#"

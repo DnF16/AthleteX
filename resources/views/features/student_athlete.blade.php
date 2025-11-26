@@ -725,7 +725,7 @@
                         ✕
                     </button>
 
-                    <h2 class="text-xl font-bold mb-4 text-center">Add Fee / Discount</h2>
+                    <h2 class="text-xl font-bold mb-4 text-center text-white">Add Fee / Discount</h2>
 
                     <form id="feeForm" class="space-y-4">
 

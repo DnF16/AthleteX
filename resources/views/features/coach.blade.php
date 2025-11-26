@@ -1107,25 +1107,247 @@
     </div>
 
     <script>
-       document.addEventListener('DOMContentLoaded', () => {
-    // -----------------------
-    // Helpers
-    // -----------------------
+document.addEventListener('DOMContentLoaded', () => {
+    // Helper functions
     const byId = id => document.getElementById(id);
-    const q = sel => document.querySelector(sel);
+    const log = (label, data) => console.log(`🔍 ${label}:`, JSON.parse(JSON.stringify(data || {})));
 
-    // -----------------------
-    // Globals (collect all coach data)
-    // -----------------------
+    // Global data store
     window.newCoachData = {
         generalInfo: {},
         achievements: [],
-        schedules: [],
+        schedule: [],      // Note: singular to match model relationship
         expenses: [],
         memberships: [],
         seminars: [],
-        workHistory: []
+        workHistory: []    // Note: singular, but maps from workHistories
     };
+
+    // -----------------------
+    // LIVE SEARCH
+    // -----------------------
+    (function initLiveSearch() {
+        const searchInput = byId('coach_search');
+        const resultsBox = byId('coach_searchResults');
+        if (!searchInput || !resultsBox) return;
+
+        const searchUrl = '{{ route('coaches.search') }}';
+        const updateBase = '{{ url('/coaches') }}';
+        const generalForm = byId('coachForm');
+        const methodInput = byId('coach_method');
+        const selectedCoachIdInput = byId('selected_coach_id');
+        const saveBtn = byId('coach_saveBtn');
+        const updateBtn = byId('coach_updateBtn');
+        const defaultAction = generalForm?.getAttribute('action') || '{{ route('coaches.store') }}';
+
+        let timer = null;
+        let selectedFromSearch = false;
+        let selectedId = null;
+
+        function clearResults() {
+            resultsBox.innerHTML = '';
+            resultsBox.classList.add('hidden');
+        }
+
+        function clearSelection() {
+            if (!generalForm) return;
+
+            // Clear form fields
+            generalForm.querySelectorAll('input[name], select[name], textarea[name]').forEach(el => {
+                if (['_method', '_token', 'selected_coach_id'].includes(el.name)) return;
+                if (el.type === 'file') {
+                    el.value = '';
+                    const preview = byId('coach_picturePreview');
+                    if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+                    byId('coach_noPictureText')?.classList.remove('hidden');
+                } else if (el.tagName === 'SELECT') {
+                    el.selectedIndex = 0;
+                } else {
+                    el.value = '';
+                }
+            });
+
+            byId('coach_selected_name').textContent = 'No Coach Selected';
+            selectedFromSearch = false;
+            selectedId = null;
+            generalForm?.setAttribute('action', defaultAction);
+            if (methodInput) methodInput.value = 'POST';
+            if (selectedCoachIdInput) selectedCoachIdInput.value = '';
+            saveBtn?.classList.remove('hidden');
+            updateBtn?.classList.add('hidden');
+
+            // Clear all tables
+            const tableIds = ['coach-achievements-tbody', 'scheduleTable', 'expensesTable', 'membershipTable', 'seminarsTable', 'workTable'];
+            tableIds.forEach(id => {
+                const tbody = byId(id);
+                if (tbody) tbody.innerHTML = `<tr><td colspan="100%" class="text-center py-4 text-gray-500">No data</td></tr>`;
+            });
+
+            // Reset global data
+            window.newCoachData = {
+                generalInfo: {},
+                achievements: [],
+                schedule: [],
+                expenses: [],
+                memberships: [],
+                seminars: [],
+                workHistory: []
+            };
+        }
+
+        function renderResults(items) {
+            if (!items?.length) {
+                clearResults();
+                return;
+            }
+            resultsBox.innerHTML = '';
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm';
+                const name = item.full_name?.trim() || `${item.coach_first_name || ''} ${item.coach_last_name || ''}`.trim();
+                div.textContent = name + (item.id ? ` — ID: ${item.id}` : '');
+                
+                div.addEventListener('click', () => {
+                    selectedFromSearch = true;
+                    selectedId = item.id || null;
+                    if (selectedCoachIdInput) selectedCoachIdInput.value = selectedId;
+
+                    if (generalForm && selectedId) {
+                        generalForm.setAttribute('action', `${updateBase}/${selectedId}`);
+                        if (methodInput) methodInput.value = 'PUT';
+                    }
+
+                    // Fetch full details
+                    fetch(`${updateBase}/${selectedId}`, { 
+                        headers: { 'Accept': 'application/json' } 
+                    })
+                    .then(r => {
+                        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                        return r.json();
+                    })
+                    .then(full => {
+                        log('✅ Coach data loaded', full); // Debug log
+
+                        // Populate general info
+                        for (const key in full) {
+                            if (['achievements', 'schedule', 'expenses', 'memberships', 'seminars', 'workHistories'].includes(key)) continue;
+                            
+                            const el = generalForm?.querySelector(`[name="${key}"]`);
+                            if (el && el.tagName !== 'SELECT' && el.type !== 'file') {
+                                el.value = full[key] ?? '';
+                            }
+                        }
+
+                        // Handle picture
+                        if (full.picture_url) {
+                            const preview = byId('coach_picturePreview');
+                            const noPic = byId('coach_noPictureText');
+                            if (preview) { 
+                                preview.src = full.picture_url; 
+                                preview.classList.remove('hidden'); 
+                            }
+                            if (noPic) noPic.classList.add('hidden');
+                        }
+
+                        // Update selected name
+                        const selectedName = byId('coach_selected_name');
+                        const fullName = full.full_name?.trim() || `${full.coach_first_name || ''} ${full.coach_last_name || ''}`.trim();
+                        if (selectedName) selectedName.textContent = fullName || 'No Coach Selected';
+
+                        // Clear tables first
+                        const tableIds = ['coach-achievements-tbody', 'scheduleTable', 'expensesTable', 'membershipTable', 'seminarsTable', 'workTable'];
+                        tableIds.forEach(id => {
+                            const tbody = byId(id);
+                            if (tbody) tbody.innerHTML = '';
+                        });
+
+                        // CRITICAL FIX: Map relationship names correctly
+                        window.newCoachData = {
+                            generalInfo: {},
+                            achievements: full.achievements || [],
+                            schedule: full.schedule || [],      // 'schedule' from model
+                            expenses: full.expenses || [],
+                            memberships: full.memberships || [],
+                            seminars: full.seminars || [],
+                            workHistory: full.workHistories || [] // Map plural to singular
+                        };
+
+                        log('📊 Global data ready', window.newCoachData);
+
+                        // Populate tables with field mapping
+                        populateTable('coach-achievements-tbody', full.achievements, {
+                            year: 'Year', month_day: 'Month-Day', sports_event: 'Sports Event', 
+                            venue: 'Venue', award: 'Award', category: 'Category', remarks: 'Remarks'
+                        });
+
+                        populateTable('scheduleTable', full.schedule, {  // Use 'schedule' not 'schedules'
+                            Event: 'Event', Date: 'Date', List: 'Athletes', coachRemark: 'Remarks'
+                        });
+
+                        populateTable('expensesTable', full.expenses, {
+                            Academic: 'Academic Year', Term: 'Term', Type: 'Type', Amount: 'Amount',
+                            EventAthlete: 'Event/Athlete', notes: 'Notes', coachRemark: 'Remarks'
+                        });
+
+                        populateTable('membershipTable', full.memberships, {
+                            AcademicTerm: 'Academic Term', UnitsEnrolled: 'Units', CoachTuition: 'Tuition',
+                            CoachMiscellaneous: 'Misc', CoachOtherCharges: 'Other', CoachAssessment: 'Assessment',
+                            CoachTotalDiscount: 'Discount', coachRemark: 'Remarks'
+                        });
+
+                        populateTable('seminarsTable', full.seminars, {
+                            Year: 'Year', date: 'Date', WorkPosition: 'Position', NameCompany: 'Company', coachRemark: 'Remarks'
+                        });
+
+                        populateTable('workTable', full.workHistories, {  // Use 'workHistories' from model
+                            year: 'Year', date: 'Date', work_position: 'Position', company_name: 'Company', coachRemark: 'Remarks'
+                        });
+
+                        saveBtn?.classList.add('hidden');
+                        updateBtn?.classList.remove('hidden');
+                    })
+                    .catch(err => {
+                        console.error('❌ Failed to load coach:', err);
+                        alert(`Error loading coach: ${err.message}`);
+                    });
+
+                clearResults();
+            });
+            resultsBox.appendChild(div);
+        });
+        resultsBox.classList.remove('hidden');
+    }
+
+    searchInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+        if (timer) clearTimeout(timer);
+
+        if (!value?.trim()) {
+            if (selectedFromSearch) clearSelection();
+            clearResults();
+            return;
+        }
+
+        timer = setTimeout(() => {
+            fetch(`${searchUrl}?q=${encodeURIComponent(value.trim())}`, { 
+                headers: { 'Accept': 'application/json' } 
+            })
+            .then(r => r.json())
+            .then(data => renderResults(data || []))
+            .catch(err => {
+                console.error('Search error:', err);
+                clearResults();
+            });
+        }, 300);
+    });
+
+    // Click outside to close
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !resultsBox.contains(e.target)) {
+            clearResults();
+        }
+    });
+    })();
 
     // -----------------------
     // TAB SWITCHING
@@ -1139,7 +1361,7 @@
             tabs.forEach(t => t.classList.remove('border-b-2', 'border-green-600', 'text-green-600'));
             contents.forEach(c => c.classList.add('hidden'));
             defaultTab.classList.add('border-b-2', 'border-green-600', 'text-green-600');
-            document.querySelector('#coach-general-info').classList.remove('hidden');
+            document.querySelector('#coach-general-info')?.classList.remove('hidden');
         }
 
         tabs.forEach(tab => {
@@ -1148,40 +1370,66 @@
                 tabs.forEach(t => t.classList.remove('border-b-2', 'border-green-600', 'text-green-600'));
                 contents.forEach(c => c.classList.add('hidden'));
                 tab.classList.add('border-b-2', 'border-green-600', 'text-green-600');
-                const target = document.querySelector(tab.getAttribute('href'));
-                if (target) target.classList.remove('hidden');
+                document.querySelector(tab.getAttribute('href'))?.classList.remove('hidden');
             });
         });
     })();
 
     // -----------------------
-    // MODAL TOGGLES (fix your HTML typos)
+    // MODAL TOGGLES
     // -----------------------
-    window.toggleCoachAchievementModal = (show) => {
-        byId('coach-AchievementModal')?.classList.toggle('hidden', !show);
-    };
-    window.toggleScheduleModal = (show) => {
-        byId('scheduleModal')?.classList.toggle('hidden', !show);
-    };
-    window.toggleExpensesModal = (show) => {
-        byId('expensesModal')?.classList.toggle('hidden', !show);
-    };
-    window.toggleMembershipModal = (show) => {
-        byId('membershipModal')?.classList.toggle('hidden', !show);
-    };
-    window.toggleSeminarsModal = (show) => { // Fixed typo
-        byId('seminarsModal')?.classList.toggle('hidden', !show);
-    };
-    window.toggleWorkHistoryModal = (show) => { // Fixed typo
-        byId('workModal')?.classList.toggle('hidden', !show);
-    };
+    window.toggleCoachAchievementModal = (show) => byId('coach-AchievementModal')?.classList.toggle('hidden', !show);
+    window.toggleScheduleModal = (show) => byId('scheduleModal')?.classList.toggle('hidden', !show);
+    window.toggleExpensesModal = (show) => byId('expensesModal')?.classList.toggle('hidden', !show);
+    window.toggleMembershipModal = (show) => byId('membershipModal')?.classList.toggle('hidden', !show);
+    window.toggleSeminarsModal = (show) => byId('seminarsModal')?.classList.toggle('hidden', !show);
+    window.toggleWorkHistoryModal = (show) => byId('workModal')?.classList.toggle('hidden', !show);
 
     // -----------------------
-    // ACHIEVEMENTS MODULE
+    // TABLE POPULATOR
     // -----------------------
-    (function achievementsModule() {
-        const form = byId('coach-achievementForm');
-        const tbody = byId('coach-achievements-tbody');
+    function populateTable(tableId, dataArray, fieldMap) {
+        const tbody = byId(tableId);
+        if (!tbody) {
+            console.error(`❌ Table body not found: ${tableId}`);
+            return;
+        }
+
+        tbody.innerHTML = ''; // Clear existing
+
+        if (!Array.isArray(dataArray) || dataArray.length === 0) {
+            console.warn(`⚠️ No data for ${tableId}`);
+            const colCount = Object.keys(fieldMap).length;
+            tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center py-4 text-gray-500">No records found</td></tr>`;
+            return;
+        }
+
+        dataArray.forEach((item, index) => {
+            const row = document.createElement('tr');
+            row.className = 'border-b hover:bg-gray-50 text-center';
+            
+            const cells = Object.entries(fieldMap).map(([key, label]) => {
+                // Try multiple casing variations to handle different field names
+                let value = item[key] ?? 
+                           item[key.toLowerCase()] ?? 
+                           item[key.replace(/([A-Z])/g, '_$1').toLowerCase()] ?? 
+                           '-';
+                return `<td class="border px-4 py-2 text-sm">${value}</td>`;
+            }).join('');
+            
+            row.innerHTML = cells;
+            tbody.appendChild(row);
+        });
+
+        console.log(`✅ Populated ${tableId} with ${dataArray.length} records`);
+    }
+
+    // -----------------------
+    // MODULE FORM HANDLERS
+    // -----------------------
+    function handleModuleForm(formId, tbodyId, dataKey, fieldMap) {
+        const form = byId(formId);
+        const tbody = byId(tbodyId);
         if (!form || !tbody) return;
 
         form.addEventListener('submit', (e) => {
@@ -1190,251 +1438,114 @@
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData.entries());
             
-            // Validate required fields
-            if (!data.year || !data.month_day || !data.sports_event || !data.venue || !data.award) {
+            // Validate required fields (first field in map)
+            const firstRequiredField = Object.keys(fieldMap)[0];
+            if (!data[firstRequiredField]?.trim()) {
                 alert('Please fill in all required fields.');
                 return;
             }
             
-            // Add to local data
-            window.newCoachData.achievements.push(data);
-            
-            // Add row to table
-            const row = document.createElement('tr');
-            row.className = 'border-b hover:bg-gray-50 text-center';
-            row.innerHTML = `
-                <td class="px-6 py-4 text-sm">${data.year || '-'}</td>
-                <td class="px-6 py-4 text-sm">${data.month_day || '-'}</td>
-                <td class="px-6 py-4 text-sm">${data.sports_event || '-'}</td>
-                <td class="px-6 py-4 text-sm">${data.venue || '-'}</td>
-                <td class="px-6 py-4 text-sm">${data.award || '-'}</td>
-                <td class="px-6 py-4 text-sm">${data.category || '-'}</td>
-                <td class="px-6 py-4 text-sm">${data.remarks || '-'}</td>
-            `;
-            tbody.appendChild(row);
-            
-            // Reset and close
-            e.target.reset();
-            toggleCoachAchievementModal(false);
-        });
-    })();
-
-    // -----------------------
-    // SCHEDULE MODULE
-    // -----------------------
-    (function scheduleModule() {
-        const form = byId('ScheduleForm');
-        const tbody = byId('scheduleTable');
-        if (!form || !tbody) return;
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            
-            window.newCoachData.schedules.push(data);
+            window.newCoachData[dataKey].push(data);
             
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="border px-4 py-2">${data.Event || '-'}</td>
-                <td class="border px-4 py-2">${data.Date || '-'}</td>
-                <td class="border px-4 py-2">${data.List || '-'}</td>
-                <td class="border px-4 py-2">${data.coachRemark || '-'}</td>
-            `;
+            row.className = 'border-b hover:bg-gray-50';
+            const cells = Object.keys(fieldMap).map(key => 
+                `<td class="border px-4 py-2 text-sm">${data[key] || '-'}</td>`
+            ).join('');
+            row.innerHTML = cells;
             tbody.appendChild(row);
             
             e.target.reset();
-            toggleScheduleModal(false);
-        });
-    })();
-
-    // -----------------------
-    // EXPENSES MODULE
-    // -----------------------
-    (function expensesModule() {
-        const form = byId('ExpensesForm');
-        const tbody = byId('expensesTable');
-        if (!form || !tbody) return;
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
             
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            
-            window.newCoachData.expenses.push(data);
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="border px-4 py-2">${data.Academic || '-'}</td>
-                <td class="border px-4 py-2">${data.Term || '-'}</td>
-                <td class="border px-4 py-2">${data.Type || '-'}</td>
-                <td class="border px-4 py-2">${data.Amount || '-'}</td>
-                <td class="border px-4 py-2">${data.EventAthlete || '-'}</td>
-                <td class="border px-4 py-2">${data.notes || '-'}</td>
-                <td class="border px-4 py-2">${data.coachRemark || '-'}</td>
-            `;
-            tbody.appendChild(row);
-            
-            e.target.reset();
-            toggleExpensesModal(false);
-        });
-    })();
-
-    // -----------------------
-    // MEMBERSHIP MODULE
-    // -----------------------
-    (function membershipModule() {
-        const form = byId('MembershipForm');
-        const tbody = byId('membershipTable');
-        if (!form || !tbody) return;
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            
-            window.newCoachData.memberships.push(data);
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="border px-4 py-2">${data.AcademicTerm || '-'}</td>
-                <td class="border px-4 py-2">${data.UnitsEnrolled || '-'}</td>
-                <td class="border px-4 py-2">${data.CoachTuition || '-'}</td>
-                <td class="border px-4 py-2">${data.CoachMiscellaneous || '-'}</td>
-                <td class="border px-4 py-2">${data.CoachOtherCharges || '-'}</td>
-                <td class="border px-4 py-2">${data.CoachAssessment || '-'}</td>
-                <td class="border px-4 py-2">${data.CoachTotalDiscount || '-'}</td>
-                <td class="border px-4 py-2">${data.coachRemark || '-'}</td>
-            `;
-            tbody.appendChild(row);
-            
-            e.target.reset();
-            toggleMembershipModal(false);
-        });
-    })();
-
-    // -----------------------
-    // SEMINARS MODULE
-    // -----------------------
-    (function seminarsModule() {
-        const form = byId('SeminarsForm');
-        const tbody = byId('seminarsTable');
-        if (!form || !tbody) return;
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            
-            window.newCoachData.seminars.push(data);
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="border px-4 py-2">${data.Year || '-'}</td>
-                <td class="border px-4 py-2">${data.date || '-'}</td>
-                <td class="border px-4 py-2">${data.WorkPosition || '-'}</td>
-                <td class="border px-4 py-2">${data.NameCompany || '-'}</td>
-                <td class="border px-4 py-2">${data.coachRemark || '-'}</td>
-            `;
-            tbody.appendChild(row);
-            
-            e.target.reset();
-            toggleSeminarsModal(false);
-        });
-    })();
-
-    // -----------------------
-    // WORK HISTORY MODULE
-    // -----------------------
-    (function workHistoryModule() {
-        const form = byId('WorkHistoryForm');
-        const tbody = byId('workTable');
-        if (!form || !tbody) return;
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            
-            window.newCoachData.workHistory.push(data);
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="border px-4 py-2">${data.year || '-'}</td>
-                <td class="border px-4 py-2">${data.date || '-'}</td>
-                <td class="border px-4 py-2">${data.work_position || '-'}</td>
-                <td class="border px-4 py-2">${data.company_name || '-'}</td>
-                <td class="border px-4 py-2">${data.coachRemark || '-'}</td>
-            `;
-            tbody.appendChild(row);
-            
-            e.target.reset();
-            toggleWorkHistoryModal(false);
-        });
-    })();
-
-    // -----------------------
-    // GENERAL INFO COLLECTION
-    // -----------------------
-    function collectGeneralInfo() {
-        const form = byId('coachForm');
-        if (!form) return;
-        
-        const inputs = form.querySelectorAll('input[name], select[name], textarea[name]');
-        inputs.forEach(input => {
-            if (input.name && input.name !== '_method' && input.name !== '_token') {
-                window.newCoachData.generalInfo[input.name] = input.value;
-            }
+            // Close corresponding modal
+            const modalMap = {
+                achievements: 'coach-AchievementModal',
+                schedule: 'scheduleModal',
+                expenses: 'expensesModal',
+                memberships: 'membershipModal',
+                seminars: 'seminarsModal',
+                workHistory: 'workModal'
+            };
+            const modalId = modalMap[dataKey];
+            if (modalId) byId(modalId)?.classList.add('hidden');
         });
     }
 
+    // Initialize all module forms
+    handleModuleForm('coach-achievementForm', 'coach-achievements-tbody', 'achievements', {
+        year: 'Year', month_day: 'Month-Day', sports_event: 'Sports Event', 
+        venue: 'Venue', award: 'Award', category: 'Category', remarks: 'Remarks'
+    });
+
+    handleModuleForm('ScheduleForm', 'scheduleTable', 'schedule', {
+        Event: 'Event', Date: 'Date', List: 'Athletes', coachRemark: 'Remarks'
+    });
+
+    handleModuleForm('ExpensesForm', 'expensesTable', 'expenses', {
+        Academic: 'Academic Year', Term: 'Term', Type: 'Type', Amount: 'Amount',
+        EventAthlete: 'Event/Athlete', notes: 'Notes', coachRemark: 'Remarks'
+    });
+
+    handleModuleForm('MembershipForm', 'membershipTable', 'memberships', {
+        AcademicTerm: 'Academic Term', UnitsEnrolled: 'Units', CoachTuition: 'Tuition',
+        CoachMiscellaneous: 'Misc', CoachOtherCharges: 'Other', CoachAssessment: 'Assessment',
+        CoachTotalDiscount: 'Discount', coachRemark: 'Remarks'
+    });
+
+    handleModuleForm('SeminarsForm', 'seminarsTable', 'seminars', {
+        Year: 'Year', date: 'date', work_position: 'work_position', NameCompany: 'NameCompany', coachRemark: 'coachRemarks'
+    });
+
+    handleModuleForm('WorkHistoryForm', 'workTable', 'workHistory', {
+        year: 'Year', date: 'Date', work_position: 'Position', company_name: 'Company', coachRemark: 'Remarks'
+    });
+
     // -----------------------
-    // FINAL SAVE (Create/Update)
+    // SAVE/UPDATE COACH
     // -----------------------
-    const saveBtn = byId('coach_saveBtn');
-    const updateBtn = byId('coach_updateBtn');
-    
     function performFinalSave(e) {
         if (e) e.preventDefault();
         
-        collectGeneralInfo();
-        
+        // Collect general info from form
+        const form = byId('coachForm');
+        if (form) {
+            form.querySelectorAll('input[name], select[name], textarea[name]').forEach(input => {
+                if (input.name && !['_method', '_token'].includes(input.name)) {
+                    window.newCoachData.generalInfo[input.name] = input.value;
+                }
+            });
+        }
+
         const selectedId = byId('selected_coach_id')?.value;
         const updateBase = '{{ url('/coaches') }}';
         const endpoint = selectedId ? `${updateBase}/${selectedId}` : updateBase;
         const method = selectedId ? 'PUT' : 'POST';
         
-        // Show loading state
         const button = e?.target;
         if (button) {
             button.disabled = true;
             button.textContent = 'Saving...';
         }
         
+        log('Sending data to server', { endpoint, method, data: window.newCoachData });
+
         fetch(endpoint, {
             method: method,
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}', // ✅ FIXED: Direct Blade injection
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'Accept': 'application/json'
             },
             body: JSON.stringify(window.newCoachData)
         })
         .then(async r => {
             const text = await r.text();
+            log('Raw server response', text);
             let data = null;
             try { data = JSON.parse(text); } catch (e) {}
-            if (!r.ok) {
-                console.error('Server error', r.status, data || text);
-                throw new Error(r.status === 422 && data?.errors ? 
-                    'Validation error: ' + JSON.stringify(data.errors) : 
-                    'Server returned ' + r.status);
-            }
+            if (!r.ok) throw new Error(r.status === 422 && data?.errors ? 
+                'Validation: ' + JSON.stringify(data.errors) : 
+                `Server ${r.status}: ${text}`);
             return data;
         })
         .then(data => {
@@ -1442,8 +1553,8 @@
             location.reload();
         })
         .catch(err => {
-            console.error('Save error:', err);
-            alert('❌ Failed to save: ' + err.message);
+            console.error('❌ Save error:', err);
+            alert(`Save failed: ${err.message}`);
         })
         .finally(() => {
             if (button) {
@@ -1453,11 +1564,9 @@
         });
     }
 
-    if (saveBtn) saveBtn.addEventListener('click', performFinalSave);
-    if (updateBtn) updateBtn.addEventListener('click', performFinalSave);
+    byId('coach_saveBtn')?.addEventListener('click', performFinalSave);
+    byId('coach_updateBtn')?.addEventListener('click', performFinalSave);
 });
-        
-
-    </script>
+</script>
 
 @endsection
