@@ -11,26 +11,19 @@
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        /* Ensures the main content wrapper has the correct background */
-        .content-area-wrapper {
-            background-color: #f3f4f6; /* Tailwind gray-100 equivalent */
-            min-height: 100vh;
-        }
-    </style>
 </head>
 <body class="bg-gray-50">
 
-    @include('partials.sidebar')
+    <div class="flex min-h-screen">
+        
+        @include('partials.sidebar')
 
-    <main class="ml-64 flex-1 p-0 overflow-y-auto min-h-screen"> 
-        <div class="content-area-wrapper">
-             @yield('content') 
+        <div class="flex-1 ml-64">
+            @yield('content')
         </div>
-    </main>
 
-    @stack('scripts')
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

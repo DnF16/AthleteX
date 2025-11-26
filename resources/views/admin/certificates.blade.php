@@ -4,7 +4,7 @@
 <div class="container-fluid p-0">
     <div class="row g-0">
         
-        <div class="col-md-3 col-lg-2" style="background-color: #dbead5; min-height: 100vh; border-right: 1px solid #c4d79b;">
+        <div class="col-md-3 col-lg-2 p-3" style="background-color: #dbead5; min-height: 100vh; border-right: 1px solid #c4d79b;">
             @include('admin.partials.sidebar')
         </div>
 
@@ -15,46 +15,93 @@
             </div>
 
             <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body" style="background-color: #EBF1DE;">
+                    <div class="section-box border p-3" style="background-color: #DCE6F1; border: 1px solid #999;">
+                        <h6 class="fw-bold fst-italic border-bottom border-secondary pb-1 mb-3">ADD NEW CERTIFICATE / AWARD</h6>
+                        
+                        <form action="{{ route('admin.addCertificate') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="row align-items-end">
+                                <div class="col-md-4 mb-2">
+                                    <label class="form-label-sm fw-bold">Name / Title</label>
+                                    <input type="text" name="name" class="form-control form-control-sm" placeholder="e.g. MVP Award" required>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <label class="form-label-sm fw-bold">Type</label>
+                                    <select name="type" class="form-select form-select-sm">
+                                        <option>Certificate</option>
+                                        <option>Award</option>
+                                        <option>Badge</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <label class="form-label-sm fw-bold">Upload File</label>
+                                    <input type="file" name="file" class="form-control form-control-sm" required>
+                                </div>
+                                <div class="col-md-2 mb-2">
+                                    <button class="btn btn-success btn-sm w-100 fw-bold shadow-sm">
+                                        <i class="fas fa-upload"></i> Upload
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
                 <div class="card-header text-center fst-italic fw-bold border-bottom-0" 
                     style="background-color: #C4D79B; border: 1px solid #999; font-family: serif;">
-                    CERTIFICATES & AWARDS
+                    CERTIFICATES & AWARDS LIST
                 </div>
 
                 <div class="card-body p-0" style="background-color: #EBF1DE; border: 1px solid #999; border-top: none;">
                     
-                    <div class="d-flex justify-content-end p-2 bg-light border-bottom">
-                        <button class="btn btn-success btn-sm fw-bold shadow-sm">
-                            <i class="fas fa-plus-circle"></i> Add Certificate
-                        </button>
-                    </div>
-
                     <div class="table-responsive">
                         <table class="table table-bordered border-secondary text-center bg-white mb-0 align-middle">
                             <thead style="background-color: #DCE6F1;">
                                 <tr>
                                     <th style="width: 25%;">Name</th>
                                     <th style="width: 15%;">Type</th>
-                                    <th style="width: 20%;">File Name</th>
-                                    <th style="width: 40%;">Thumbnail</th>
+                                    <th style="width: 20%;">File Path</th>
+                                    <th style="width: 40%;">Thumbnail / Preview</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($certs as $cert)
-                                <tr style="height: 50px;">
-                                    <td>{{ $cert->name }}</td>
-                                    <td>{{ $cert->type }}</td>
-                                    <td>{{ $cert->file_name }}</td>
-                                    <td class="bg-light text-muted">
-                                        @if($cert->type == 'Award')
-                                            <i class="fas fa-trophy text-warning fa-lg"></i>
+                                @forelse($certs as $cert)
+                                <tr>
+                                    <td class="fw-bold">{{ $cert->name }}</td>
+                                    <td><span class="badge bg-secondary">{{ $cert->type }}</span></td>
+                                    <td class="text-muted small text-break">{{ basename($cert->filename) }}</td>
+                                    <td class="bg-light p-2">
+                                        @php
+                                            $extension = pathinfo($cert->filename, PATHINFO_EXTENSION);
+                                            $fileUrl = asset('storage/' . $cert->filename);
+                                        @endphp
+
+                                        @if(in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
+                                            {{-- Image Preview --}}
+                                            <a href="{{ $fileUrl }}" target="_blank">
+                                                <img src="{{ $fileUrl }}" style="height: 60px; border: 1px solid #ccc; padding: 2px;">
+                                            </a>
+                                        @elseif(strtolower($extension) == 'pdf')
+                                            {{-- PDF Icon --}}
+                                            <a href="{{ $fileUrl }}" target="_blank" class="text-decoration-none text-danger">
+                                                <i class="fas fa-file-pdf fa-3x"></i><br><small>View PDF</small>
+                                            </a>
                                         @else
-                                            <small>No Preview</small>
+                                            {{-- Generic File Icon --}}
+                                            <a href="{{ $fileUrl }}" target="_blank" class="text-decoration-none text-primary">
+                                                <i class="fas fa-file-alt fa-3x"></i><br><small>Download</small>
+                                            </a>
                                         @endif
                                     </td>
                                 </tr>
-                                @endforeach
-                                <tr style="height: 50px;"><td></td><td></td><td></td><td class="bg-light"></td></tr>
-                                <tr style="height: 50px;"><td></td><td></td><td></td><td class="bg-light"></td></tr>
+                                @empty
+                                <tr>
+                                    <td colspan="4" class="text-muted py-4">No certificates or awards uploaded yet.</td>
+                                </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>

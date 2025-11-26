@@ -4,7 +4,7 @@
 <div class="container-fluid p-0">
     <div class="row g-0">
         
-        <div class="col-md-3 col-lg-2" style="background-color: #dbead5; min-height: 100vh; border-right: 1px solid #c4d79b;">
+        <div class="col-md-3 col-lg-2 p-3" style="background-color: #dbead5; min-height: 100vh; border-right: 1px solid #c4d79b;">
             @include('admin.partials.sidebar')
         </div>
 
@@ -23,7 +23,7 @@
                                 <thead class="align-middle">
                                     <tr>
                                         <th rowspan="2" class="bg-light" style="width: 15%;">USER DETAILS</th>
-                                        <th colspan="10" class="text-white" style="background-color: #4F6228;">SECURITY RIGHTS</th>
+                                        <th colspan="10" class="text-white" style="background-color: #2e4e1f;">SECURITY RIGHTS</th>
                                     </tr>
                                     <tr style="background-color: #C4D79B;">
                                         <th>Admin</th><th>Athletes</th><th>Coaches</th><th>Sched</th><th>Achieve</th><th>Classes</th><th>Exams</th><th>Trans</th><th>Notifs</th><th>Dash</th>

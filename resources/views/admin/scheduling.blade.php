@@ -4,7 +4,7 @@
 <div class="container-fluid p-0">
     <div class="row g-0">
         
-        <div class="col-md-3 col-lg-2" style="background-color: #dbead5; min-height: 100vh; border-right: 1px solid #c4d79b;">
+        <div class="col-md-3 col-lg-2 p-3" style="background-color: #dbead5; min-height: 100vh; border-right: 1px solid #c4d79b;">
             @include('admin.partials.sidebar')
         </div>
 
@@ -28,26 +28,30 @@
                                     <div class="mb-3 row align-items-center">
                                         <label class="col-sm-6 col-form-label form-label-sm text-end bg-light border border-secondary me-2" style="max-width: 140px;">Weekday Start</label>
                                         <div class="col-sm-6">
-                                            <select name="weekday_start" class="form-select form-select-sm border-secondary rounded-0"><option>Monday</option></select>
+                                            <select name="weekday_start" class="form-select form-select-sm border-secondary rounded-0">
+                                                <option value="Monday" {{ (\App\Models\Setting::get('weekday_start') == 'Monday') ? 'selected' : '' }}>Monday</option>
+                                                <option value="Sunday" {{ (\App\Models\Setting::get('weekday_start') == 'Sunday') ? 'selected' : '' }}>Sunday</option>
+                                            </select>
                                         </div>
                                     </div>
+                                    
                                     <div class="mb-3 row align-items-center">
-                                        <label class="col-sm-6 col-form-label form-label-sm text-end bg-light border border-secondary me-2" style="max-width: 140px;">1st Class Start Time</label>
-                                        <div class="col-sm-6"><input type="time" name="class_start_time" class="form-control form-control-sm border-secondary rounded-0" value="08:00"></div>
+                                        <label class="col-sm-6 col-form-label form-label-sm text-end bg-light border border-secondary me-2" style="max-width: 140px;">1st Class Start</label>
+                                        <div class="col-sm-6"><input type="time" name="class_start_time" class="form-control form-control-sm border-secondary rounded-0" value="{{ \App\Models\Setting::get('class_start_time', '08:00') }}"></div>
                                     </div>
+
                                     <div class="mb-3 row align-items-center">
-                                        <label class="col-sm-6 col-form-label form-label-sm text-end bg-light border border-secondary me-2" style="max-width: 140px;">Last Class End Time</label>
-                                        <div class="col-sm-6"><input type="time" name="class_end_time" class="form-control form-control-sm border-secondary rounded-0" value="17:00"></div>
+                                        <label class="col-sm-6 col-form-label form-label-sm text-end bg-light border border-secondary me-2" style="max-width: 140px;">Last Class End</label>
+                                        <div class="col-sm-6"><input type="time" name="class_end_time" class="form-control form-control-sm border-secondary rounded-0" value="{{ \App\Models\Setting::get('class_end_time', '17:00') }}"></div>
                                     </div>
+
                                     <div class="mb-3 row align-items-center">
-                                        <label class="col-sm-6 col-form-label form-label-sm text-end bg-light border border-secondary me-2" style="max-width: 140px;">Schedule Interval</label>
+                                        <label class="col-sm-6 col-form-label form-label-sm text-end bg-light border border-secondary me-2" style="max-width: 140px;">Interval (min)</label>
                                         <div class="col-sm-6">
-                                            <div class="input-group input-group-sm">
-                                                <input type="number" name="schedule_interval" class="form-control border-secondary rounded-0" value="60">
-                                                <span class="input-group-text border-secondary rounded-0">min</span>
-                                            </div>
+                                            <input type="number" name="schedule_interval" class="form-control border-secondary rounded-0" value="{{ \App\Models\Setting::get('schedule_interval', 60) }}">
                                         </div>
                                     </div>
+
                                     <button type="submit" class="btn btn-success btn-sm w-100 mt-2">Save Schedule Defaults</button>
                                 </div>
                             </div>
@@ -61,6 +65,10 @@
                                         <table class="table table-bordered table-sm mb-0 bg-white border-secondary">
                                             <tbody style="font-size: 0.9rem;">
                                                 <tr><td class="ps-3 w-50">Monday</td><td class="text-center fw-bold"><i class="fas fa-check text-success"></i></td></tr>
+                                                <tr><td class="ps-3 w-50">Tuesday</td><td class="text-center fw-bold"><i class="fas fa-check text-success"></i></td></tr>
+                                                <tr><td class="ps-3 w-50">Wednesday</td><td class="text-center fw-bold"><i class="fas fa-check text-success"></i></td></tr>
+                                                <tr><td class="ps-3 w-50">Thursday</td><td class="text-center fw-bold"><i class="fas fa-check text-success"></i></td></tr>
+                                                <tr><td class="ps-3 w-50">Friday</td><td class="text-center fw-bold"><i class="fas fa-check text-success"></i></td></tr>
                                                 <tr><td class="ps-3 w-50">Saturday</td><td class="text-center fw-bold"><i class="fas fa-check text-success"></i></td></tr>
                                                 <tr><td class="ps-3 w-50">Sunday</td><td class="text-center text-muted"></td></tr>
                                             </tbody>
@@ -73,6 +81,18 @@
 
                     <hr class="border-secondary my-4">
 
+                    <div class="section-box border p-3 mb-3" style="background-color: #DCE6F1; border: 1px solid #999;">
+                        <h6 class="fw-bold border-bottom pb-2 mb-3">Add New Holiday</h6>
+                        <form action="{{ route('admin.addHoliday') }}" method="POST" class="row g-2">
+                            @csrf
+                            <div class="col-md-3"><label class="form-label-sm">Holiday Name</label><input type="text" name="name" class="form-control form-control-sm" placeholder="e.g. Christmas Break" required></div>
+                            <div class="col-md-2"><label class="form-label-sm">From</label><input type="date" name="from_date" class="form-control form-control-sm" required></div>
+                            <div class="col-md-2"><label class="form-label-sm">To</label><input type="date" name="to_date" class="form-control form-control-sm" required></div>
+                            <div class="col-md-2"><label class="form-label-sm">Term</label><input type="text" name="term" class="form-control form-control-sm" placeholder="e.g. 1st"></div>
+                            <div class="col-md-3"><button type="submit" class="btn btn-primary btn-sm w-100">Save Holiday</button></div>
+                        </form>
+                    </div>
+
                     <h5 class="text-center fw-bold fst-italic mb-0 pt-2" style="font-family: serif; background-color: #bfbfbf; border: 1px solid #999; border-bottom: none;">Scheduled Holidays</h5>
                     
                     <div class="table-responsive">
@@ -80,11 +100,9 @@
                             <thead style="background-color: #C4D79B;">
                                 <tr>
                                     <th style="width: 25%;">Holiday Name</th>
-                                    <th style="width: 15%;">From Date</th>
-                                    <th style="width: 15%;">To Date</th>
-                                    <th style="width: 15%;">Term</th>
-                                    <th style="width: 15%;">From Date</th>
-                                    <th style="width: 15%;">To Date</th>
+                                    <th style="width: 25%;">From Date</th>
+                                    <th style="width: 25%;">To Date</th>
+                                    <th style="width: 25%;">Term</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -94,10 +112,11 @@
                                         <td>{{ $holiday->from_date }}</td>
                                         <td>{{ $holiday->to_date }}</td>
                                         <td>{{ $holiday->term }}</td>
-                                        <td>—</td>
-                                        <td>—</td>
                                     </tr>
                                 @endforeach
+                                @if($holidays->isEmpty())
+                                    <tr style="height: 35px;"><td colspan="4" class="text-muted">No holidays scheduled yet.</td></tr>
+                                @endif
                             </tbody>
                         </table>
                     </div>
