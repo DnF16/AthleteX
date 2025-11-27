@@ -500,7 +500,7 @@
 
                     <button onclick="toggleAchievementModal(true)"
                         class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow">
-                        + Add Achievemen
+                        + Add Achievement
                     </button>
                 </div>
 
@@ -525,7 +525,7 @@
                 </div>
             </div>
 
-                <!-- Modal Background -->
+                <!-- Modal -->
                 <div id="AchievementModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
                         
@@ -724,7 +724,7 @@
                         ✕
                     </button>
 
-                    <h2 class="text-xl font-bold mb-4 text-center">Add Fee / Discount</h2>
+                    <h2 class="text-xl font-bold mb-4 text-center text-white">Add Fee / Discount</h2>
 
                     <form id="feeForm" class="space-y-4">
 

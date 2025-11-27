@@ -20,6 +20,7 @@ return new class extends Migration
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
             $table->string('location')->nullable();
+            $table->string('teacher')->nullable();
             $table->string('subject');
             $table->string('type'); 
             $table->string('status')->default('Active');

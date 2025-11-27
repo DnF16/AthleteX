@@ -32,13 +32,13 @@
                                 <div class="mb-3 row">
                                     <label class="col-sm-3 col-form-label form-label-sm fw-bold text-end">Email</label>
                                     <div class="col-sm-4"><input type="email" name="email" class="form-control" value="{{ \App\Models\Setting::get('email') }}"></div>
-                                    <label class="col-sm-2 col-form-label form-label-sm fw-bold text-end">Phone Number 1</label>
+                                    <label class="col-sm-2 col-form-label form-label-sm fw-bold text-end">Phone 1</label>
                                     <div class="col-sm-3"><input type="text" name="phone_1" class="form-control" value="{{ \App\Models\Setting::get('phone_1') }}"></div>
                                 </div>
                                 <div class="mb-3 row">
                                     <label class="col-sm-3 col-form-label form-label-sm fw-bold text-end">Address</label>
                                     <div class="col-sm-4"><input type="text" name="address" class="form-control" value="{{ \App\Models\Setting::get('address') }}"></div>
-                                    <label class="col-sm-2 col-form-label form-label-sm fw-bold text-end">Phone Number 2</label>
+                                    <label class="col-sm-2 col-form-label form-label-sm fw-bold text-end">Phone 2</label>
                                     <div class="col-sm-3"><input type="text" name="phone_2" class="form-control" value="{{ \App\Models\Setting::get('phone_2') }}"></div>
                                 </div>
                             </div>
@@ -48,7 +48,6 @@
                                     <div class="card-header text-center bg-secondary text-white py-1 small fw-bold">Logo</div>
                                     <div class="card-body d-flex flex-column align-items-center justify-content-center p-2 bg-white">
                                         @php $logo = \App\Models\Setting::get('logo'); @endphp
-                                        
                                         @if($logo)
                                             <img src="{{ asset('storage/' . $logo) }}" class="img-fluid mb-2" style="max-height: 100px; border: 1px solid #ddd;">
                                         @else
@@ -56,12 +55,12 @@
                                                 <i class="fas fa-image fa-3x text-secondary"></i>
                                             </div>
                                         @endif
-
                                         <input type="file" name="logo" class="form-control form-control-sm">
                                         <small class="text-muted d-block mt-1">Rec: 200x200px</small>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
                         <hr>
                         <div class="row g-2">

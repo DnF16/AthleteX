@@ -70,11 +70,9 @@ return new class extends Migration
             // Occupation
             $table->string('occupation')->nullable();
             $table->string('coach_current_company')->nullable();
-<<<<<<< HEAD
             $table->string('coach_selected_name')->nullable();
             $table->string('coach_picturePreview')->nullable();
             $table->string('coach_noPictureText')->nullable();
-=======
 
             // RIGHT SIDE — SPORTS EVENT, POSITION, STATUS, PICTURE
             $table->string('coach_sport_event')->nullable();
@@ -87,7 +85,6 @@ return new class extends Migration
             $table->text('coach_notes')->nullable();
 
             $table->timestamps();
->>>>>>> af7ac3879a49a4a8dd05e88da8fbdfe72905d477
         });
     }
 

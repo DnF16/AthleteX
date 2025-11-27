@@ -4,7 +4,7 @@
 <div class="container-fluid p-0">
     <div class="row g-0">
         
-        <div class="col-md-3 col-lg-2" style="background-color: #dbead5; min-height: 100vh; border-right: 1px solid #c4d79b;">
+        <div class="col-md-3 col-lg-2 p-3" style="background-color: #dbead5; min-height: 100vh; border-right: 1px solid #c4d79b;">
             @include('admin.partials.sidebar')
         </div>
 
@@ -29,8 +29,10 @@
                                     <div class="mb-2 row"><label class="col-sm-4 form-label-sm text-end">Default Subject</label><div class="col-sm-8"><input type="text" name="subject" class="form-control form-control-sm"></div></div>
                                     <div class="mb-2 row"><label class="col-sm-4 form-label-sm text-end">Default Class Type</label><div class="col-sm-8"><input type="text" name="type" class="form-control form-control-sm"></div></div>
                                 </div>
-                                <div class="col-md-2 d-flex align-items-center">
-                                    <button type="submit" class="btn btn-success w-100 h-75 fw-bold shadow-sm"><i class="fas fa-plus-circle fa-2x mb-1"></i><br>Add Class</button>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold shadow-sm d-flex flex-column justify-content-center align-items-center" style="height: auto;">
+                                        <i class="fas fa-plus-circle fa-2x mb-1"></i><br><span>Add Class</span>
+                                    </button>
                                 </div>
                             </div>
                         </form>
@@ -40,9 +42,7 @@
 
             <div class="table-responsive">
                 <table class="table table-bordered custom-table bg-white text-center align-middle">
-                    <thead>
-                        <tr><th>Location</th><th>Subject</th><th>Type</th><th>Status</th><th>Icon</th><th>File Name</th></tr>
-                    </thead>
+                    <thead><tr><th>Location</th><th>Subject</th><th>Type</th><th>Status</th><th>Icon</th><th>File Name</th></tr></thead>
                     <tbody>
                         @foreach($courses as $course)
                         <tr>
@@ -57,7 +57,6 @@
                     </tbody>
                 </table>
             </div>
-
         </div>
     </div>
 </div>

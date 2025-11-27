@@ -10,6 +10,8 @@ use App\Models\User;
 use App\Models\TransactionItem;
 use App\Models\Holiday; // Added for scheduling
 use App\Models\Certificate; // Added for certificates
+use App\Models\GradeScale; 
+use App\Models\ScholarshipCriteria;
 
 class AdminController extends Controller
 {
@@ -70,38 +72,90 @@ class AdminController extends Controller
     }
 
     public function updateUserPermissions(Request $request) {
-    
-    // Get the permissions data array from the request input
+    // 1. Get the array of permissions from the form
     $permissionsData = $request->input('permissions'); 
 
-    // Check if the permissions data exists before processing (This is the fix!)
-    if ($permissionsData) {
-        foreach ($permissionsData as $userId => $perms) {
-            $user = \App\Models\User::find($userId);
-            
-            if ($user) {
-                // $perms is an array like ['admin' => 'Edit', 'athletes' => 'View']
-                $user->permissions = $perms; 
-                $user->save();
+        if ($permissionsData) {
+            foreach ($permissionsData as $userId => $perms) {
+                // 2. Find the user
+                $user = User::find($userId);
+                
+                if ($user) {
+                    // 3. Save the array (Laravel automatically converts this to JSON because of the Model Cast)
+                    $user->permissions = $perms; 
+                    $user->save();
+                }
             }
+            return back()->with('success', 'Security Rights Updated!');
         }
-        return back()->with('success', 'Security Rights Updated!');
+        
+        return back()->with('success', 'No changes detected.'); 
     }
-    
-    // If no permissions array was submitted (e.g., table was empty or no changes were made), 
-    // we still return a success message to prevent the unhandled exception (500 error).
-    return back()->with('success', 'No changes detected or permissions already updated!'); 
-}
     
     public function addClass(Request $request) {
         // Simplified creation for demonstration
         Course::forceCreate($request->except('_token'));
         return back()->with('success', 'Class Added');
     }
+
+    public function saveGrades(Request $request) {
+        // 1. Save Grades
+        if ($request->has('grades')) {
+            \App\Models\GradeScale::truncate(); // Deletes old rows
+            
+            foreach ($request->grades as $grade) {
+                // Only save if the Grade letter is typed in
+                if (!empty($grade['grade'])) {
+                    \App\Models\GradeScale::create($grade);
+                }
+            }
+        }
+
+        // 2. Save Scholarships
+        if ($request->has('scholarships')) {
+            \App\Models\ScholarshipCriteria::truncate(); // Deletes old rows
+            
+            foreach ($request->scholarships as $scholarship) {
+                // Only save if the Level is typed in
+                if (!empty($scholarship['level'])) {
+                    \App\Models\ScholarshipCriteria::create($scholarship);
+                }
+            }
+        }
+
+        return back()->with('success', 'Grades & Scoring Updated!');
+    }
+
+    public function addCertificate(Request $request) {
+        // 1. Validate input
+        $request->validate([
+            'name' => 'required|string',
+            'type' => 'required|string',
+            'file' => 'required|file|max:10240' // Max 10MB
+        ]);
+
+        // 2. Upload the file
+        // Saves to storage/app/public/certificates/
+        $path = $request->file('file')->store('certificates', 'public');
+
+        // 3. Save to Database
+        \App\Models\Certificate::create([
+            'name' => $request->name,
+            'type' => $request->type,
+            'filename' => $path
+        ]);
+
+        return back()->with('success', 'Certificate Added Successfully!');
+    }
     
     public function addTransaction(Request $request) {
         // Simplified creation for demonstration
         TransactionItem::forceCreate($request->except('_token'));
         return back()->with('success', 'Item Added');
+    }
+
+    public function addHoliday(Request $request) {
+        \App\Models\Holiday::forceCreate($request->except('_token'));
+        return back()->with('success', 'Holiday Added Successfully!');
     }
 }

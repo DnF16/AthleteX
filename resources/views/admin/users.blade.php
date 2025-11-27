@@ -4,7 +4,7 @@
 <div class="container-fluid p-0">
     <div class="row g-0">
         
-        <div class="col-md-3 col-lg-2" style="background-color: #dbead5; min-height: 100vh; border-right: 1px solid #c4d79b;">
+        <div class="col-md-3 col-lg-2 p-3" style="background-color: #dbead5; min-height: 100vh; border-right: 1px solid #c4d79b;">
             @include('admin.partials.sidebar')
         </div>
 
@@ -51,7 +51,6 @@
                                 </tbody>
                             </table>
                         </div>
-
                         <div class="p-3 bg-light border-top text-end">
                             <button type="submit" class="btn btn-success fw-bold"><i class="fas fa-save"></i> Update Security Rights</button>
                         </div>

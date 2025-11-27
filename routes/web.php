@@ -5,12 +5,9 @@ use App\Http\Controllers\AthleteController;
 use App\Http\Controllers\AcademicEvaluationController;
 use App\Http\Controllers\FeesDiscountController;
 use App\Http\Controllers\WorkHistoryController;
-<<<<<<< HEAD
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route as Router;
-=======
 use App\Http\Controllers\CoachController;
->>>>>>> af7ac3879a49a4a8dd05e88da8fbdfe72905d477
 
 Route::get('/', function () {
 	return view('features.dashboard');
@@ -75,7 +72,6 @@ Route::post('/work-history', [WorkHistoryController::class, 'store']);
 Route::get('/work-history/{athlete_id}', [WorkHistoryController::class, 'show']);
 
 
-<<<<<<< HEAD
 //==================================================================
 // Admin
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -94,9 +90,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/save-settings', [AdminController::class, 'saveSettings'])->name('saveSettings');
     Route::post('/add-class', [AdminController::class, 'addClass'])->name('addClass');
     Route::post('/add-transaction', [AdminController::class, 'addTransaction'])->name('addTransaction');
+    Route::post('/save-settings', [AdminController::class, 'saveSettings'])->name('saveSettings');
+    Route::post('/save-grades', [AdminController::class, 'saveGrades'])->name('saveGrades');
     Route::post('/users/update', [AdminController::class, 'updateUserPermissions'])->name('updateUserPermissions');
+    Route::post('/add-holiday', [AdminController::class, 'addHoliday'])->name('addHoliday');
+    Route::post('/add-certificate', [AdminController::class, 'addCertificate'])->name('addCertificate');
 });
-=======
 
 // ================================================================================================================================
 // Coach CRUD routes
@@ -160,4 +159,3 @@ Route::delete('/coach-work-history/{id}', [CoachWorkHistoryController::class, 'd
 Route::post('/coach-work-history', [CoachWorkHistoryController::class, 'store']);
 Route::get('/coach-work-history/{coach_id}', [CoachWorkHistoryController::class, 'show']);
 
->>>>>>> af7ac3879a49a4a8dd05e88da8fbdfe72905d477
