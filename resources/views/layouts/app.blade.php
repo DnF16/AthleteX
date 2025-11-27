@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'AthleteX')</title>
+<<<<<<< HEAD
     
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -19,6 +20,12 @@
             min-height: 100vh;
         }
     </style>
+=======
+    <!-- Tailwind (CDN fallback) -->
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <script src="https://cdn.tailwindcss.com" onerror="this.onerror=null;this.src='/js/tailwind.min.js'"></script>
+
+>>>>>>> af7ac3879a49a4a8dd05e88da8fbdfe72905d477
 </head>
 <body class="bg-gray-50">
 
