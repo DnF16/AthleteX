@@ -89,5 +89,9 @@ class Coach extends Model
     {
         return $this->hasMany(CoachExpense::class);
     }
+    public function athletes() {
+        return $this->hasMany(Athlete::class);
+    }
+
 
 }

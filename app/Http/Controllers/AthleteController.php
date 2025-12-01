@@ -11,12 +11,20 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class AthleteController extends Controller
 {
     public function index()
     {
-        $athletes = Athlete::all();
+        // Admins see all athletes with all statuses
+        // Coaches see only approved athletes
+        if (auth()->user()->role === 'admin') {
+            $athletes = Athlete::all();
+        } else {
+            // Non-admin users (coaches) only see approved athletes
+            $athletes = Athlete::where('approval_status', 'approved')->get();
+        }
         return view('athlete_lists.athlete_lists', compact('athletes'));
     }
 
@@ -61,7 +69,7 @@ class AthleteController extends Controller
             'full_name', 'athlete_id', 'middle_initial', 'sport_event', 'status', 'classification',
             'gender', 'birthdate', 'age', 'blood_type', 'email', 'facebook', 'marital_status',
             'contact_number', 'address', 'city_municipality', 'province_state', 'zip_code',
-            'emergency_person', 'emergency_contact', 'coach_name', 'date_joined', 'term_graduated',
+            'emergency_person', 'emergency_contact', 'coach_id', 'date_joined', 'term_graduated',
             'asst_coach', 'total_unit', 'year_graduated', 'tuition_fee', 'misc_fee', 'other_charges',
             'total_assessment', 'total_discount', 'balance', 'current_work', 'current_company',
             'picture_path', 'notes', 'inactive_date'
@@ -71,6 +79,14 @@ class AthleteController extends Controller
             if (array_key_exists($f, $general)) {
                 $data[$f] = $general[$f];
             }
+        }
+
+        // Set approval_status to pending for all new athletes
+        $data['approval_status'] = 'pending';
+
+        // Assign the logged-in coach automatically if user has a coach role
+        if (auth()->check() && auth()->user()->role === 'coach' && auth()->user()->coach) {
+            $data['coach_id'] = auth()->user()->coach->id;
         }
         
 
@@ -211,7 +227,10 @@ class AthleteController extends Controller
             'zip_code' => $a->zip_code,
             'emergency_person' => $a->emergency_person,
             'emergency_contact' => $a->emergency_contact,
-            'coach_name' => $a->coach_name,
+            'coach_name' => $a->coach
+            ? $a->coach->coach_first_name . ' ' . $a->coach->coach_last_name
+            : null,
+
             'date_joined' => $a->date_joined,
             'term_graduated' => $a->term_graduated,
             'asst_coach' => $a->asst_coach,
@@ -274,7 +293,7 @@ class AthleteController extends Controller
             'full_name', 'athlete_id', 'middle_initial', 'sport_event', 'status', 'classification',
             'gender', 'birthdate', 'age', 'blood_type', 'email', 'facebook', 'marital_status',
             'contact_number', 'address', 'city_municipality', 'province_state', 'zip_code',
-            'emergency_person', 'emergency_contact', 'coach_name', 'date_joined', 'term_graduated',
+            'emergency_person', 'emergency_contact', 'coach_id', 'date_joined', 'term_graduated',
             'asst_coach', 'total_unit', 'year_graduated', 'tuition_fee', 'misc_fee', 'other_charges',
             'total_assessment', 'total_discount', 'balance', 'current_work', 'current_company',
             'picture_path', 'notes', 'inactive_date'

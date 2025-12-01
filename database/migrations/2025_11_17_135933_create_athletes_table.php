@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('athletes', function (Blueprint $table) {
             $table->id();
             $table->string('student_id');
+            $table->foreignId('coach_id')->nullable()->constrained('coaches')->onDelete('set null');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('course')->nullable();

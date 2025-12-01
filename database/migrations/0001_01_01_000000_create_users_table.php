@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('role')->default('user');
+            $table->unsignedBigInteger('coach_id')->nullable();
+            $table->string('coach_sport')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

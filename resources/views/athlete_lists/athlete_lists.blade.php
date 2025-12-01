@@ -60,6 +60,7 @@
                     <th class="px-4 py-3 border">Stud ID</th>
                     <th class="px-4 py-3 border">Sports Event</th>
                     <th class="px-4 py-3 border">Status</th>
+                    <th class="px-4 py-3 border">Approval</th>
                     <th class="px-4 py-3 border">Classification</th>
                     <th class="px-4 py-3 border">Gender</th>
                     <th class="px-4 py-3 border">Birthdate</th>
@@ -110,6 +111,12 @@
                         <td class="border px-4 py-2">
                             <span class="px-2 py-1 rounded text-white {{ $athlete->status == 'Active' ? 'bg-green-600' : 'bg-gray-500' }} text-xs">
                                 {{ $athlete->status }}
+                            </span>
+                        </td>
+                        <td class="border px-4 py-2">
+                            <span class="px-2 py-1 rounded text-white text-xs font-semibold
+                                {{ $athlete->approval_status == 'approved' ? 'bg-green-600' : ($athlete->approval_status == 'pending' ? 'bg-yellow-600' : 'bg-red-600') }}">
+                                {{ ucfirst($athlete->approval_status) }}
                             </span>
                         </td>
                         <td class="border px-4 py-2">{{ $athlete->classification }}</td>

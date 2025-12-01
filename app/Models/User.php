@@ -15,6 +15,9 @@ class User extends Authenticatable
         'email',
         'password',
         'username',
+        'role',
+        'coach_id',
+        'coach_sport',
         'permissions', // Make sure this is added!
     ];
 
@@ -28,4 +31,10 @@ class User extends Authenticatable
         'password' => 'hashed',
         'permissions' => 'array', // <--- THIS IS THE MISSING KEY TO FIX IT
     ];
+
+    // Relationship to Coach
+    public function coach()
+    {
+        return $this->belongsTo(Coach::class);
+    }
 }

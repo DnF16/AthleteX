@@ -11,6 +11,7 @@ class Athlete extends Model
 
     protected $fillable = [
         'student_id',
+        'coach_id',
         'first_name',
         'last_name',
         'course',
@@ -55,6 +56,20 @@ class Athlete extends Model
         'picture_path',
         'notes',
         'inactive_date',
+
+        // Approval workflow
+        'approval_status',
+        'approval_notes',
+        'approved_at',
+        'approved_by',
+    ];
+
+    // Cast fields to proper types
+    protected $casts = [
+        'birthdate' => 'date',
+        'approved_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // Relationships
@@ -76,5 +91,13 @@ class Athlete extends Model
     public function workHistories()
     {
         return $this->hasMany(WorkHistory::class);
+    }
+    public function coach() {
+        return $this->belongsTo(Coach::class);
+    }
+
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }

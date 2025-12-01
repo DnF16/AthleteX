@@ -6,37 +6,65 @@
     <title>ATHLETIX Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen" style="background-image: url('{{ asset('images/bg.jpg') }}');">
+<body class="flex flex-col items-center min-h-screen bg-gradient-to-br from-green-900 to-green-800">
 
-    <div class="bg-[#2e4e1f] p-8 rounded-xl shadow-md w-full max-w-md text-center">
-        <!-- Logo -->
-        <img src="{{ asset('images/logo.png') }}" alt="UC Logo" class="mx-auto mb-6 w-24 h-24">
+    <!-- Header -->
+    <div class="w-full bg-green-900/70 p-6 shadow-lg border-b border-green-700/50 backdrop-blur-sm">
+        <div class="text-center">
+            <h1 class="text-3xl font-bold text-white tracking-wide">SPORTS DEVELOPMENT OFFICE</h1>
+        </div>
+    </div>
 
-        <h2 class="text-2xl font-bold mb-6 text-white">ATHLETIX Login</h2>
-
-        @if($errors->any())
-            <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
-                {{ $errors->first() }}
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('login') }}">
-            @csrf
-
-            <div class="mb-4 text-left">
-                <label for="email" class="block text-white font-medium mb-1">Email</label>
-                <input type="email" name="email" id="email" class="w-full border border-gray-300 rounded px-3 py-2" required autofocus>
+    <!-- Login Container -->
+    <div class="flex-1 flex items-center justify-center w-full p-6">
+        <div class="bg-[#2e4e1f] p-8 rounded-xl shadow-2xl w-full max-w-md border border-green-800/50">
+            
+            <!-- Logo -->
+            <div class="text-center mb-6">
+                <img src="{{ asset('images/logo.png') }}" alt="UC Logo" class="mx-auto mb-4 w-24 h-24 rounded-full border-2 border-green-700">
+                <h2 class="text-2xl font-bold text-white">ATHLETIX Login</h2>
             </div>
 
-            <div class="mb-4 text-left">
-                <label for="password" class="block text-white font-medium mb-1">Password</label>
-                <input type="password" name="password" id="password" class="w-full border border-gray-300 rounded px-3 py-2" required>
-            </div>
+            <!-- Error Message -->
+            @if($errors->any())
+                <div class="bg-red-900/50 text-red-200 p-3 rounded-lg mb-6 border border-red-700/50 text-sm">
+                    {{ $errors->first() }}
+                </div>
+            @endif
 
-            <button type="submit" class="w-full bg-green-700 text-white py-2 rounded hover:bg-green-800 transition">
-                Login
-            </button>
-        </form>
+            <!-- Login Form -->
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
+
+                <div class="mb-5">
+                    <label for="email" class="block text-green-200 font-medium mb-2 text-sm">Email</label>
+                    <input type="email" name="email" id="email" 
+                        class="w-full bg-black/20 border border-green-700/50 rounded-lg px-4 py-2.5 text-white placeholder-green-200/50 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-green-600 transition" 
+                        placeholder="Enter your email" 
+                        required autofocus>
+                </div>
+
+                <div class="mb-6">
+                    <label for="password" class="block text-green-200 font-medium mb-2 text-sm">Password</label>
+                    <input type="password" name="password" id="password" 
+                        class="w-full bg-black/20 border border-green-700/50 rounded-lg px-4 py-2.5 text-white placeholder-green-200/50 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-green-600 transition" 
+                        placeholder="Enter your password" 
+                        required>
+                </div>
+
+                <button type="submit" 
+                    class="w-full bg-green-700 hover:bg-green-800 text-white py-2.5 rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg">
+                    Login
+                </button>
+            </form>
+
+            <!-- Footer Links -->
+            <div class="mt-6 text-center text-sm text-green-200">
+                <a href="#" class="text-green-400 hover:text-green-300 transition-colors hover:underline">Forgot Password?</a>
+                <span class="mx-2">•</span>
+                <a href="#" class="text-green-400 hover:text-green-300 transition-colors hover:underline">Contact Admin</a>
+            </div>
+        </div>
     </div>
 
 </body>

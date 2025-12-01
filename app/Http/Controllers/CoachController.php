@@ -13,14 +13,46 @@ use Illuminate\Support\Facades\Validator;
 
 class CoachController extends Controller
 {
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
+        // If user is a coach, show only their own profile
+        if (auth()->check() && auth()->user()->role === 'coach') {
+            $user = auth()->user();
+
+            // If coach_id specified in the request (after redirect), prefer that
+            $requestedCoachId = $request->query('coach_id');
+            if ($requestedCoachId) {
+                $coach = Coach::with('achievements', 'workHistories', 'memberships')->find($requestedCoachId);
+            } else {
+                // Prefer explicit coach_id (in case session user relation is stale).
+                if ($user->coach_id) {
+                    $coach = Coach::with('achievements', 'workHistories', 'memberships')
+                        ->find($user->coach_id);
+                } else {
+                    // fallback to relation
+                    $coach = $user->coach ? $user->coach->load('achievements', 'workHistories', 'memberships') : null;
+                }
+            }
+
+            // If no coach record, show the creation form
+            if (!$coach) {
+                return view('features.coach', compact('coach'));
+            }
+
+            return view('features.coach', compact('coach'));
+        }
+        
+        // Admins see all coaches
         $coaches = Coach::all();
         return view('c_lists.coach_lists', compact('coaches'));
     }
 
     public function create()
     {
+        // If coach user, redirect to index (their profile page)
+        if (auth()->check() && auth()->user()->role === 'coach') {
+            return redirect()->route('coaches.index');
+        }
         return view('features.coach');
     }
 
@@ -50,6 +82,10 @@ class CoachController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
+        // If coach user is updating their own profile
+        $isCoachUser = auth()->check() && auth()->user()->role === 'coach';
+        $coach = $isCoachUser ? auth()->user()->coach : null;
+
         // Mass assign coach data from general info
         $fields = [
             'coach_last_name', 'coach_first_name', 'coach_middle_initial',
@@ -73,7 +109,18 @@ class CoachController extends Controller
         }
 
         try {
-            $coach = DB::transaction(function () use ($data, $payload) {
+            // If coach user updating their own profile, update instead of create
+            if ($isCoachUser && $coach) {
+                $coach->update($data);
+                
+                if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
+                    return response()->json(['success' => true, 'coach' => $coach], 200);
+                }
+                return redirect()->route('coaches.index')->with('success', 'Your profile has been updated successfully!');
+            }
+
+            // Otherwise, create new coach (for admins or first-time coach setup)
+            $coachData = DB::transaction(function () use ($data, $payload) {
                 $c = Coach::create($data);
 
                 // ACHIEVEMENTS
@@ -167,19 +214,33 @@ class CoachController extends Controller
 
             // Handle picture upload if present
             if ($request->hasFile('coach_picture')) {
-                $path = $request->file('coach_picture')->store('coaches', 'public');
-                $coach->update(['coach_picture' => $path]);
+                $coachData->update(['coach_picture' => $path]);
+            }
+
+            // If the creator is the coach user themselves, link the created coach record
+            if (auth()->check()) {
+                $user = auth()->user();
+                $user->coach_id = $coachData->id;
+                // if coach_sport_event was set on the coach, copy it to user.coach_sport
+                if (!empty($coachData->coach_sport_event)) {
+                    $user->coach_sport = $coachData->coach_sport_event;
+                }
+                // Ensure the user's role is set to 'coach' so index() loads their profile
+                if ($user->role !== 'coach') {
+                    $user->role = 'coach';
+                }
+                $user->save();
             }
 
             if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
                 return response()->json([
                     'success' => true,
                     'message' => 'Coach created successfully',
-                    'coach' => $coach
+                    'coach' => $coachData
                 ], 201);
             }
 
-            return redirect()->route('coaches.show', $coach->id)->with('success', 'Coach created successfully');
+            return redirect()->route('coaches.show', $coachData->id)->with('success', 'Coach created successfully');
         } catch (\Exception $e) {
             Log::error('Coach creation failed', ['exception' => $e->getMessage()]);
 
@@ -425,5 +486,35 @@ public function show(Request $request, Coach $coach)
 
     // Return the model - Laravel auto-includes all loaded relationships
     return response()->json($coach);
+}
+
+// Get available sports (exclude already assigned sports)
+public function getAvailableSports()
+{
+    // All available sports
+    $allSports = [
+        'Basketball',
+        'Volleyball',
+        'Athletics',
+        'Swimming',
+        'Taekwondo',
+        'Chess',
+        'Football',
+        'Boxing',
+    ];
+
+    // Get sports already assigned to coaches
+    $assignedSports = Coach::whereNotNull('coach_sport_event')
+        ->pluck('coach_sport_event')
+        ->unique()
+        ->toArray();
+
+    // Filter out assigned sports
+    $availableSports = array_diff($allSports, $assignedSports);
+
+    return response()->json([
+        'available' => array_values($availableSports),
+        'assigned' => $assignedSports,
+    ]);
 }
 }

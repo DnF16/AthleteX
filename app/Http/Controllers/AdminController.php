@@ -91,6 +91,28 @@ class AdminController extends Controller
         
         return back()->with('success', 'No changes detected.'); 
     }
+
+    public function createCoachUser(Request $request)
+    {
+        // 1. Validate the input
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'coach_sport' => 'required|string|in:Basketball,Volleyball,Athletics,Swimming,Taekwondo,Chess,Football,Boxing',
+        ]);
+
+        // 2. Create the user account
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+            'role' => 'coach',
+            'coach_sport' => $validated['coach_sport'],
+        ]);
+
+        return back()->with('success', "Coach user account '{$user->email}' created successfully for {$validated['coach_sport']}! They can now login.");
+    }
     
     public function addClass(Request $request) {
         // Simplified creation for demonstration

@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Http\Request;
+use App\Http\Controllers\LoginController;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AthleteController;
 use App\Http\Controllers\AcademicEvaluationController;
@@ -8,8 +12,14 @@ use App\Http\Controllers\WorkHistoryController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route as Router;
 use App\Http\Controllers\CoachController;
+use App\Http\Controllers\ApprovalController;
 
-Route::get('/', function () {
+// Route::get('/', function () {
+//     return view('log.login');   
+// })->name('login');
+// Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
+
+Route::get('/dashboard', function () {
 	return view('features.dashboard');
 })->name('dashboard');
 
@@ -21,14 +31,30 @@ Route::get('/schedule', function () {
 	return view('features.schedule');
 })->name('schedule');
 
-// Log Routes
-Route::get('/login', function () {
-	return view('log.login');
+Route::get('/sports', function () {
+	return view('features.sports');
+})->name('sports');
+
+// // Log Routes
+// Show login form
+Route::get('/', function () {
+    return view('log.login');
 })->name('log.login');
 
-Route::post('/login', function (\Illuminate\Http\Request $request) {
-	return redirect()->route('dashboard');
+// Handle login form submission
+Route::post('/login', function (Request $request) {
+    $credentials = $request->only('email', 'password');
+
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        return redirect()->intended(route('dashboard'));
+    }
+
+    return back()->withErrors([
+        'email' => 'Invalid credentials.',
+    ]);
 })->name('login');
+
 
 // Student athlete pages
 Route::get('/student-athlete', function () {
@@ -74,7 +100,11 @@ Route::get('/work-history/{athlete_id}', [WorkHistoryController::class, 'show'])
 
 //==================================================================
 // Admin
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['auth', AdminMiddleware::class])
+    ->group(function () {
+    
     
     // View Routes (The 8 Screens)
     Route::get('/general', [AdminController::class, 'general'])->name('general');
@@ -93,8 +123,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/save-settings', [AdminController::class, 'saveSettings'])->name('saveSettings');
     Route::post('/save-grades', [AdminController::class, 'saveGrades'])->name('saveGrades');
     Route::post('/users/update', [AdminController::class, 'updateUserPermissions'])->name('updateUserPermissions');
+    Route::post('/users/create-coach', [AdminController::class, 'createCoachUser'])->name('createCoachUser');
     Route::post('/add-holiday', [AdminController::class, 'addHoliday'])->name('addHoliday');
     Route::post('/add-certificate', [AdminController::class, 'addCertificate'])->name('addCertificate');
+
+    Route::get('/sports/filter/{sport}', [SportsController::class, 'filter'])->name('sports.filter');
+
 });
 
 // ================================================================================================================================
@@ -104,6 +138,8 @@ Route::get('/coaches/create', [CoachController::class, 'create'])->name('coaches
 Route::post('/coaches', [CoachController::class, 'store'])->name('coaches.store');
 // Live search endpoint used by the coach page (AJAX)
 Route::get('/coaches/search', [CoachController::class, 'search'])->name('coaches.search');
+// Get available sports for coach assignment
+Route::get('/coaches-api/available-sports', [CoachController::class, 'getAvailableSports'])->name('coaches.available-sports');
 // Get full coach (with related sections)
 Route::get('/coaches/{coach}', [CoachController::class, 'show'])->name('coaches.show');
 // Update coach
@@ -158,4 +194,13 @@ Route::delete('/coach-work-history/{id}', [CoachWorkHistoryController::class, 'd
 // Work History routes (if coaches have it)
 Route::post('/coach-work-history', [CoachWorkHistoryController::class, 'store']);
 Route::get('/coach-work-history/{coach_id}', [CoachWorkHistoryController::class, 'show']);
+
+// =================================================================
+// Admin Athlete Approval Routes
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/approvals', [ApprovalController::class, 'pendingApprovals'])->name('approvals.pending');
+    Route::get('/approvals/{athlete}', [ApprovalController::class, 'show'])->name('approvals.show');
+    Route::post('/approvals/{athlete}/approve', [ApprovalController::class, 'approve'])->name('approvals.approve');
+    Route::post('/approvals/{athlete}/decline', [ApprovalController::class, 'decline'])->name('approvals.decline');
+});
 
