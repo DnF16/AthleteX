@@ -270,11 +270,16 @@
 
                         <!-- 8th Row -->
                         <div class="grid grid-cols-3 gap-4 mb-4">
-                            <div class="flex items-center">
-                                <label for="coach_name" class="w-1/3 text-gray-700 font-medium">Coach’s Name</label>
-                                <input type="text" id="coach_name" name="coach_name" placeholder="Enter Coach’s Name"
-                                    class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-bold mb-2">Coach</label>
+                                <div class="p-2 border rounded bg-gray-100 text-gray-700">
+                                    <?php echo e(Auth::user()->coach ? Auth::user()->coach->coach_first_name . ' ' . Auth::user()->coach->coach_last_name : 'No coach assigned'); ?>
+
+                                </div>
                             </div>
+
+                            <input type="hidden" name="coach_id" value="<?php echo e(Auth::user()->coach ? Auth::user()->coach->id : ''); ?>">
+
 
                             <div class="flex items-center">
                                 <label for="date_joined" class="w-1/3 text-gray-700 font-medium">Date Joined (Varsity)</label>
@@ -824,47 +829,47 @@
             <div id="workModal" 
                 class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 
-                <div class="bg-[#2e4e1f] text-white rounded-xl shadow-xl w-full max-w-lg p-6 relative">
+                <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
 
                     <button type="button" onclick="toggleWorkModal(false)" 
                             class="absolute top-3 right-3 text-white hover:text-white">
                         ✕
                     </button>
 
-                    <h2 class="text-xl font-bold mb-4 text-center">Add Work History</h2>
+                    <h2 class="text-xl font-bold mb-4 text-center text-white">Add Work History</h2>
 
                     <form id="workForm" class="space-y-4">
 
                         
                         <div>
-                            <label class=" font-medium">Year</label>
+                            <label class="text-white font-medium">Year</label>
                             <input type="text" name="year" placeholder="Ex: 2025"
                                 class="w-full border rounded px-3 py-2">
                         </div>
 
                         
                         <div>
-                            <label class=" font-medium">Date</label>
+                            <label class="text-white font-medium">Date</label>
                             <input type="date" name="date" class="w-full border rounded px-3 py-2">
                         </div>
 
                         
                         <div>
-                            <label class=" font-medium">Work Position</label>
+                            <label class="text-white font-medium">Work Position</label>
                             <input type="text" name="position" placeholder="Ex: Coach"
                                 class="w-full border rounded px-3 py-2">
                         </div>
 
                         
                         <div>
-                            <label class=" font-medium">Name of Company</label>
+                            <label class="text-white font-medium">Name of Company</label>
                             <input type="text" name="company" placeholder="Ex: ABC Sports Academy"
                                 class="w-full border rounded px-3 py-2">
                         </div>
 
                         
                         <div>
-                            <label class=" font-medium">Remarks</label>
+                            <label class="text-white font-medium">Remarks</label>
                             <select name="remarks" class="w-full border rounded px-3 py-2">
                                 <option value="">Select</option>
                                 <option>Active</option>

@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('content'); ?>
 <div class="container-fluid p-0"><div class="row g-0">
     <div class="col-md-3 col-lg-2 p-3" style="background-color: #dbead5; min-height: 100vh; border-right: 1px solid #c4d79b;"><?php echo $__env->make('admin.partials.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?></div>
