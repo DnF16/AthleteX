@@ -1383,7 +1383,24 @@ if (window.currentUserRole === 'coach' && window.currentCoachId) {
             Event: 'Event', Date: 'Date', List: 'Athletes', coachRemark: 'Remarks'
         });
 
-        // ... other table populates ...
+        populateTable('expensesTable', full.expenses, {
+            Academic: 'Academic Year', Term: 'Term', Type: 'Type', Amount: 'Amount',
+            EventAthlete: 'Event/Athlete', notes: 'Notes', coachRemark: 'Remarks'
+        });
+
+        populateTable('membershipTable', full.memberships, {
+            AcademicTerm: 'Academic Term', UnitsEnrolled: 'Units', CoachTuition: 'Tuition',
+            CoachMiscellaneous: 'Misc', CoachOtherCharges: 'Other', CoachAssessment: 'Assessment',
+            CoachTotalDiscount: 'Discount', coachRemark: 'Remarks'
+        });
+
+        populateTable('seminarsTable', full.seminars, {
+            Year: 'Year', date: 'Date', WorkPosition: 'Position', NameCompany: 'Company', coachRemark: 'Remarks'
+        });
+
+        populateTable('workTable', full.workHistories, {
+            year: 'Year', date: 'Date', work_position: 'Position', company_name: 'Company', coachRemark: 'Remarks'
+        });
     })
     .catch(err => console.error('❌ Failed to auto-load coach data:', err));
 }

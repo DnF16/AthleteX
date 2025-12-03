@@ -127,7 +127,7 @@ class CoachController extends Controller
                 // SCHEDULES
                 if (!empty($payload['schedules']) && is_array($payload['schedules'])) {
                     foreach ($payload['schedules'] as $sch) {
-                        $c->schedule()->create([
+                        $coach->schedule()->create([
                             'event' => $sch['Event'] ?? null,          
                             'date' => $sch['Date'] ?? null,
                             'athlete_list' => $sch['List'] ?? null,    
@@ -139,7 +139,7 @@ class CoachController extends Controller
                 // EXPENSES
                 if (!empty($payload['expenses']) && is_array($payload['expenses'])) {
                     foreach ($payload['expenses'] as $exp) {
-                        $c->expenses()->create([
+                        $coach->expenses()->create([
                             'academic_year' => $exp['Academic'] ?? null,          
                             'term' => $exp['Term'] ?? null,
                             'type' => $exp['Type'] ?? null,
@@ -154,7 +154,7 @@ class CoachController extends Controller
                 // MEMBERSHIPS
                 if (!empty($payload['memberships']) && is_array($payload['memberships'])) {
                     foreach ($payload['memberships'] as $mem) {
-                        $c->memberships()->create([
+                        $coach->memberships()->create([
                             'academic_term_year' => $mem['AcademicTerm'] ?? null,     
                             'total_units_enrolled' => $mem['UnitsEnrolled'] ?? null,
                             'tuition_fee' => $mem['CoachTuition'] ?? null,          
@@ -170,7 +170,7 @@ class CoachController extends Controller
                 // SEMINARS
                 if (!empty($payload['seminars']) && is_array($payload['seminars'])) {
                     foreach ($payload['seminars'] as $sem) {
-                        $c->seminars()->create([
+                        $coach->seminars()->create([
                             'Year' => $sem['Year'] ?? null,
                             'date' => $sem['date'] ?? null,
                             'work_position' => $sem['WorkPosition'] ?? null,  
@@ -184,7 +184,7 @@ class CoachController extends Controller
                 if (!empty($payload['workHistory']) && is_array($payload['workHistory'])) {
                     foreach ($payload['workHistory'] as $w) {
                         CoachWorkHistory::create([
-                            'coach_id' => $c->id,
+                            'coach_id' => $coach->id,
                             'year' => $w['year'] ?? null,
                             'date' => $w['date'] ?? null,
                             'work_position' => $w['work_position'] ?? null,    
@@ -328,7 +328,7 @@ class CoachController extends Controller
                 // SCHEDULES
                 if (!empty($payload['schedules']) && is_array($payload['schedules'])) {
                     foreach ($payload['schedules'] as $sch) {
-                        $c->schedule()->create([
+                        $coach->schedule()->create([
                             'event' => $sch['Event'] ?? null,          
                             'date' => $sch['Date'] ?? null,
                             'athlete_list' => $sch['List'] ?? null,    
@@ -340,7 +340,7 @@ class CoachController extends Controller
                 // EXPENSES
                 if (!empty($payload['expenses']) && is_array($payload['expenses'])) {
                     foreach ($payload['expenses'] as $exp) {
-                        $c->expenses()->create([
+                        $coach->expenses()->create([
                             'academic_year' => $exp['Academic'] ?? null,          
                             'term' => $exp['Term'] ?? null,
                             'type' => $exp['Type'] ?? null,
@@ -355,7 +355,7 @@ class CoachController extends Controller
                 // MEMBERSHIPS
                 if (!empty($payload['memberships']) && is_array($payload['memberships'])) {
                     foreach ($payload['memberships'] as $mem) {
-                        $c->memberships()->create([
+                        $coach->memberships()->create([
                             'academic_term_year' => $mem['AcademicTerm'] ?? null,     
                             'total_units_enrolled' => $mem['UnitsEnrolled'] ?? null,
                             'tuition_fee' => $mem['CoachTuition'] ?? null,          
@@ -371,7 +371,7 @@ class CoachController extends Controller
                 // SEMINARS
                 if (!empty($payload['seminars']) && is_array($payload['seminars'])) {
                     foreach ($payload['seminars'] as $sem) {
-                        $c->seminars()->create([
+                        $coach->seminars()->create([
                             'Year' => $sem['Year'] ?? null,
                             'date' => $sem['date'] ?? null,
                             'work_position' => $sem['WorkPosition'] ?? null,  
