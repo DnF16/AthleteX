@@ -147,17 +147,23 @@
         <!-- Coach General Info Content -->
         <div id="coach-general-info" class="tab-content hidden">
             <div class="flex items-stretch gap-6">
-                <form id="coachForm" 
-                    method="POST" 
-                    action="<?php echo e(isset($coach) ? route('coaches.update', $coach->id) : route('coaches.store')); ?>" 
-                    class="coach-form flex items-stretch gap-6 w-full" 
-                    autocomplete="off" 
-                    enctype="multipart/form-data">
+                <form id="coachForm" method="POST" action="
+                    <?php if(auth()->check() && auth()->user()->role === 'coach' && isset($coach)): ?>
+                        <?php echo e(route('coaches.update', $coach->id)); ?>
+
+                    <?php else: ?>
+                        <?php echo e(route('coaches.store')); ?>
+
+                    <?php endif; ?>
+                " class="coach-form flex items-stretch gap-6 w-full" autocomplete="off" enctype="multipart/form-data">
                     <?php echo csrf_field(); ?>
-                    <?php if(isset($coach)): ?>
+
+                    <?php if(auth()->check() && auth()->user()->role === 'coach' && isset($coach)): ?>
                         <?php echo method_field('PUT'); ?>
                     <?php endif; ?>
 
+                    <!-- method spoofing input: stay POST by default, switched to PUT when updating -->
+                    <input type="hidden" name="_method" id="coach_method" value="POST">
                     <!-- selected coach id (for reference) -->
                     <input type="hidden" name="selected_coach_id" id="selected_coach_id" value="<?php echo e(isset($coach) ? $coach->id : ''); ?>">
 
@@ -1253,7 +1259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         expenses: [],
         memberships: [],
         seminars: [],
-        workHistories: []    // Note: singular, but maps from workHistories
+        workHistory: []    // Note: singular, but maps from workHistories
     };
 
     // Auto-load logged-in coach data for coaches

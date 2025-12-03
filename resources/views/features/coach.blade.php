@@ -149,17 +149,21 @@
         <!-- Coach General Info Content -->
         <div id="coach-general-info" class="tab-content hidden">
             <div class="flex items-stretch gap-6">
-                <form id="coachForm" 
-                    method="POST" 
-                    action="{{ isset($coach) ? route('coaches.update', $coach->id) : route('coaches.store') }}" 
-                    class="coach-form flex items-stretch gap-6 w-full" 
-                    autocomplete="off" 
-                    enctype="multipart/form-data">
+                <form id="coachForm" method="POST" action="
+                    @if(auth()->check() && auth()->user()->role === 'coach' && isset($coach))
+                        {{ route('coaches.update', $coach->id) }}
+                    @else
+                        {{ route('coaches.store') }}
+                    @endif
+                " class="coach-form flex items-stretch gap-6 w-full" autocomplete="off" enctype="multipart/form-data">
                     @csrf
-                    @if(isset($coach))
+
+                    @if(auth()->check() && auth()->user()->role === 'coach' && isset($coach))
                         @method('PUT')
                     @endif
 
+                    <!-- method spoofing input: stay POST by default, switched to PUT when updating -->
+                    <input type="hidden" name="_method" id="coach_method" value="POST">
                     <!-- selected coach id (for reference) -->
                     <input type="hidden" name="selected_coach_id" id="selected_coach_id" value="{{ isset($coach) ? $coach->id : '' }}">
 
@@ -1255,7 +1259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         expenses: [],
         memberships: [],
         seminars: [],
-        workHistories: []    // Note: singular, but maps from workHistories
+        workHistory: []    // Note: singular, but maps from workHistories
     };
 
     // Auto-load logged-in coach data for coaches
@@ -1366,7 +1370,7 @@ if (window.currentUserRole === 'coach' && window.currentCoachId) {
             expenses: full.expenses || [],
             memberships: full.memberships || [],
             seminars: full.seminars || [],
-            workHistories: full.workHistories || []
+            workHistory: full.workHistories || []
         };
 
         // Populate tables
@@ -1453,7 +1457,7 @@ if (window.currentUserRole === 'coach' && window.currentCoachId) {
                 expenses: [],
                 memberships: [],
                 seminars: [],
-                workHistories: []
+                workHistory: []
             };
         }
 
@@ -1531,7 +1535,7 @@ if (window.currentUserRole === 'coach' && window.currentCoachId) {
                             expenses: full.expenses || [],
                             memberships: full.memberships || [],
                             seminars: full.seminars || [],
-                            workHistories: full.workHistories || [] // Map plural to singular
+                            workHistory: full.workHistories || [] // Map plural to singular
                         };
 
                         log('📊 Global data ready', window.newCoachData);
