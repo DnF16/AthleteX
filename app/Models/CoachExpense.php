@@ -11,13 +11,13 @@ class CoachExpense extends Model
 
     protected $fillable = [
         'coach_id',
-        'academic_year',
-        'term',
-        'type',
-        'amount',
-        'event_athlete',
-        'notes',
-        'remarks',
+        'year',
+        'date',
+        'title',
+        'estimate_budget',
+        'actual_budget',
+        'variance',
+        'remark',
     ];
 
     public function coach()

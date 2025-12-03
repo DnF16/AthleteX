@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('coach_seminars', function (Blueprint $table) {
             $table->id();
             $table->foreignId('coach_id')->constrained('coaches')->onDelete('cascade');
-            $table->date('year')->nullable();
+            $table->text('year')->nullable();
             $table->date('date')->nullable();
-            $table->string('work_position')->nullable();
-            $table->string('company_name')->nullable();
+            $table->string('venue')->nullable();
+            $table->string('title_of_seminar_workshop')->nullable();
+            $table->string('level')->nullable();
             $table->text('remarks')->nullable();
             $table->timestamps();
         });

@@ -11,9 +11,11 @@ class CoachSchedule extends Model
 
     protected $fillable = [
         'coach_id',
-        'event',
-        'date',
-        'athlete_list',
+        'term',
+        'academic_year',
+        'count_a',
+        'count_b',
+        'count_c',
         'remarks',
     ];
 

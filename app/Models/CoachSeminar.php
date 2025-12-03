@@ -13,8 +13,9 @@ class CoachSeminar extends Model
         'coach_id',
         'year',
         'date',
-        'work_position',
-        'company_name',
+        'venue',
+        'title_of_seminar_workshop',
+        'level',
         'remarks',
     ];
 

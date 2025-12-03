@@ -14,13 +14,12 @@ return new class extends Migration
         Schema::create('coach_memberships', function (Blueprint $table) {
             $table->id();
             $table->foreignId('coach_id')->constrained('coaches')->onDelete('cascade');
-            $table->string('academic_term_year')->nullable();
-            $table->decimal('total_units_enrolled', 8, 2)->nullable();
-            $table->decimal('tuition_fee', 12, 2)->nullable();
-            $table->decimal('misc_fee', 12, 2)->nullable();
-            $table->decimal('other_charges', 12, 2)->nullable();
-            $table->decimal('total_assessment', 12, 2)->nullable();
-            $table->decimal('total_discount', 12, 2)->nullable();
+            $table->string('year')->nullable();
+            $table->date('date')->nullable();
+            $table->text('venue')->nullable();
+            $table->text('name_of_organization')->nullable();
+            $table->text('level')->nullable();
+            $table->text('position')->nullable();
             $table->text('remarks')->nullable();
             $table->timestamps();
         });

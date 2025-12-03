@@ -125,13 +125,15 @@ class CoachController extends Controller
                 }
 
                 // SCHEDULES
-                if (!empty($payload['schedules']) && is_array($payload['schedules'])) {
-                    foreach ($payload['schedules'] as $sch) {
-                        $coach->schedule()->create([
-                            'event' => $sch['Event'] ?? null,          
-                            'date' => $sch['Date'] ?? null,
-                            'athlete_list' => $sch['List'] ?? null,    
-                            'remarks' => $sch['coachRemark'] ?? null,   
+                if (!empty($payload['schedule']) && is_array($payload['schedule'])) {
+                    foreach ($payload['schedule'] as $sch) {
+                        $c->schedule()->create([
+                            'term' => $sch['term'] ?? null,
+                            'academic_year' => $sch['academic_year'] ?? null,
+                            'count_a' => $sch['count_a'] ?? 0,
+                            'count_b' => $sch['count_b'] ?? 0,
+                            'count_c' => $sch['count_c'] ?? 0, 
+                            'remarks' => $sch['remarks'] ?? null,   
                         ]);
                     }
                 }
@@ -139,14 +141,15 @@ class CoachController extends Controller
                 // EXPENSES
                 if (!empty($payload['expenses']) && is_array($payload['expenses'])) {
                     foreach ($payload['expenses'] as $exp) {
-                        $coach->expenses()->create([
-                            'academic_year' => $exp['Academic'] ?? null,          
-                            'term' => $exp['Term'] ?? null,
-                            'type' => $exp['Type'] ?? null,
-                            'amount' => $exp['Amount'] ?? null,
+                        $c->expenses()->create([
+                            'year' => $exp['year'] ?? null,          
+                            'date' => $exp['date'] ?? null,
+                            'title' => $exp['title'] ?? null,
+                            'estimate_budget' => $exp['estimate'] ?? null,
                             'notes' => $exp['notes'] ?? null,
-                            'event_athlete' => $exp['EventAthlete'] ?? null,     
-                            'remarks' => $exp['coachRemark'] ?? null,             
+                            'actual_budget' => $exp['actual'] ?? null,
+                            'variance' => $exp['variance'] ?? null,     
+                            'remark' => $exp['remark'] ?? null,             
                         ]);
                     }
                 }
@@ -154,15 +157,14 @@ class CoachController extends Controller
                 // MEMBERSHIPS
                 if (!empty($payload['memberships']) && is_array($payload['memberships'])) {
                     foreach ($payload['memberships'] as $mem) {
-                        $coach->memberships()->create([
-                            'academic_term_year' => $mem['AcademicTerm'] ?? null,     
-                            'total_units_enrolled' => $mem['UnitsEnrolled'] ?? null,
-                            'tuition_fee' => $mem['CoachTuition'] ?? null,          
-                            'misc_fee' => $mem['CoachMiscellaneous'] ?? null,         
-                            'other_charges' => $mem['CoachOtherCharges'] ?? null,    
-                            'total_assessment' => $mem['CoachAssessment'] ?? null,
-                            'total_discount' => $mem['CoachTotalDiscount'] ?? null,
-                            'remarks' => $mem['coachRemark'] ?? null,                 
+                        $c->memberships()->create([
+                            'year' => $mem['year'] ?? null,     
+                            'date' => $mem['date'] ?? null,
+                            'venue' => $mem['venue'] ?? null,          
+                            'name_of_organization' => $mem['organization'] ?? null,         
+                            'level' => $mem['level'] ?? null,    
+                            'position' => $mem['position'] ?? null,
+                            'remarks' => $mem['remark'] ?? null,                   
                         ]);
                     }
                 }
@@ -170,12 +172,13 @@ class CoachController extends Controller
                 // SEMINARS
                 if (!empty($payload['seminars']) && is_array($payload['seminars'])) {
                     foreach ($payload['seminars'] as $sem) {
-                        $coach->seminars()->create([
-                            'Year' => $sem['Year'] ?? null,
+                        $c->seminars()->create([
+                            'year' => $sem['year'] ?? null,
                             'date' => $sem['date'] ?? null,
-                            'work_position' => $sem['WorkPosition'] ?? null,  
-                            'company_name' => $sem['NameCompany'] ?? null,     
-                            'remarks' => $sem['coachRemark'] ?? null,         
+                            'venue' => $sem['venue'] ?? null,  
+                            'title_of_seminar_workshop' => $sem['seminar'] ?? null,
+                            'level' => $sem['level'] ?? null,     
+                            'remarks' => $sem['remark'] ?? null,         
                         ]);
                     }
                 }
@@ -184,12 +187,12 @@ class CoachController extends Controller
                 if (!empty($payload['workHistory']) && is_array($payload['workHistory'])) {
                     foreach ($payload['workHistory'] as $w) {
                         CoachWorkHistory::create([
-                            'coach_id' => $coach->id,
+                            'coach_id' => $c->id,
                             'year' => $w['year'] ?? null,
                             'date' => $w['date'] ?? null,
                             'work_position' => $w['work_position'] ?? null,    
-                            'company_name' => $w['company_name'] ?? null,     
-                            'remarks' => $w['coachRemark'] ?? null,       
+                            'company_name' => $w['company'] ?? null,     
+                            'remarks' => $w['remark'] ?? null,       
                         ]);
                     }
                 }
@@ -326,13 +329,15 @@ class CoachController extends Controller
                 }
 
                 // SCHEDULES
-                if (!empty($payload['schedules']) && is_array($payload['schedules'])) {
-                    foreach ($payload['schedules'] as $sch) {
+                if (!empty($payload['schedule']) && is_array($payload['schedule'])) {
+                    foreach ($payload['schedule'] as $sch) {
                         $coach->schedule()->create([
-                            'event' => $sch['Event'] ?? null,          
-                            'date' => $sch['Date'] ?? null,
-                            'athlete_list' => $sch['List'] ?? null,    
-                            'remarks' => $sch['coachRemark'] ?? null,   
+                            'term' => $sch['term'] ?? null,
+                            'academic_year' => $sch['academic_year'] ?? null,
+                            'count_a' => $sch['count_a'] ?? 0,
+                            'count_b' => $sch['count_b'] ?? 0,
+                            'count_c' => $sch['count_c'] ?? 0,   
+                            'remarks' => $sch['remarks'] ?? null,   
                         ]);
                     }
                 }
@@ -341,13 +346,13 @@ class CoachController extends Controller
                 if (!empty($payload['expenses']) && is_array($payload['expenses'])) {
                     foreach ($payload['expenses'] as $exp) {
                         $coach->expenses()->create([
-                            'academic_year' => $exp['Academic'] ?? null,          
-                            'term' => $exp['Term'] ?? null,
-                            'type' => $exp['Type'] ?? null,
-                            'amount' => $exp['Amount'] ?? null,
-                            'notes' => $exp['notes'] ?? null,
-                            'event_athlete' => $exp['EventAthlete'] ?? null,     
-                            'remarks' => $exp['coachRemark'] ?? null,             
+                            'year' => $exp['year'] ?? null,          
+                            'date' => $exp['date'] ?? null,
+                            'title' => $exp['title'] ?? null,
+                            'estimate_budget' => $exp['estimate'] ?? null,
+                            'actual_budget' => $exp['actual'] ?? null,
+                            'variance' => $exp['variance'] ?? null,     
+                            'remark' => $exp['remark'] ?? null,              
                         ]);
                     }
                 }
@@ -356,14 +361,13 @@ class CoachController extends Controller
                 if (!empty($payload['memberships']) && is_array($payload['memberships'])) {
                     foreach ($payload['memberships'] as $mem) {
                         $coach->memberships()->create([
-                            'academic_term_year' => $mem['AcademicTerm'] ?? null,     
-                            'total_units_enrolled' => $mem['UnitsEnrolled'] ?? null,
-                            'tuition_fee' => $mem['CoachTuition'] ?? null,          
-                            'misc_fee' => $mem['CoachMiscellaneous'] ?? null,         
-                            'other_charges' => $mem['CoachOtherCharges'] ?? null,    
-                            'total_assessment' => $mem['CoachAssessment'] ?? null,
-                            'total_discount' => $mem['CoachTotalDiscount'] ?? null,
-                            'remarks' => $mem['coachRemark'] ?? null,                 
+                            'year' => $mem['year'] ?? null,     
+                            'date' => $mem['date'] ?? null,
+                            'venue' => $mem['venue'] ?? null,          
+                            'name_of_organization' => $mem['organization'] ?? null,         
+                            'level' => $mem['level'] ?? null,    
+                            'position' => $mem['position'] ?? null,
+                            'remarks' => $mem['remark'] ?? null,                 
                         ]);
                     }
                 }
@@ -372,11 +376,12 @@ class CoachController extends Controller
                 if (!empty($payload['seminars']) && is_array($payload['seminars'])) {
                     foreach ($payload['seminars'] as $sem) {
                         $coach->seminars()->create([
-                            'Year' => $sem['Year'] ?? null,
+                            'year' => $sem['year'] ?? null,
                             'date' => $sem['date'] ?? null,
-                            'work_position' => $sem['WorkPosition'] ?? null,  
-                            'company_name' => $sem['NameCompany'] ?? null,     
-                            'remarks' => $sem['coachRemark'] ?? null,         
+                            'venue' => $sem['venue'] ?? null,  
+                            'title_of_seminar_workshop' => $sem['seminar'] ?? null,
+                            'level' => $sem['level'] ?? null,     
+                            'remarks' => $sem['remark'] ?? null,         
                         ]);
                     }
                 }
@@ -384,13 +389,12 @@ class CoachController extends Controller
                 // WORK HISTORY
                 if (!empty($payload['workHistory']) && is_array($payload['workHistory'])) {
                     foreach ($payload['workHistory'] as $w) {
-                        CoachWorkHistory::create([
-                            'coach_id' => $c->id,
+                        $coach->workHistories()->create([
                             'year' => $w['year'] ?? null,
                             'date' => $w['date'] ?? null,
                             'work_position' => $w['work_position'] ?? null,    
-                            'company_name' => $w['company_name'] ?? null,     
-                            'remarks' => $w['coachRemark'] ?? null,       
+                            'company_name' => $w['company'] ?? null,     
+                            'remarks' => $w['remark'] ?? null,       
                         ]);
                     }
                 }

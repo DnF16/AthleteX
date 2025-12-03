@@ -14,9 +14,13 @@ return new class extends Migration
         Schema::create('coach_schedules', function (Blueprint $table) {
             $table->id();
             $table->foreignId('coach_id')->constrained('coaches')->onDelete('cascade');
-            $table->string('event')->nullable();
-            $table->date('date')->nullable();
-            $table->string('athlete_list')->nullable(); 
+             $table->string('term')->nullable();
+            $table->string('academic_year')->nullable();
+
+            // Athlete counts
+            $table->integer('count_a')->default(0);
+            $table->integer('count_b')->default(0);
+            $table->integer('count_c')->default(0);
             $table->text('remarks')->nullable();
             $table->timestamps();
         });

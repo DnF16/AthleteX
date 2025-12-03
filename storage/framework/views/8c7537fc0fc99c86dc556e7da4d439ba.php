@@ -719,10 +719,15 @@
                     <table class="w-full text-left">
                         <thead class="bg-green-600 text-white text-center">
                             <tr>
-                                <th class="py-3">Event</th>
-                                <th class="py-3">Date</th>
-                                <th class="py-3">List of AThletes</th>
-                                <th class="py-3">Remarks</th>
+                                <th class="py-3 border border-gray-300" rowspan="2">Term</th>
+                                <th class="py-3 border border-gray-300" rowspan="2">Academic Year</th>
+                                <th class="py-3 border border-gray-300" colspan="3">Total Number of Athletes</th>
+                                <th class="py-3 border border-gray-300" rowspan="2">Remarks</th>
+                            </tr>
+                            <tr>
+                                <th class="py-2 border border-gray-300">A</th>
+                                <th class="py-2 border border-gray-300">B</th>
+                                <th class="py-2 border border-gray-300">C</th>
                             </tr>
                         </thead>
 
@@ -749,33 +754,44 @@
 
                     <form id="ScheduleForm" class="space-y-4">
 
+                        <!-- TERM -->
                         <div>
-                            <label class="text-white font-medium">Event</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="Event" placeholder="Event">
+                            <label class="text-white font-medium">Term</label>
+                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2"
+                                name="term" placeholder="e.g., 1st Term">
                         </div>
 
+                        <!-- ACADEMIC YEAR -->
                         <div>
-                            <label class="text-white font-medium">Date</label>
-                            <input type="date" class="w-full border rounded px-3 py-2" 
-                                name="Date" placeholder="Date">
+                            <label class="text-white font-medium">Academic Year</label>
+                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2"
+                                name="academic_year" placeholder="e.g., 2024 - 2025">
                         </div>
 
-                        <div>
-                            <label class="text-white font-medium">List of Athletes</label>
-                            <select name="List" class="w-full border rounded px-3 py-2">
-                                <option value="">Select Class</option>
-                                <option value="Class A">Class A</option>
-                                <option value="Class B">Class B</option>
-                                <option value="Class C">Class C</option>
-                                <!-- Add more classes as needed -->
-                            </select>
+                        <!-- TOTAL NUMBER OF ATHLETES -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="text-white font-medium">Class A</label>
+                                <input type="number" class="w-full border border-gray-300 rounded px-3 py-2"
+                                    name="count_a" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="text-white font-medium">Class B</label>
+                                <input type="number" class="w-full border border-gray-300 rounded px-3 py-2"
+                                    name="count_b" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="text-white font-medium">Class C</label>
+                                <input type="number" class="w-full border border-gray-300 rounded px-3 py-2"
+                                    name="count_c" placeholder="0">
+                            </div>
                         </div>
 
+                        <!-- REMARKS -->
                         <div>
-                            <label class="text-white font-medium">Remark</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="coachRemark" placeholder="Input Remark">
+                            <label class="text-white font-medium">Remarks</label>
+                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2"
+                                name="remarks" placeholder="Any notes or remark">
                         </div>
 
                         <!-- Submit -->
@@ -810,12 +826,12 @@
                     <table class="w-full text-left">
                         <thead class="bg-green-600 text-white text-center">
                             <tr>
-                                <th class="py-3">Academic Year</th>
-                                <th class="py-3">Term</th>
-                                <th class="py-3">Type</th>
-                                <th class="py-3">Amount</th>
-                                <th class="py-3">Event / Athlete</th>
-                                <th class="py-3">Notes</th>
+                                <th class="py-3">Year</th>
+                                <th class="py-3">Date</th>
+                                <th class="py-3">Title of Activity</th>
+                                <th class="py-3">Estimate Budget</th>
+                                <th class="py-3">Actual Budget</th>
+                                <th class="py-3">Variance</th>
                                 <th class="py-3">Remarks</th>
                             </tr>
                         </thead>
@@ -839,50 +855,50 @@
                         ✕
                     </button>
 
-                    <h2 class="text-xl font-bold mb-4 text-white">Add Schedule an Athlete</h2>
+                    <h2 class="text-xl font-bold mb-4 text-white">Add Expenses</h2>
 
                     <form id="ExpensesForm" class="space-y-4">
 
                         <div>
-                            <label class="text-white font-medium">Academic Year</label>
+                            <label class="text-white font-medium">Year</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="Academic" placeholder="Academic Year">
+                                name="year" placeholder="Year">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Term</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="Term" placeholder="Term">
+                            <label class="text-white font-medium">Date</label>
+                            <input type="date" class="w-full border rounded px-3 py-2" 
+                                name="date" placeholder="Term">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Type</label>
+                            <label class="text-white font-medium">Title of Activity</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="Type" placeholder="Type">
+                                name="title" placeholder="Title of Activity">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Amount</label>
+                            <label class="text-white font-medium">Estimate Budget</label>
                             <input type="number" class="w-full border rounded px-3 py-2" 
-                                name="Amount" placeholder="Amount">
+                                name="estimate" placeholder="Estimate Budget">
                         </div>
                         
                         <div>
-                            <label class="text-white font-medium">Event / Athlete</label>
+                            <label class="text-white font-medium">Actual Budget</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="EventAthlete" placeholder="Event / Athlete">
+                                name="actual" placeholder="Actual Budget">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Notes</label>
+                            <label class="text-white font-medium">Variance</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="notes" placeholder="Notes">
+                                name="variance" placeholder="Variance">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Remarks</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="coachRemark" placeholder="Input Remark">
+                                name="remark" placeholder="Input Remark">
                         </div>
 
                         <!-- Submit -->
@@ -917,13 +933,12 @@
                     <table class="w-full text-left">
                         <thead class="bg-green-600 text-white text-center">
                             <tr>
-                                <th class="py-3">Academic Term and Year</th>
-                                <th class="py-3">Total Units Enrolled</th>
-                                <th class="py-3">Tuition Fee</th>
-                                <th class="py-3">Miscellaneous Fee</th>
-                                <th class="py-3">Other Charges</th>
-                                <th class="py-3">Total Assessment</th>
-                                <th class="py-3">Total Discount</th>
+                                <th class="py-3">Year</th>
+                                <th class="py-3">Date</th>
+                                <th class="py-3">Venue</th>
+                                <th class="py-3">Name of organization</th>
+                                <th class="py-3">Level</th>
+                                <th class="py-3">Position</th>
                                 <th class="py-3">Remarks</th>
                             </tr>
                         </thead>
@@ -952,51 +967,45 @@
                     <form id="MembershipForm" class="space-y-4">
 
                         <div>
-                            <label class="text-white font-medium">Academic Term and Year</label>
+                            <label class="text-white font-medium">Year</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="AcademicTerm" placeholder="Academic Term and Year">
+                                name="year" placeholder="Year">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Total Units Enrolled</label>
-                            <input type="number" class="w-full border rounded px-3 py-2" 
-                                step="0.01" name="UnitsEnrolled" placeholder="Total Units Enrolled">
+                            <label class="text-white font-medium">Date</label>
+                            <input type="date" class="w-full border rounded px-3 py-2" 
+                            name="date" placeholder="Date">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Tuition Fee</label>
-                            <input type="number" class="w-full border rounded px-3 py-2" 
-                                name="CoachTuition" placeholder="Tuition Fee">
+                            <label class="text-white font-medium">Venue</label>
+                            <input type="text" class="w-full border rounded px-3 py-2" 
+                                name="venue" placeholder="Venue">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Miscellaneous Fee</label>
-                            <input type="number" class="w-full border rounded px-3 py-2" 
-                                name="CoachMiscellaneous" placeholder="Miscellaneous Fee">
+                            <label class="text-white font-medium">Name of Organization</label>
+                            <input type="text" class="w-full border rounded px-3 py-2" 
+                                name="organization" placeholder="Name of Organization">
                         </div>
                         
                         <div>
-                            <label class="text-white font-medium">Other Charges</label>
-                            <input type="number" class="w-full border rounded px-3 py-2" 
-                                name="CoachOtherCharges" placeholder="Other Charges">
-                        </div>
-
-                        <div>
-                            <label class="text-white font-medium">Total Assessment</label>
+                            <label class="text-white font-medium">Level</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="CoachAssessment" placeholder="Total Assessment">
+                                name="level" placeholder="Level">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Total Discount</label>
-                            <input type="number" class="w-full border rounded px-3 py-2" 
-                                name="CoachTotalDiscount" placeholder="Total Discount">
+                            <label class="text-white font-medium">Position</label>
+                            <input type="text" class="w-full border rounded px-3 py-2" 
+                                name="position" placeholder="Position">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Remarks</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="coachRemark" placeholder="Input Remark">
+                                name="remark" placeholder="Remarks">
                         </div>
 
                         <!-- Submit -->
@@ -1033,8 +1042,9 @@
                             <tr>
                                 <th class="py-3">Year</th>
                                 <th class="py-3">Date</th>
-                                <th class="py-3">Work position</th>
-                                <th class="py-3">Name of Company</th>
+                                <th class="py-3">Venue</th>
+                                <th class="py-3">Title of Seminar / Workshop</th>
+                                <th class="py-3">Level</th>
                                 <th class="py-3">Remarks</th>
                             </tr>
                         </thead>
@@ -1064,8 +1074,8 @@
 
                         <div>
                             <label class="text-white font-medium">Year</label>
-                            <input type="date" class="w-full border rounded px-3 py-2" 
-                                name="Year" placeholder="Seminar Year">
+                            <input type="text" class="w-full border rounded px-3 py-2" 
+                                name="year" placeholder="Seminar Year">
                         </div>
 
                         <div>
@@ -1075,21 +1085,27 @@
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Work Position</label>
+                            <label class="text-white font-medium">Venue</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="WorkPosition" placeholder="Work Position">
+                                name="venue" placeholder="Venue">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Name of Company</label>
+                            <label class="text-white font-medium">Title of Seminar / Workshop</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="NameCompany" placeholder="Name of Company">
+                                name="seminar" placeholder="Title of Seminar / Workshop">
+                        </div>
+                            <label class="text-white font-medium">Level</label>
+                            <input type="text" class="w-full border rounded px-3 py-2" 
+                                name="level" placeholder="Level">
+                        <div>
+
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Remarks</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="coachRemark" placeholder="Input Remark">
+                                name="remark" placeholder="Remarks">
                         </div>
 
                         <!-- Submit -->
@@ -1176,13 +1192,13 @@
                         <div>
                             <label class="text-white font-medium">Name of Company</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="company_name" placeholder="Name of Company">
+                                name="company" placeholder="Name of Company">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Remarks</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="coachRemark" placeholder="Input Remark">
+                                name="remark" placeholder="Input Remark">
                         </div>
 
                         <!-- Submit -->
@@ -1255,11 +1271,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.newCoachData = {
         generalInfo: {},
         achievements: [],
-        schedule: [],      // Note: singular to match model relationship
+        schedule: [],      
         expenses: [],
         memberships: [],
         seminars: [],
-        workHistory: []    // Note: singular, but maps from workHistories
+        workHistory: []    
     };
 
     // Auto-load logged-in coach data for coaches
@@ -1380,26 +1396,26 @@ if (window.currentUserRole === 'coach' && window.currentCoachId) {
         });
 
         populateTable('scheduleTable', full.schedule, {
-            Event: 'Event', Date: 'Date', List: 'Athletes', coachRemark: 'Remarks'
+            term: 'Term', academic_year: 'Academic Year', count_a: 'A',count_b: 'B',count_c: 'C', coachRemark: 'Remarks'
         });
 
         populateTable('expensesTable', full.expenses, {
-            Academic: 'Academic Year', Term: 'Term', Type: 'Type', Amount: 'Amount',
-            EventAthlete: 'Event/Athlete', notes: 'Notes', coachRemark: 'Remarks'
+            year: 'Year', date: 'Date', title: 'Title of Activity', estimate: 'Estimate Budget',
+            actual: 'Actual Budget', variance: 'Variance', remark: 'Remarks'
         });
 
         populateTable('membershipTable', full.memberships, {
-            AcademicTerm: 'Academic Term', UnitsEnrolled: 'Units', CoachTuition: 'Tuition',
-            CoachMiscellaneous: 'Misc', CoachOtherCharges: 'Other', CoachAssessment: 'Assessment',
-            CoachTotalDiscount: 'Discount', coachRemark: 'Remarks'
+            year: 'Year', date: 'Date', venue: 'Venue',
+            organization: 'Name of Organization', level: 'Level', position: 'Position',
+            remark: 'Remarks'
         });
 
         populateTable('seminarsTable', full.seminars, {
-            Year: 'Year', date: 'Date', WorkPosition: 'Position', NameCompany: 'Company', coachRemark: 'Remarks'
+            year: 'Year', date: 'Date', venue: 'venue', seminar: 'Title of Seminar / Workshop', level: 'Level', remark: 'Remarks'
         });
 
         populateTable('workTable', full.workHistories, {
-            year: 'Year', date: 'Date', work_position: 'Position', company_name: 'Company', coachRemark: 'Remarks'
+            year: 'Year', date: 'Date', work_position: 'Position', company: 'Company', remark: 'Remarks'
         });
     })
     .catch(err => console.error('❌ Failed to auto-load coach data:', err));
@@ -1564,26 +1580,26 @@ if (window.currentUserRole === 'coach' && window.currentCoachId) {
                         });
 
                         populateTable('scheduleTable', full.schedule, {  // Use 'schedule' not 'schedules'
-                            Event: 'Event', Date: 'Date', List: 'Athletes', coachRemark: 'Remarks'
+                            term: 'Term', academic_year: 'Academic Year', count_a: 'A',count_b: 'B',count_c: 'C', coachRemark: 'Remarks'
                         });
 
                         populateTable('expensesTable', full.expenses, {
-                            Academic: 'Academic Year', Term: 'Term', Type: 'Type', Amount: 'Amount',
-                            EventAthlete: 'Event/Athlete', notes: 'Notes', coachRemark: 'Remarks'
+                            year: 'Year', date: 'Date', title: 'Title of Activity', estimate: 'Estimate Budget',
+                            actual: 'Actual Budget', variance: 'Variance', remark: 'Remarks'
                         });
 
                         populateTable('membershipTable', full.memberships, {
-                            AcademicTerm: 'Academic Term', UnitsEnrolled: 'Units', CoachTuition: 'Tuition',
-                            CoachMiscellaneous: 'Misc', CoachOtherCharges: 'Other', CoachAssessment: 'Assessment',
-                            CoachTotalDiscount: 'Discount', coachRemark: 'Remarks'
+                            year: 'Year', date: 'Date', venue: 'Venue',
+                            organization: 'Name of Organization', level: 'Level', position: 'Position',
+                            remark: 'Remarks'
                         });
 
                         populateTable('seminarsTable', full.seminars, {
-                            Year: 'Year', date: 'Date', WorkPosition: 'Position', NameCompany: 'Company', coachRemark: 'Remarks'
+                            year: 'Year', date: 'Date', venue: 'venue', seminar: 'Title of Seminar / Workshop', level: 'Level', remark: 'Remarks'
                         });
 
                         populateTable('workTable', full.workHistories, {  // Use 'workHistories' from model
-                            year: 'Year', date: 'Date', work_position: 'Position', company_name: 'Company', coachRemark: 'Remarks'
+                            year: 'Year', date: 'Date', work_position: 'Position', company: 'Company', remark: 'Remarks'
                         });
 
                         saveBtn?.classList.add('hidden');
@@ -1761,26 +1777,26 @@ if (window.currentUserRole === 'coach' && window.currentCoachId) {
     });
 
     handleModuleForm('ScheduleForm', 'scheduleTable', 'schedule', {
-        Event: 'Event', Date: 'Date', List: 'Athletes', coachRemark: 'Remarks'
+        term: 'Term', academic_year: 'Academic Year', count_a: 'A',count_b: 'B',count_c: 'C', remarks: 'Remarks'
     });
 
     handleModuleForm('ExpensesForm', 'expensesTable', 'expenses', {
-        Academic: 'Academic Year', Term: 'Term', Type: 'Type', Amount: 'Amount',
-        EventAthlete: 'Event/Athlete', notes: 'Notes', coachRemark: 'Remarks'
+        year: 'Year', date: 'Date', title: 'Title of Activity', estimate: 'Estimate Budget',
+        actual: 'Actual Budget', variance: 'Variance', remark: 'Remarks'
     });
 
     handleModuleForm('MembershipForm', 'membershipTable', 'memberships', {
-        AcademicTerm: 'Academic Term', UnitsEnrolled: 'Units', CoachTuition: 'Tuition',
-        CoachMiscellaneous: 'Misc', CoachOtherCharges: 'Other', CoachAssessment: 'Assessment',
-        CoachTotalDiscount: 'Discount', coachRemark: 'Remarks'
+        year: 'Year', date: 'Date', venue: 'Venue',
+        organization: 'Name of Organization', level: 'Level', position: 'Position',
+        remark: 'Remarks'
     });
 
     handleModuleForm('SeminarsForm', 'seminarsTable', 'seminars', {
-        Year: 'Year', date: 'date', work_position: 'work_position', NameCompany: 'NameCompany', coachRemark: 'coachRemarks'
+        year: 'Year', date: 'Date', venue: 'venue', seminar: 'Title of Seminar / Workshop', level: 'Level', remark: 'Remarks'
     });
 
     handleModuleForm('WorkHistoryForm', 'workTable', 'workHistory', {
-        year: 'Year', date: 'Date', work_position: 'Position', company_name: 'Company', coachRemark: 'Remarks'
+        year: 'Year', date: 'Date', work_position: 'Position', company: 'Company', remark: 'Remarks'
     });
 
     // -----------------------

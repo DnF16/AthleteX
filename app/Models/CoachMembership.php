@@ -11,13 +11,12 @@ class CoachMembership extends Model
 
     protected $fillable = [
         'coach_id',
-        'academic_term_year',
-        'total_units_enrolled',
-        'tuition_fee',
-        'misc_fee',
-        'other_charges',
-        'total_assessment',
-        'total_discount',
+        'year',
+        'date',
+        'venue',
+        'name_of_organization',
+        'level',
+        'position',
         'remarks',
     ];
 
