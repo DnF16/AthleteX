@@ -3,7 +3,7 @@
          style="background-color: #2e4e1f; border-radius: 0; font-size: 0.95rem;">
         Admin Menu
     </div>
-    @php
+    <?php
         // 1. Count Pending Approvals for the Notification Badge
         $pendingCount = \App\Models\Athlete::where('approval_status', 'pending')->count();
 
@@ -25,22 +25,23 @@
             'grades' => ['name' => 'Grades & Scoring', 'icon' => 'fas fa-star'],
             'transactions' => ['name' => 'Transactions', 'icon' => 'fas fa-money-check'],
         ];
-    @endphp
+    ?>
 
-    @foreach($admin_links as $route_name => $link)
-    <a href="{{ route('admin.' . $route_name) }}" 
+    <?php $__currentLoopData = $admin_links; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $route_name => $link): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <a href="<?php echo e(route('admin.' . $route_name)); ?>" 
        class="list-group-item list-group-item-action border-0 py-2 fw-semibold d-flex justify-content-between align-items-center
-       {{ request()->routeIs('admin.' . $route_name) ? 'bg-light text-success border-start border-5 border-success ps-3' : 'bg-transparent text-secondary' }}"
+       <?php echo e(request()->routeIs('admin.' . $route_name) ? 'bg-light text-success border-start border-5 border-success ps-3' : 'bg-transparent text-secondary'); ?>"
        style="border-bottom: 1px solid #eee; font-size: 0.9rem; transition: all 0.15s;">
        
        <div>
-           <i class="{{ $link['icon'] }} me-2" style="width: 20px;"></i> {{ $link['name'] }}
+           <i class="<?php echo e($link['icon']); ?> me-2" style="width: 20px;"></i> <?php echo e($link['name']); ?>
+
        </div>
 
-       @if(isset($link['badge']) && $link['badge'] > 0)
-           <span class="badge bg-danger rounded-pill">{{ $link['badge'] }}</span>
-       @endif
+       <?php if(isset($link['badge']) && $link['badge'] > 0): ?>
+           <span class="badge bg-danger rounded-pill"><?php echo e($link['badge']); ?></span>
+       <?php endif; ?>
 
     </a>
-    @endforeach
-</div>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+</div><?php /**PATH D:\xampp\htdocs\AthleteX\resources\views/admin/partials/sidebar.blade.php ENDPATH**/ ?>

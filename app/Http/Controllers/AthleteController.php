@@ -25,7 +25,7 @@ class AthleteController extends Controller
             // Non-admin users (coaches) only see approved athletes
             $athletes = Athlete::where('approval_status', 'approved')->get();
         }
-        return view('athlete_lists.athlete_lists', compact('athletes'));
+        return view('features.athlete_lists', compact('athletes'));
     }
 
     public function create()
@@ -390,6 +390,97 @@ class AthleteController extends Controller
             }
 
             return back()->withErrors('Failed to update athlete.');
+        }
+    }
+
+    // =================================================================
+    // PUBLIC REGISTRATION FUNCTIONS (The "Google Form" Logic)
+    // =================================================================
+
+    // 1. Show the blank form
+    public function showPublicRegistrationForm()
+    {
+        return view('features.alumni_registration');
+    }
+
+    // 2. Save the data as "Pending"
+    public function storePublicRegistration(Request $request)
+    {
+        // 1. DEFINE VALIDATION RULES
+        $rules = [
+            'classification' => 'required|in:Active,Alumni',
+            'student_id' => 'required|string|unique:athletes,student_id',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'sport_event' => 'required|string',
+        ];
+
+        // 2. ADD STRICT RULES FOR ACTIVE STUDENTS
+        if ($request->classification === 'Active') {
+            $rules['birthdate'] = 'required|date';
+            $rules['sex'] = 'required|string';
+            $rules['contact_number'] = 'required|string';
+            $rules['address'] = 'required|string';
+            $rules['emergency_person'] = 'required|string';
+            $rules['emergency_contact'] = 'required|string';
+        }
+
+        $validated = $request->validate($rules);
+
+        try {
+            // 3. SAVE TO DATABASE
+            \App\Models\Athlete::create([
+                // Basic Info
+                'student_id' => $validated['student_id'],
+                'first_name' => $validated['first_name'],
+                'middle_name' => $request->input('middle_name'),
+                'last_name' => $validated['last_name'],
+                'suffix' => $request->input('suffix'),
+                'email' => $validated['email'],
+                'sport' => $validated['sport_event'],
+                
+                // System Status
+                'status' => $validated['classification'],
+                'approval_status' => 'pending', 
+
+                // Personal Details
+                'birthdate' => $request->input('birthdate'),
+                'age' => $request->input('age'),
+                'sex' => $request->input('sex'),
+                'civil_status' => $request->input('civil_status'),
+                'place_of_birth' => $request->input('place_of_birth'),
+                'nationality' => $request->input('nationality'),
+                
+                // Physical
+                'height' => $request->input('height'),
+                'weight' => $request->input('weight'),
+                'blood_type' => $request->input('blood_type'),
+
+                // Contact
+                'contact_number' => $request->input('contact_number'),
+                'facebook' => $request->input('facebook_link'), // Ensure DB column is 'facebook' or 'facebook_link'
+                'address' => $request->input('address'),
+                'city_municipality' => $request->input('city_municipality'),
+                'province' => $request->input('province'),
+                'zip_code' => $request->input('zip_code'),
+
+                // Academic
+                'college' => $request->input('college'),
+                'course' => $request->input('course'),
+                'year_level' => $request->input('year_level'),
+
+                // Emergency
+                'emergency_person' => $request->input('emergency_person'),
+                'emergency_contact' => $request->input('emergency_contact'),
+                'emergency_relationship' => $request->input('emergency_relationship'),
+            ]);
+
+            return back()->with('success', 'Registration submitted successfully! Please wait for SDO verification.');
+
+        } catch (\Exception $e) {
+            // This will help you find missing columns if the database crashes
+            return back()->with('error', 'Database Error: ' . $e->getMessage())->withInput();
         }
     }
 }
