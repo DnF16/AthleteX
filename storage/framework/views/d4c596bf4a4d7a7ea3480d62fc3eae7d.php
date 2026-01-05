@@ -1,15 +1,13 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Student Athletes'); ?>
 
-@section('title', 'Student Athletes')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="space-y-6 w-full">
     <div class="bg-white p-6 flex items-center justify-between">
         <div class="flex-1 text-center">
             <h1 class="text-3xl font-bold text-gray-800 mb-0">Student Athlete</h1>
         </div>
         <div>
-            <a href="{{ route('student.athletes') }}" 
+            <a href="<?php echo e(route('student.athletes')); ?>" 
             class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
                 Student Athlete List
             </a>
@@ -86,8 +84,8 @@
 
         <div id="general-info" class="tab-pane">
             <div class="flex items-stretch gap-6">
-                <form id="athleteForm" method="POST" action="{{ route('athletes.store') }}" class="student-form flex items-stretch gap-6 w-full" autocomplete="off">
-                    @csrf
+                <form id="athleteForm" method="POST" action="<?php echo e(route('athletes.store')); ?>" class="student-form flex items-stretch gap-6 w-full" autocomplete="off">
+                    <?php echo csrf_field(); ?>
 
                     <input type="hidden" name="_method" id="_method" value="POST">
                     <input type="hidden" name="selected_athlete_id" id="selected_athlete_id" value="">
@@ -254,16 +252,17 @@
                             <div class="mb-4">
                                 <label class="block text-gray-700 font-bold mb-2">Coach</label>
                                 <div class="p-2 border rounded bg-gray-100 text-gray-700">
-                                    @php
+                                    <?php
                                         // Safety check: Ensure User exists AND Coach relationship exists
                                         $currentCoach = optional(Auth::user())->coach; 
-                                    @endphp
+                                    ?>
                                     
-                                    {{ $currentCoach ? $currentCoach->coach_first_name . ' ' . $currentCoach->coach_last_name : 'No coach assigned' }}
+                                    <?php echo e($currentCoach ? $currentCoach->coach_first_name . ' ' . $currentCoach->coach_last_name : 'No coach assigned'); ?>
+
                                 </div>
                             </div>
                             
-                            <input type="hidden" name="coach_id" value="{{ $currentCoach ? $currentCoach->id : '' }}">
+                            <input type="hidden" name="coach_id" value="<?php echo e($currentCoach ? $currentCoach->id : ''); ?>">
                             <div class="flex items-center">
                                 <label for="date_joined" class="w-1/3 text-gray-700 font-medium">Date Joined (Varsity)</label>
                                 <input type="date" id="date_joined" name="date_joined"
@@ -365,7 +364,8 @@
 
                             <div class="flex flex-col items-center border border-dashed border-gray-400 rounded-lg p-3 bg-white mb-4">  
                                 <span id="selected_name" class="mt-2 text-gray-800 font-semibold">
-                                    {{ $selectedAthlete->name ?? 'No athlete selected' }}
+                                    <?php echo e($selectedAthlete->name ?? 'No athlete selected'); ?>
+
                                 </span>
                             </div>
                             
@@ -918,13 +918,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // If not present, skip live search
         if (!searchInput || !resultsBox) return;
 
-        const searchUrl = '{{ route('athletes.search') }}'; // Blade route (should produce URL)
+        const searchUrl = '<?php echo e(route('athletes.search')); ?>'; // Blade route (should produce URL)
         let timer = null;
         let selectedFromSearch = false;
         let selectedId = null;
 
-        const defaultAction = generalForm ? generalForm.getAttribute('action') : '{{ route('athletes.store') }}';
-        const updateBase = '{{ url('/athletes') }}';
+        const defaultAction = generalForm ? generalForm.getAttribute('action') : '<?php echo e(route('athletes.store')); ?>';
+        const updateBase = '<?php echo e(url('/athletes')); ?>';
 
         function clearResults() {
             resultsBox.innerHTML = '';
@@ -1405,7 +1405,7 @@ document.addEventListener('DOMContentLoaded', () => {
             collectGeneralInfo();
 
             // decide endpoint and method based on whether an athlete is selected
-            const updateBase = '{{ url('/athletes') }}';
+            const updateBase = '<?php echo e(url('/athletes')); ?>';
             const selectedId = (selectedIdInput && selectedIdInput.value) ? selectedIdInput.value : '';
             const endpoint = selectedId ? (updateBase + '/' + selectedId) : updateBase;
             const method = selectedId ? 'PUT' : 'POST';
@@ -1418,7 +1418,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify(newAthleteData)
@@ -1456,4 +1456,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp\htdocs\AthleteX\resources\views/features/student_athlete.blade.php ENDPATH**/ ?>
