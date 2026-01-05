@@ -165,7 +165,7 @@ class AthleteController extends Controller
             }
 
             return redirect()->route('athletes.index')
-                         ->with('success', 'Athlete added successfully!');
+                             ->with('success', 'Athlete added successfully!');
 
         } catch (\Throwable $e) {
             Log::error('Athlete store error: ' . $e->getMessage(), [
@@ -190,89 +190,88 @@ class AthleteController extends Controller
      * Returns JSON array of matches (limit 15).
      */
     public function search(Request $request)
-{
-    $term = trim($request->get('q', ''));
+    {
+        $term = trim($request->get('q', ''));
 
-    $query = Athlete::query();
+        $query = Athlete::query();
 
-    if ($term !== '') {
-        $query->where(function ($q) use ($term) {
-            $q->where('first_name', 'like', "%{$term}%")
-              ->orWhere('last_name', 'like', "%{$term}%")
-              ->orWhere('full_name', 'like', "%{$term}%")
-              ->orWhere('student_id', 'like', "%{$term}%");
+        if ($term !== '') {
+            $query->where(function ($q) use ($term) {
+                $q->where('first_name', 'like', "%{$term}%")
+                  ->orWhere('last_name', 'like', "%{$term}%")
+                  ->orWhere('full_name', 'like', "%{$term}%")
+                  ->orWhere('student_id', 'like', "%{$term}%");
+            });
+        }
+
+        $results = $query->limit(15)->get()->map(function ($a) {
+            return [
+                'id' => $a->id,
+                'student_id' => $a->student_id,
+                'first_name' => $a->first_name,
+                'last_name' => $a->last_name,
+                'full_name' => $a->full_name,
+                'age' => $a->age,
+                'gender' => $a->gender,
+                'birthdate' => $a->birthdate,
+                'blood_type' => $a->blood_type,
+                'course' => $a->course,
+                'year_level' => $a->year_level,
+                'email' => $a->email,
+                'facebook' => $a->facebook,
+                'marital_status' => $a->marital_status,
+                'contact_number' => $a->contact_number,
+                'address' => $a->address,
+                'city_municipality' => $a->city_municipality,
+                'province_state' => $a->province_state,
+                'zip_code' => $a->zip_code,
+                'emergency_person' => $a->emergency_person,
+                'emergency_contact' => $a->emergency_contact,
+                'coach_name' => $a->coach
+                ? $a->coach->coach_first_name . ' ' . $a->coach->coach_last_name
+                : null,
+
+                'date_joined' => $a->date_joined,
+                'term_graduated' => $a->term_graduated,
+                'asst_coach' => $a->asst_coach,
+                'total_unit' => $a->total_unit,
+                'year_graduated' => $a->year_graduated,
+                'tuition_fee' => $a->tuition_fee,
+                'misc_fee' => $a->misc_fee,
+                'other_charges' => $a->other_charges,
+                'total_assessment' => $a->total_assessment,
+                'total_discount' => $a->total_discount,
+                'balance' => $a->balance,
+                'current_work' => $a->current_work,
+                'current_company' => $a->current_company,
+
+                // right-side fields
+                'sport_event' => $a->sport_event,
+                'status' => $a->status,
+                'classification' => $a->classification,
+                'inactive_date' => $a->inactive_date,
+
+                // picture
+                'picture_url' => $a->picture_path ? asset('storage/' . $a->picture_path) : null,
+
+            ];
         });
+
+        return response()->json($results);
     }
-
-    $results = $query->limit(15)->get()->map(function ($a) {
-        return [
-            'id' => $a->id,
-            'student_id' => $a->student_id,
-            'first_name' => $a->first_name,
-            'last_name' => $a->last_name,
-            'full_name' => $a->full_name,
-            'age' => $a->age,
-            'gender' => $a->gender,
-            'birthdate' => $a->birthdate,
-            'blood_type' => $a->blood_type,
-            'course' => $a->course,
-            'year_level' => $a->year_level,
-            'email' => $a->email,
-            'facebook' => $a->facebook,
-            'marital_status' => $a->marital_status,
-            'contact_number' => $a->contact_number,
-            'address' => $a->address,
-            'city_municipality' => $a->city_municipality,
-            'province_state' => $a->province_state,
-            'zip_code' => $a->zip_code,
-            'emergency_person' => $a->emergency_person,
-            'emergency_contact' => $a->emergency_contact,
-            'coach_name' => $a->coach
-            ? $a->coach->coach_first_name . ' ' . $a->coach->coach_last_name
-            : null,
-
-            'date_joined' => $a->date_joined,
-            'term_graduated' => $a->term_graduated,
-            'asst_coach' => $a->asst_coach,
-            'total_unit' => $a->total_unit,
-            'year_graduated' => $a->year_graduated,
-            'tuition_fee' => $a->tuition_fee,
-            'misc_fee' => $a->misc_fee,
-            'other_charges' => $a->other_charges,
-            'total_assessment' => $a->total_assessment,
-            'total_discount' => $a->total_discount,
-            'balance' => $a->balance,
-            'current_work' => $a->current_work,
-            'current_company' => $a->current_company,
-
-            // right-side fields
-            'sport_event' => $a->sport_event,
-            'status' => $a->status,
-            'classification' => $a->classification,
-            'inactive_date' => $a->inactive_date,
-
-            // picture
-            'picture_url' => $a->picture_path ? asset('storage/' . $a->picture_path) : null,
-
-        ];
-    });
-
-    return response()->json($results);
-}
 
 
     /**
      * Return full athlete with related records (achievements, academics, fees, work history)
      */
-    public function show(Request $request, Athlete $athlete)
+    public function show($id)
     {
-        // eager load relations
-        $athlete->load(['achievements', 'academicEvaluations', 'feesDiscounts', 'workHistories']);
+        // 1. Find the athlete by ID (or show 404 error if missing)
+        // We use 'with' to load the related tables (achievements, grades, etc.) if you have them defined in the Model
+        $athlete = \App\Models\Athlete::with(['achievements', 'academicEvaluations', 'feesDiscounts', 'workHistories'])->findOrFail($id);
 
-        // normalize picture url
-        $athlete->picture_url = $athlete->picture_path ? asset('storage/' . $athlete->picture_path) : null;
-
-        return response()->json($athlete);
+        // 2. Return the VIEW, passing the athlete data to it
+        return view('features.athlete_profile', compact('athlete'));
     }
 
 
