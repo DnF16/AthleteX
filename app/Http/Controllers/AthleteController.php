@@ -392,4 +392,48 @@ class AthleteController extends Controller
             return back()->withErrors('Failed to update athlete.');
         }
     }
+
+    // --- PUBLIC REGISTRATION FUNCTIONS ---
+
+    // 1. Show the blank form
+    public function showPublicRegistrationForm()
+    {
+        return view('features.alumni_registration'); // We will create this view next
+    }
+
+    // 2. Save the data as "Pending"
+    public function storePublicRegistration(Request $request)
+    {
+        // A. Validate the Input
+        $validated = $request->validate([
+            'student_id' => 'required|string|unique:athletes,student_id', // Must be unique
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'sport_event' => 'required|string',
+            // Add other fields here if your form has them (e.g., gender, address)
+        ]);
+
+        try {
+            // B. Create the Record
+            \App\Models\Athlete::create([
+                'student_id' => $validated['student_id'],
+                'first_name' => $validated['first_name'],
+                'last_name' => $validated['last_name'],
+                'email' => $validated['email'],
+                'sport' => $validated['sport_event'], // Map form 'sport_event' to DB 'sport'
+                
+                // FORCE these values (User cannot change them)
+                'status' => 'Alumni', 
+                'approval_status' => 'pending', 
+            ]);
+
+            // C. Success Message
+            return back()->with('success', 'Registration submitted successfully! Please wait for SDO verification.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error submitting form: ' . $e->getMessage())->withInput();
+        }
+    }
 }
+

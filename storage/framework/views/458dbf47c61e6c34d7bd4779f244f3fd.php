@@ -8,42 +8,75 @@
             <!-- Centered Title -->
             <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-2">
                 <i class="bi bi-person text-3xl text-gray-800"></i>
-                <h1 class="text-3xl font-bold text-gray-800 mb-0">Coaches</h1>
+                <?php if(auth()->check() && auth()->user()->role === 'coach'): ?>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-0">My Profile</h1>
+                <?php else: ?>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-0">Coaches</h1>
+                <?php endif; ?>
             </div>
 
-            <!-- Right Button -->
-            <div class="flex justify-end">
-                <a href="<?php echo e(route('coaches.index')); ?>" 
-                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-                    List of Coaches
-                </a>
-            </div>
+            <!-- Right Button - Only show for admins -->
+            <?php if(!auth()->check() || auth()->user()->role !== 'coach'): ?>
+                <div class="flex justify-end">
+                    <a href="<?php echo e(route('coaches.index')); ?>" 
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                        List of Coaches
+                    </a>
+                </div>
+            <?php endif; ?>
         </div>
 
-        <div class="flex items-end space-x-2">
-            <!-- Search -->
-            <div class="">
-                <label class=" text-gray-700 font-medium mb-1" for="coach_search">Search</label>
-                <input type="text" id="coach_search" name="coach_search" placeholder="Enter full name"
-                    class="w-64 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
-                    autocomplete="off" value="">
-                <!-- Live search results -->
-                <div id="coach_searchResults" class="mt-2 w-64 bg-white border border-gray-200 rounded shadow-sm hidden"></div>
+        <!-- Search Section - Only for admins -->
+        <?php if(!auth()->check() || auth()->user()->role !== 'coach'): ?>
+            <div class="flex items-end space-x-2">
+                <!-- Search -->
+                <div class="">
+                    <label class=" text-gray-700 font-medium mb-1" for="coach_search">Search</label>
+                    <input type="text" id="coach_search" name="coach_search" placeholder="Enter full name"
+                        class="w-64 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+                        autocomplete="off" value="">
+                    <!-- Live search results -->
+                    <div id="coach_searchResults" class="mt-2 w-64 bg-white border border-gray-200 rounded shadow-sm hidden"></div>
+                </div>
             </div>
-            <!-- Save All Button -->
-            <div class="flex justify-center space-x-2 mt-4">
-                <button id="coach_saveBtn" type="submit" form="coachForm" class="px-4 py-2 rounded bg-green-600 text-white bg-green-700 hover:bg-green-700 transition">
+        <?php endif; ?>
+
+        <!-- Action Buttons -->
+        <!-- Action Buttons -->
+        <div class="flex justify-center space-x-2">
+            <?php if(auth()->check() && auth()->user()->role === 'coach'): ?>
+                <!-- COACH USERS: Show Save (new) or Edit (existing) -->
+                <?php if(!isset($coach)): ?>
+                    <!-- New profile: Show Save button -->
+                    <button id="coach_saveBtn" type="button" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition">
+                        Save My Profile
+                    </button>
+                <?php else: ?>
+                    <!-- Existing profile: Show Edit button -->
+                    <button id="coach_editBtn" type="button" class="px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600 transition">
+                        Edit My Profile
+                    </button>
+                <?php endif; ?>
+                
+                <!-- ALWAYS render Update button (hidden by default) -->
+                <button id="coach_updateBtn" type="button" class="hidden px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition">
+                    Update My Profile
+                </button>
+                
+            <?php else: ?>
+                <!-- ADMIN USERS: Original logic -->
+                <button id="coach_saveBtn" type="submit" form="coachForm" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition">
                     Save Coach
                 </button>
 
-                <button id="coach_updateBtn" type="button" form="coachForm" class="<?php echo e(isset($coach) ? '' : 'hidden'); ?> px-4 py-2 rounded bg-blue-600 text-white bg-green-700 hover:bg-blue-700 transition">
+                <button id="coach_updateBtn" type="button" form="coachForm" class="<?php echo e(isset($coach) ? '' : 'hidden'); ?> px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition">
                     Update Coach
                 </button>
 
                 <button type="button" onclick="resetCoachForm()" class="px-4 py-2 rounded bg-gray-300 text-gray-800 hover:bg-gray-400 transition">
                     Cancel New
                 </button>
-            </div>
+            <?php endif; ?>
         </div>
 
         <!-- Navigation Tabs -->
@@ -109,12 +142,25 @@
         <hr class="border-t-2 border-gray-400 my-2 w-[100%]">
 
         <!-- Tab Content -->
+    <div id="tab-content" class="bg-white p-6 rounded shadow w-full">
 
         <!-- Coach General Info Content -->
         <div id="coach-general-info" class="tab-content hidden">
             <div class="flex items-stretch gap-6">
-                <form id="coachForm" method="POST" action="<?php echo e(route('coaches.store')); ?>" class="coach-form flex items-stretch gap-6 w-full" autocomplete="off" enctype="multipart/form-data">
+                <form id="coachForm" method="POST" action="
+                    <?php if(auth()->check() && auth()->user()->role === 'coach' && isset($coach)): ?>
+                        <?php echo e(route('coaches.update', $coach->id)); ?>
+
+                    <?php else: ?>
+                        <?php echo e(route('coaches.store')); ?>
+
+                    <?php endif; ?>
+                " class="coach-form flex items-stretch gap-6 w-full" autocomplete="off" enctype="multipart/form-data">
                     <?php echo csrf_field(); ?>
+
+                    <?php if(auth()->check() && auth()->user()->role === 'coach' && isset($coach)): ?>
+                        <?php echo method_field('PUT'); ?>
+                    <?php endif; ?>
 
                     <!-- method spoofing input: stay POST by default, switched to PUT when updating -->
                     <input type="hidden" name="_method" id="coach_method" value="POST">
@@ -136,14 +182,16 @@
                             <!-- First Name -->
                             <div class="flex items-center">
                                 <label for="coach_first_name" class="w-1/3 text-gray-700 font-medium">First Name</label>
-                                <input type="text" id="coach_first_name" name="coach_first_name" placeholder="Enter first name"
-                                    class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                                            <input type="text" id="coach_first_name" name="coach_first_name" placeholder="Enter first name"
+                                                value="<?php echo e(old('coach_first_name', isset($coach) ? $coach->coach_first_name : '')); ?>"
+                                                class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
 
                             <!-- Middle Initial -->
                             <div class="flex items-center">
                                 <label for="coach_middle_initial" class="w-1/3 text-gray-700 font-medium">Middle Initial</label>
                                 <input type="text" id="coach_middle_initial" name="coach_middle_initial" placeholder="Enter middle initial"
+                                    value="<?php echo e(old('coach_middle_initial', isset($coach) ? $coach->coach_middle_initial : '')); ?>"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
                         </div>
@@ -156,8 +204,8 @@
                             <select id="coach_gender" name="coach_gender"
                                 class="w-2/3 border border-gray-300 rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
                                 <option value="">Select Gender</option>
-                                <option value="Male" >Male</option>
-                                <option value="Female">Female</option>
+                                <option value="Male" <?php echo e(isset($coach) && $coach->coach_gender === 'Male' ? 'selected' : ''); ?>>Male</option>
+                                <option value="Female" <?php echo e(isset($coach) && $coach->coach_gender === 'Female' ? 'selected' : ''); ?>>Female</option>
                             </select>
                         </div>
 
@@ -165,12 +213,14 @@
                             <div class="flex items-center">
                                 <label class="w-1/3 text-gray-700 font-medium">Birthdate</label>
                                 <input type="date" id="coach_birthdate" name="coach_birthdate"
+                                    value="<?php echo e(old('coach_birthdate', isset($coach) && $coach->coach_birthdate ? $coach->coach_birthdate->format('Y-m-d') : '')); ?>"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
 
                             <div class="flex items-center">
                                 <label class="w-1/3 text-gray-700 font-medium">Age</label>
                                 <input type="number" id="coach_age" name="coach_age" placeholder="Enter Age"
+                                    value="<?php echo e(old('coach_age', isset($coach) ? $coach->coach_age : '')); ?>"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
                         </div>
@@ -208,6 +258,7 @@
                             <div class="flex items-center">
                                 <label for="coach_email" class="w-1/3 text-gray-700 font-medium">Email Address</label>
                                 <input type="text" id="coach_email" name="coach_email" placeholder="Enter Email Address"
+                                    value="<?php echo e(old('coach_email', isset($coach) ? $coach->coach_email : '')); ?>"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
 
@@ -229,12 +280,14 @@
                             <div class="flex items-center">
                                 <label for="coach_contact_number" class="w-1/3 text-gray-700 font-medium">Contact No.</label>
                                 <input type="text" id="coach_contact_number" name="coach_contact_number" placeholder="Enter Contact Number"
+                                    value="<?php echo e(old('coach_contact_number', isset($coach) ? $coach->coach_contact_number : '')); ?>"
                                     class="contact-number w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
 
                             <div class="col-span-2 flex items-center">
                                 <label for="coach_address" class="w-1/6 text-gray-700 font-medium">Address</label>
                                 <input type="text" id="coach_address" name="coach_address" placeholder="Enter Address"
+                                    value="<?php echo e(old('coach_address', isset($coach) ? $coach->coach_address : '')); ?>"
                                     class="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
                         </div>
@@ -421,18 +474,72 @@
                             <div class="space-y-3 flex-1">
                                 <div class="flex items-center">
                                     <label class="w-1/3 text-sm font-medium text-gray-700">Sports Event</label>
-                                    <select name="coach_sport_event" class="w-2/3 bg-blue-100 border border-gray-300 rounded px-2 py-1">
-                                        <option value="">-- Select Sport Event --</option>
-                                        <option value="Basketball">Basketball</option>
-                                        <option value="Volleyball">Volleyball</option>
-                                        <option value="Athletics">Athletics</option>
-                                        <option value="Swimming">Swimming</option>
-                                        <option value="Taekwondo" >Taekwondo</option>
-                                        <option value="Chess">Chess</option>
-                                        <option value="Football">Football</option>
-                                        <option value="Boxing">Boxing</option>
-                                    </select>
+                                    <?php if(auth()->check() && auth()->user()->role === 'coach' && auth()->user()->coach_sport): ?>
+                                        <!-- Coach user: show sport from user account (read-only with hidden input) -->
+                                        <input type="text" class="w-2/3 bg-blue-100 border border-gray-300 rounded px-2 py-1" 
+                                            value="<?php echo e(auth()->user()->coach_sport); ?>" disabled>
+                                        <input type="hidden" name="coach_sport_event" value="<?php echo e(auth()->user()->coach_sport); ?>">
+                                        <span class="ml-2 text-sm text-green-600 font-semibold italic">(Assigned: <?php echo e(auth()->user()->coach_sport); ?>)</span>
+                                    <?php else: ?>
+                                        <!-- Admin or coach without sport: show dropdown -->
+                                        <select name="coach_sport_event" id="coach_sport_event" class="w-2/3 bg-blue-100 border border-gray-300 rounded px-2 py-1"
+                                            <?php echo e(isset($coach) && $coach->coach_sport_event ? 'disabled' : ''); ?>>
+                                            <option value="">-- Select Sport Event --</option>
+                                            <option value="Basketball" <?php echo e(isset($coach) && $coach->coach_sport_event === 'Basketball' ? 'selected' : ''); ?>>Basketball</option>
+                                            <option value="Volleyball" <?php echo e(isset($coach) && $coach->coach_sport_event === 'Volleyball' ? 'selected' : ''); ?>>Volleyball</option>
+                                            <option value="Athletics" <?php echo e(isset($coach) && $coach->coach_sport_event === 'Athletics' ? 'selected' : ''); ?>>Athletics</option>
+                                            <option value="Swimming" <?php echo e(isset($coach) && $coach->coach_sport_event === 'Swimming' ? 'selected' : ''); ?>>Swimming</option>
+                                            <option value="Taekwondo" <?php echo e(isset($coach) && $coach->coach_sport_event === 'Taekwondo' ? 'selected' : ''); ?>>Taekwondo</option>
+                                            <option value="Chess" <?php echo e(isset($coach) && $coach->coach_sport_event === 'Chess' ? 'selected' : ''); ?>>Chess</option>
+                                            <option value="Football" <?php echo e(isset($coach) && $coach->coach_sport_event === 'Football' ? 'selected' : ''); ?>>Football</option>
+                                            <option value="Boxing" <?php echo e(isset($coach) && $coach->coach_sport_event === 'Boxing' ? 'selected' : ''); ?>>Boxing</option>
+                                        </select>
+                                        <?php if(isset($coach) && $coach->coach_sport_event): ?>
+                                            <input type="hidden" name="coach_sport_event" value="<?php echo e($coach->coach_sport_event); ?>">
+                                            <span class="ml-2 text-sm text-gray-600 italic">(Locked: <?php echo e($coach->coach_sport_event); ?>)</span>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
                                 </div>
+
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', () => {
+                                        const isCoachWithProfile = <?php echo e(auth()->check() && auth()->user()->role === 'coach' && isset($coach) ? 'true' : 'false'); ?>;
+                                        if (!isCoachWithProfile) return;
+
+                                        // Disable all inputs/selects/textareas initially for coach users who already have profile
+                                        const form = document.getElementById('coachForm');
+                                        if (form) {
+                                            form.querySelectorAll('input,select,textarea,button').forEach(el => {
+                                                // Keep the Edit button enabled
+                                                if (el.id === 'coach_editBtn') return;
+                                                // keep Cancel/New or other admin buttons unchanged
+                                                if (el.id === 'coach_saveBtn') return;
+                                                // disable form controls (but not hidden inputs)
+                                                if (el.type !== 'hidden') el.disabled = true;
+                                            });
+
+                                            const editBtn = document.getElementById('coach_editBtn');
+                                            const updateBtn = document.getElementById('coach_updateBtn');
+
+                                            editBtn?.addEventListener('click', () => {
+                                                // enable inputs for editing
+                                                form.querySelectorAll('input,select,textarea').forEach(el => {
+                                                    if (el.type !== 'hidden') el.disabled = false;
+                                                });
+                                                // swap buttons
+                                                editBtn.classList.add('hidden');
+                                                updateBtn.classList.remove('hidden');
+                                                // mark method as PUT
+                                                document.getElementById('coach_method').value = 'PUT';
+                                            });
+
+                                            updateBtn?.addEventListener('click', (e) => {
+                                                // Gather and send via existing performFinalSave
+                                                performFinalSave(e);
+                                            });
+                                        }
+                                    });
+                                </script>
 
                                 <div class="flex items-center mt-2">
                                     <label class="w-1/3 text-sm font-medium text-gray-700">Positon</label>
@@ -612,10 +719,15 @@
                     <table class="w-full text-left">
                         <thead class="bg-green-600 text-white text-center">
                             <tr>
-                                <th class="py-3">Event</th>
-                                <th class="py-3">Date</th>
-                                <th class="py-3">List of AThletes</th>
-                                <th class="py-3">Remarks</th>
+                                <th class="py-3 border border-gray-300" rowspan="2">Term</th>
+                                <th class="py-3 border border-gray-300" rowspan="2">Academic Year</th>
+                                <th class="py-3 border border-gray-300" colspan="3">Total Number of Athletes</th>
+                                <th class="py-3 border border-gray-300" rowspan="2">Remarks</th>
+                            </tr>
+                            <tr>
+                                <th class="py-2 border border-gray-300">A</th>
+                                <th class="py-2 border border-gray-300">B</th>
+                                <th class="py-2 border border-gray-300">C</th>
                             </tr>
                         </thead>
 
@@ -642,33 +754,44 @@
 
                     <form id="ScheduleForm" class="space-y-4">
 
+                        <!-- TERM -->
                         <div>
-                            <label class="text-white font-medium">Event</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="Event" placeholder="Event">
+                            <label class="text-white font-medium">Term</label>
+                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2"
+                                name="term" placeholder="e.g., 1st Term">
                         </div>
 
+                        <!-- ACADEMIC YEAR -->
                         <div>
-                            <label class="text-white font-medium">Date</label>
-                            <input type="date" class="w-full border rounded px-3 py-2" 
-                                name="Date" placeholder="Date">
+                            <label class="text-white font-medium">Academic Year</label>
+                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2"
+                                name="academic_year" placeholder="e.g., 2024 - 2025">
                         </div>
 
-                        <div>
-                            <label class="text-white font-medium">List of Athletes</label>
-                            <select name="List" class="w-full border rounded px-3 py-2">
-                                <option value="">Select Class</option>
-                                <option value="Class A">Class A</option>
-                                <option value="Class B">Class B</option>
-                                <option value="Class C">Class C</option>
-                                <!-- Add more classes as needed -->
-                            </select>
+                        <!-- TOTAL NUMBER OF ATHLETES -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="text-white font-medium">Class A</label>
+                                <input type="number" class="w-full border border-gray-300 rounded px-3 py-2"
+                                    name="count_a" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="text-white font-medium">Class B</label>
+                                <input type="number" class="w-full border border-gray-300 rounded px-3 py-2"
+                                    name="count_b" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="text-white font-medium">Class C</label>
+                                <input type="number" class="w-full border border-gray-300 rounded px-3 py-2"
+                                    name="count_c" placeholder="0">
+                            </div>
                         </div>
 
+                        <!-- REMARKS -->
                         <div>
-                            <label class="text-white font-medium">Remark</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="coachRemark" placeholder="Input Remark">
+                            <label class="text-white font-medium">Remarks</label>
+                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2"
+                                name="remarks" placeholder="Any notes or remark">
                         </div>
 
                         <!-- Submit -->
@@ -703,12 +826,12 @@
                     <table class="w-full text-left">
                         <thead class="bg-green-600 text-white text-center">
                             <tr>
-                                <th class="py-3">Academic Year</th>
-                                <th class="py-3">Term</th>
-                                <th class="py-3">Type</th>
-                                <th class="py-3">Amount</th>
-                                <th class="py-3">Event / Athlete</th>
-                                <th class="py-3">Notes</th>
+                                <th class="py-3">Year</th>
+                                <th class="py-3">Date</th>
+                                <th class="py-3">Title of Activity</th>
+                                <th class="py-3">Estimate Budget</th>
+                                <th class="py-3">Actual Budget</th>
+                                <th class="py-3">Variance</th>
                                 <th class="py-3">Remarks</th>
                             </tr>
                         </thead>
@@ -732,50 +855,50 @@
                         ✕
                     </button>
 
-                    <h2 class="text-xl font-bold mb-4 text-white">Add Schedule an Athlete</h2>
+                    <h2 class="text-xl font-bold mb-4 text-white">Add Expenses</h2>
 
                     <form id="ExpensesForm" class="space-y-4">
 
                         <div>
-                            <label class="text-white font-medium">Academic Year</label>
+                            <label class="text-white font-medium">Year</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="Academic" placeholder="Academic Year">
+                                name="year" placeholder="Year">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Term</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="Term" placeholder="Term">
+                            <label class="text-white font-medium">Date</label>
+                            <input type="date" class="w-full border rounded px-3 py-2" 
+                                name="date" placeholder="Term">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Type</label>
+                            <label class="text-white font-medium">Title of Activity</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="Type" placeholder="Type">
+                                name="title" placeholder="Title of Activity">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Amount</label>
+                            <label class="text-white font-medium">Estimate Budget</label>
                             <input type="number" class="w-full border rounded px-3 py-2" 
-                                name="Amount" placeholder="Amount">
+                                name="estimate" placeholder="Estimate Budget">
                         </div>
                         
                         <div>
-                            <label class="text-white font-medium">Event / Athlete</label>
+                            <label class="text-white font-medium">Actual Budget</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="EventAthlete" placeholder="Event / Athlete">
+                                name="actual" placeholder="Actual Budget">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Notes</label>
+                            <label class="text-white font-medium">Variance</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="notes" placeholder="Notes">
+                                name="variance" placeholder="Variance">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Remarks</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="coachRemark" placeholder="Input Remark">
+                                name="remark" placeholder="Input Remark">
                         </div>
 
                         <!-- Submit -->
@@ -810,13 +933,12 @@
                     <table class="w-full text-left">
                         <thead class="bg-green-600 text-white text-center">
                             <tr>
-                                <th class="py-3">Academic Term and Year</th>
-                                <th class="py-3">Total Units Enrolled</th>
-                                <th class="py-3">Tuition Fee</th>
-                                <th class="py-3">Miscellaneous Fee</th>
-                                <th class="py-3">Other Charges</th>
-                                <th class="py-3">Total Assessment</th>
-                                <th class="py-3">Total Discount</th>
+                                <th class="py-3">Year</th>
+                                <th class="py-3">Date</th>
+                                <th class="py-3">Venue</th>
+                                <th class="py-3">Name of organization</th>
+                                <th class="py-3">Level</th>
+                                <th class="py-3">Position</th>
                                 <th class="py-3">Remarks</th>
                             </tr>
                         </thead>
@@ -845,51 +967,45 @@
                     <form id="MembershipForm" class="space-y-4">
 
                         <div>
-                            <label class="text-white font-medium">Academic Term and Year</label>
+                            <label class="text-white font-medium">Year</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="AcademicTerm" placeholder="Academic Term and Year">
+                                name="year" placeholder="Year">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Total Units Enrolled</label>
-                            <input type="number" class="w-full border rounded px-3 py-2" 
-                                step="0.01" name="UnitsEnrolled" placeholder="Total Units Enrolled">
+                            <label class="text-white font-medium">Date</label>
+                            <input type="date" class="w-full border rounded px-3 py-2" 
+                            name="date" placeholder="Date">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Tuition Fee</label>
-                            <input type="number" class="w-full border rounded px-3 py-2" 
-                                name="CoachTuition" placeholder="Tuition Fee">
+                            <label class="text-white font-medium">Venue</label>
+                            <input type="text" class="w-full border rounded px-3 py-2" 
+                                name="venue" placeholder="Venue">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Miscellaneous Fee</label>
-                            <input type="number" class="w-full border rounded px-3 py-2" 
-                                name="CoachMiscellaneous" placeholder="Miscellaneous Fee">
+                            <label class="text-white font-medium">Name of Organization</label>
+                            <input type="text" class="w-full border rounded px-3 py-2" 
+                                name="organization" placeholder="Name of Organization">
                         </div>
                         
                         <div>
-                            <label class="text-white font-medium">Other Charges</label>
-                            <input type="number" class="w-full border rounded px-3 py-2" 
-                                name="CoachOtherCharges" placeholder="Other Charges">
-                        </div>
-
-                        <div>
-                            <label class="text-white font-medium">Total Assessment</label>
+                            <label class="text-white font-medium">Level</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="CoachAssessment" placeholder="Total Assessment">
+                                name="level" placeholder="Level">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Total Discount</label>
-                            <input type="number" class="w-full border rounded px-3 py-2" 
-                                name="CoachTotalDiscount" placeholder="Total Discount">
+                            <label class="text-white font-medium">Position</label>
+                            <input type="text" class="w-full border rounded px-3 py-2" 
+                                name="position" placeholder="Position">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Remarks</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="coachRemark" placeholder="Input Remark">
+                                name="remark" placeholder="Remarks">
                         </div>
 
                         <!-- Submit -->
@@ -926,8 +1042,9 @@
                             <tr>
                                 <th class="py-3">Year</th>
                                 <th class="py-3">Date</th>
-                                <th class="py-3">Work position</th>
-                                <th class="py-3">Name of Company</th>
+                                <th class="py-3">Venue</th>
+                                <th class="py-3">Title of Seminar / Workshop</th>
+                                <th class="py-3">Level</th>
                                 <th class="py-3">Remarks</th>
                             </tr>
                         </thead>
@@ -957,8 +1074,8 @@
 
                         <div>
                             <label class="text-white font-medium">Year</label>
-                            <input type="date" class="w-full border rounded px-3 py-2" 
-                                name="Year" placeholder="Seminar Year">
+                            <input type="text" class="w-full border rounded px-3 py-2" 
+                                name="year" placeholder="Seminar Year">
                         </div>
 
                         <div>
@@ -968,21 +1085,27 @@
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Work Position</label>
+                            <label class="text-white font-medium">Venue</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="WorkPosition" placeholder="Work Position">
+                                name="venue" placeholder="Venue">
                         </div>
 
                         <div>
-                            <label class="text-white font-medium">Name of Company</label>
+                            <label class="text-white font-medium">Title of Seminar / Workshop</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="NameCompany" placeholder="Name of Company">
+                                name="seminar" placeholder="Title of Seminar / Workshop">
+                        </div>
+                            <label class="text-white font-medium">Level</label>
+                            <input type="text" class="w-full border rounded px-3 py-2" 
+                                name="level" placeholder="Level">
+                        <div>
+
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Remarks</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="coachRemark" placeholder="Input Remark">
+                                name="remark" placeholder="Remarks">
                         </div>
 
                         <!-- Submit -->
@@ -1069,13 +1192,13 @@
                         <div>
                             <label class="text-white font-medium">Name of Company</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="company_name" placeholder="Name of Company">
+                                name="company" placeholder="Name of Company">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Remarks</label>
                             <input type="text" class="w-full border rounded px-3 py-2" 
-                                name="coachRemark" placeholder="Input Remark">
+                                name="remark" placeholder="Input Remark">
                         </div>
 
                         <!-- Submit -->
@@ -1103,23 +1226,201 @@
         </div>
 
     </div>
+</div>    
 
     <script>
+        window.currentUserRole = '<?php echo e(auth()->check() ? auth()->user()->role : ''); ?>';
+        window.currentCoachId = '<?php echo e(auth()->check() ? auth()->user()->coach_id : ''); ?>';
+        window.hasCoachProfile = <?php echo e((auth()->check() && auth()->user()->role === 'coach' && isset($coach) && $coach) ? 'true' : 'false'); ?>;
+
 document.addEventListener('DOMContentLoaded', () => {
     // Helper functions
     const byId = id => document.getElementById(id);
     const log = (label, data) => console.log(`🔍 ${label}:`, JSON.parse(JSON.stringify(data || {})));
 
+    // Load available sports (filter out already assigned ones)
+    async function loadAvailableSports() {
+        try {
+            const response = await fetch('<?php echo e(route('coaches.available-sports')); ?>');
+            const data = await response.json();
+            const sportSelect = byId('coach_sport_event');
+            
+            if (sportSelect && !sportSelect.disabled) {
+                // Get all existing options except the placeholder
+                const allOptions = Array.from(sportSelect.querySelectorAll('option')).slice(1);
+                const allSports = allOptions.map(opt => opt.value);
+                
+                // Update visibility based on available sports
+                allOptions.forEach(option => {
+                    if (data.available.includes(option.value)) {
+                        option.style.display = '';
+                    } else {
+                        option.style.display = 'none';
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error loading available sports:', error);
+        }
+    }
+
+    // Call on page load
+    loadAvailableSports();
+
     // Global data store
     window.newCoachData = {
         generalInfo: {},
         achievements: [],
-        schedule: [],      // Note: singular to match model relationship
+        schedule: [],      
         expenses: [],
         memberships: [],
         seminars: [],
-        workHistory: []    // Note: singular, but maps from workHistories
+        workHistory: []    
     };
+
+    // Auto-load logged-in coach data for coaches
+if (window.currentUserRole === 'coach' && window.currentCoachId) {
+    const generalForm = document.getElementById('coachForm');
+    const updateBase = '<?php echo e(url('/coaches')); ?>';
+
+    fetch(`${updateBase}/${window.currentCoachId}`, {
+        headers: { 'Accept': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(full => {
+        if (!full) return;
+
+        console.log('Coach data loaded:', full); // DEBUG LOG
+
+        // 1. TEXT/NUMBER INPUTS (explicit mapping)
+        const fieldMap = {
+            'coach_last_name': 'coach_last_name',
+            'coach_first_name': 'coach_first_name',
+            'coach_middle_initial': 'coach_middle_initial',
+            'coach_age': 'coach_age',
+            'coach_blood_type': 'coach_blood_type',
+            'coach_place_of_birth': 'coach_place_of_birth',
+            'coach_email': 'coach_email',
+            'coach_facebook': 'coach_facebook',
+            'coach_tba': 'coach_tba',
+            'coach_contact_number': 'coach_contact_number',
+            'coach_address': 'coach_address',
+            'coach_city_municipality': 'coach_city_municipality',
+            'coach_province_state': 'coach_province_state',
+            'coach_zip_code': 'coach_zip_code',
+            'coach_emergency_person': 'coach_emergency_person',
+            'coach_emergency_contact': 'coach_emergency_contact',
+            'post_graduate': 'post_graduate',
+            'course_graduated': 'course_graduated',
+            'name_collage': 'name_collage',
+            'coach_course_graduated': 'coach_course_graduated',
+            'coach_highschool': 'coach_highschool',
+            'strand_graduated': 'strand_graduated',
+            'date_hired': 'date_hired',
+            'honorarium_payment': 'honorarium_payment',
+            'occupation': 'occupation',
+            'coach_current_company': 'coach_current_company',
+            'coach_notes': 'coach_notes'
+        };
+
+        for (const [dbField, formField] of Object.entries(fieldMap)) {
+            const el = generalForm?.querySelector(`[name="${formField}"]`);
+            if (el && el.type !== 'file' && el.tagName !== 'SELECT') {
+                el.value = full[dbField] ?? '';
+            }
+        }
+
+        // 2. SELECT DROPDOWNS (gender, marital status, etc.)
+        const selectFields = ['coach_gender', 'coach_marital_status', 'coach_sport_event', 'position', 'coach_status'];
+        selectFields.forEach(field => {
+            const el = generalForm?.querySelector(`[name="${field}"]`);
+            if (el && full[field]) {
+                el.value = full[field];
+                el.dispatchEvent(new Event('change')); // Trigger any event listeners
+            }
+        });
+
+        // 3. DATE FIELDS (ensure Y-m-d format)
+        const dateFields = ['coach_birthdate', 'coach_year_graduated', 'coach_graduated', 'highschool_graduated', 'date_hired', 'date_resigned', 'coach_inactive_date'];
+        dateFields.forEach(field => {
+            const el = generalForm?.querySelector(`[name="${field}"]`);
+            if (el && full[field]) {
+                const date = new Date(full[field]);
+                if (!isNaN(date.getTime())) {
+                    el.value = date.toISOString().split('T')[0];
+                } else {
+                    el.value = full[field]; // Already formatted
+                }
+            }
+        });
+
+        // 4. PICTURE
+        if (full.picture_url) {
+            const preview = byId('coach_picturePreview');
+            const noPic = byId('coach_noPictureText');
+            if (preview) { 
+                preview.src = full.picture_url; 
+                preview.classList.remove('hidden'); 
+            }
+            if (noPic) noPic.classList.add('hidden');
+        }
+
+        // 5. SELECTED NAME DISPLAY
+        const selectedName = byId('coach_selected_name');
+        const fullName = full.coach_first_name && full.coach_last_name 
+            ? `${full.coach_first_name} ${full.coach_last_name}`.trim() 
+            : 'No Coach Selected';
+        if (selectedName) selectedName.textContent = fullName;
+
+        // 6. SHOW UPDATE BUTTON
+        byId('coach_saveBtn')?.classList.add('hidden');
+        byId('coach_updateBtn')?.classList.remove('hidden');
+        byId('coach_method').value = 'PUT';
+        byId('selected_coach_id').value = window.currentCoachId;
+
+        // 7. POPULATE RELATED TABLES
+        window.newCoachData = {
+            generalInfo: {},
+            achievements: full.achievements || [],
+            schedule: full.schedule || [],
+            expenses: full.expenses || [],
+            memberships: full.memberships || [],
+            seminars: full.seminars || [],
+            workHistory: full.workHistories || []
+        };
+
+        // Populate tables
+        populateTable('coach-achievements-tbody', full.achievements, {
+            year: 'Year', month_day: 'Month-Day', sports_event: 'Sports Event', 
+            venue: 'Venue', award: 'Award', category: 'Category', remarks: 'Remarks'
+        });
+
+        populateTable('scheduleTable', full.schedule, {
+            term: 'Term', academic_year: 'Academic Year', count_a: 'A',count_b: 'B',count_c: 'C', coachRemark: 'Remarks'
+        });
+
+        populateTable('expensesTable', full.expenses, {
+            year: 'Year', date: 'Date', title: 'Title of Activity', estimate: 'Estimate Budget',
+            actual: 'Actual Budget', variance: 'Variance', remark: 'Remarks'
+        });
+
+        populateTable('membershipTable', full.memberships, {
+            year: 'Year', date: 'Date', venue: 'Venue',
+            organization: 'Name of Organization', level: 'Level', position: 'Position',
+            remark: 'Remarks'
+        });
+
+        populateTable('seminarsTable', full.seminars, {
+            year: 'Year', date: 'Date', venue: 'venue', seminar: 'Title of Seminar / Workshop', level: 'Level', remark: 'Remarks'
+        });
+
+        populateTable('workTable', full.workHistories, {
+            year: 'Year', date: 'Date', work_position: 'Position', company: 'Company', remark: 'Remarks'
+        });
+    })
+    .catch(err => console.error('❌ Failed to auto-load coach data:', err));
+}
+
 
     // -----------------------
     // LIVE SEARCH
@@ -1279,26 +1580,26 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
 
                         populateTable('scheduleTable', full.schedule, {  // Use 'schedule' not 'schedules'
-                            Event: 'Event', Date: 'Date', List: 'Athletes', coachRemark: 'Remarks'
+                            term: 'Term', academic_year: 'Academic Year', count_a: 'A',count_b: 'B',count_c: 'C', coachRemark: 'Remarks'
                         });
 
                         populateTable('expensesTable', full.expenses, {
-                            Academic: 'Academic Year', Term: 'Term', Type: 'Type', Amount: 'Amount',
-                            EventAthlete: 'Event/Athlete', notes: 'Notes', coachRemark: 'Remarks'
+                            year: 'Year', date: 'Date', title: 'Title of Activity', estimate: 'Estimate Budget',
+                            actual: 'Actual Budget', variance: 'Variance', remark: 'Remarks'
                         });
 
                         populateTable('membershipTable', full.memberships, {
-                            AcademicTerm: 'Academic Term', UnitsEnrolled: 'Units', CoachTuition: 'Tuition',
-                            CoachMiscellaneous: 'Misc', CoachOtherCharges: 'Other', CoachAssessment: 'Assessment',
-                            CoachTotalDiscount: 'Discount', coachRemark: 'Remarks'
+                            year: 'Year', date: 'Date', venue: 'Venue',
+                            organization: 'Name of Organization', level: 'Level', position: 'Position',
+                            remark: 'Remarks'
                         });
 
                         populateTable('seminarsTable', full.seminars, {
-                            Year: 'Year', date: 'Date', WorkPosition: 'Position', NameCompany: 'Company', coachRemark: 'Remarks'
+                            year: 'Year', date: 'Date', venue: 'venue', seminar: 'Title of Seminar / Workshop', level: 'Level', remark: 'Remarks'
                         });
 
                         populateTable('workTable', full.workHistories, {  // Use 'workHistories' from model
-                            year: 'Year', date: 'Date', work_position: 'Position', company_name: 'Company', coachRemark: 'Remarks'
+                            year: 'Year', date: 'Date', work_position: 'Position', company: 'Company', remark: 'Remarks'
                         });
 
                         saveBtn?.classList.add('hidden');
@@ -1476,26 +1777,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     handleModuleForm('ScheduleForm', 'scheduleTable', 'schedule', {
-        Event: 'Event', Date: 'Date', List: 'Athletes', coachRemark: 'Remarks'
+        term: 'Term', academic_year: 'Academic Year', count_a: 'A',count_b: 'B',count_c: 'C', remarks: 'Remarks'
     });
 
     handleModuleForm('ExpensesForm', 'expensesTable', 'expenses', {
-        Academic: 'Academic Year', Term: 'Term', Type: 'Type', Amount: 'Amount',
-        EventAthlete: 'Event/Athlete', notes: 'Notes', coachRemark: 'Remarks'
+        year: 'Year', date: 'Date', title: 'Title of Activity', estimate: 'Estimate Budget',
+        actual: 'Actual Budget', variance: 'Variance', remark: 'Remarks'
     });
 
     handleModuleForm('MembershipForm', 'membershipTable', 'memberships', {
-        AcademicTerm: 'Academic Term', UnitsEnrolled: 'Units', CoachTuition: 'Tuition',
-        CoachMiscellaneous: 'Misc', CoachOtherCharges: 'Other', CoachAssessment: 'Assessment',
-        CoachTotalDiscount: 'Discount', coachRemark: 'Remarks'
+        year: 'Year', date: 'Date', venue: 'Venue',
+        organization: 'Name of Organization', level: 'Level', position: 'Position',
+        remark: 'Remarks'
     });
 
     handleModuleForm('SeminarsForm', 'seminarsTable', 'seminars', {
-        Year: 'Year', date: 'date', work_position: 'work_position', NameCompany: 'NameCompany', coachRemark: 'coachRemarks'
+        year: 'Year', date: 'Date', venue: 'venue', seminar: 'Title of Seminar / Workshop', level: 'Level', remark: 'Remarks'
     });
 
     handleModuleForm('WorkHistoryForm', 'workTable', 'workHistory', {
-        year: 'Year', date: 'Date', work_position: 'Position', company_name: 'Company', coachRemark: 'Remarks'
+        year: 'Year', date: 'Date', work_position: 'Position', company: 'Company', remark: 'Remarks'
     });
 
     // -----------------------
@@ -1547,6 +1848,47 @@ document.addEventListener('DOMContentLoaded', () => {
             return data;
         })
         .then(data => {
+            try {
+                const coachId = data?.coach?.id || data?.id;
+                
+                // For coach users, update UI without redirect
+                if (window.currentUserRole === 'coach') {
+                    if (coachId) {
+                        // Update form for future updates
+                        const updateBase = '<?php echo e(url('/coaches')); ?>';
+                        byId('coachForm')?.setAttribute('action', `${updateBase}/${coachId}`);
+                        byId('coach_method').value = 'PUT';
+                        byId('selected_coach_id').value = coachId;
+                        
+                        // Swap buttons: hide Save/Edit, show Update
+                        byId('coach_saveBtn')?.classList.add('hidden');
+                        byId('coach_editBtn')?.classList.add('hidden');
+                        byId('coach_updateBtn')?.classList.remove('hidden');
+                        
+                        // Update global coach ID
+                        window.currentCoachId = coachId;
+                        
+                        // Re-enable form controls after save
+                        byId('coachForm')?.querySelectorAll('input,select,textarea').forEach(el => {
+                            if (el.type !== 'hidden') el.disabled = false;
+                        });
+                        
+                        alert('✅ Profile saved successfully!');
+                        return; // Don't reload or redirect
+                    }
+                } else {
+                    // For admin users, redirect to show page if coach created
+                    if (coachId) {
+                        const target = '<?php echo e(url('/coach')); ?>' + '?coach_id=' + coachId;
+                        window.location.href = target;
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.error('Error handling success response:', e);
+            }
+            
+            // Fallback: reload page
             alert('✅ Coach saved successfully!');
             location.reload();
         })

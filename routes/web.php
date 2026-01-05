@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route as Router;
 use App\Http\Controllers\CoachController;
 use App\Http\Controllers\ApprovalController;
 
+
 // Route::get('/', function () {
 //     return view('log.login');   
 // })->name('login');
@@ -202,5 +203,17 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/approvals/{athlete}', [ApprovalController::class, 'show'])->name('approvals.show');
     Route::post('/approvals/{athlete}/approve', [ApprovalController::class, 'approve'])->name('approvals.approve');
     Route::post('/approvals/{athlete}/decline', [ApprovalController::class, 'decline'])->name('approvals.decline');
+    // --- ADMIN APPROVAL ROUTES ---
+    // Approve a pending athlete
+    Route::post('/admin/approve-athlete/{id}', [App\Http\Controllers\AdminController::class, 'approveAthlete'])->name('admin.approve.athlete');
+    // Reject/Delete a pending athlete
+    Route::delete('/admin/reject-athlete/{id}', [App\Http\Controllers\AdminController::class, 'rejectAthlete'])->name('admin.reject.athlete');
 });
 
+// --- PUBLIC ALUMNI REGISTRATION ROUTES ---
+
+// 1. Show the registration form (GET)
+Route::get('/alumni-registration', [AthleteController::class, 'showPublicRegistrationForm'])->name('alumni.register.show');
+
+// 2. Submit the form data (POST)
+Route::post('/alumni-registration', [AthleteController::class, 'storePublicRegistration'])->name('alumni.register.submit');
