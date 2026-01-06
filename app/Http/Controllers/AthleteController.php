@@ -81,6 +81,16 @@ class AthleteController extends Controller
             }
         }
 
+        // --- FIX FOR PROVINCE SAVING ---
+        // We check both inputs and save to the database column 'province_state' (or 'province')
+        if (isset($general['province_state'])) {
+            $data['province_state'] = $general['province_state']; 
+            $data['province'] = $general['province_state']; // Try saving to both to be safe
+        } elseif (isset($general['province'])) {
+            $data['province_state'] = $general['province'];
+            $data['province'] = $general['province'];
+        }
+
         // Set approval_status to pending for all new athletes
         $data['approval_status'] = 'pending';
 
@@ -264,16 +274,21 @@ class AthleteController extends Controller
     /**
      * Return full athlete with related records (achievements, academics, fees, work history)
      */
-    public function show($id)
+    // Show Single Athlete Profile (Handles BOTH Form Search & View Page)
+    public function show(\Illuminate\Http\Request $request, $id)
     {
-        // 1. Find the athlete by ID (or show 404 error if missing)
-        // We use 'with' to load the related tables (achievements, grades, etc.) if you have them defined in the Model
+        // 1. Find the athlete by ID (and load their records)
         $athlete = \App\Models\Athlete::with(['achievements', 'academicEvaluations', 'feesDiscounts', 'workHistories'])->findOrFail($id);
 
-        // 2. Return the VIEW, passing the athlete data to it
+        // 2. SMART CHECK: Is this the Search Bar asking for data?
+        if ($request->wantsJson()) {
+            // YES! Return the raw data so the form can auto-fill
+            return response()->json($athlete);
+        }
+
+        // 3. NO, it's a human clicking "View". Return the Green Profile Page.
         return view('features.athlete_profile', compact('athlete'));
     }
-
 
 
     /**
@@ -437,7 +452,7 @@ class AthleteController extends Controller
                 'last_name' => $validated['last_name'],
                 'suffix' => $request->input('suffix'),
                 'email' => $validated['email'],
-                'sport' => $validated['sport_event'],
+                'sport_event' => $validated['sport_event'],
                 
                 // System Status
                 'status' => $validated['classification'],
@@ -461,7 +476,7 @@ class AthleteController extends Controller
                 'facebook' => $request->input('facebook_link'), // Ensure DB column is 'facebook' or 'facebook_link'
                 'address' => $request->input('address'),
                 'city_municipality' => $request->input('city_municipality'),
-                'province' => $request->input('province'),
+                'province_state' => $request->input('province') ?? $request->input('province_state'),
                 'zip_code' => $request->input('zip_code'),
 
                 // Academic

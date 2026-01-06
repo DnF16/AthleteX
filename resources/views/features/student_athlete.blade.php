@@ -381,13 +381,35 @@
                                     <label class="w-1/3 text-sm font-medium text-gray-700">Sports Event</label>
                                     <select name="sport_event" class="w-2/3 bg-blue-100 border border-gray-300 rounded px-2 py-1">
                                         <option value="">-- Select Sport Event --</option>
-                                        <option value="Basketball">Basketball</option>
-                                        <option value="Volleyball">Volleyball</option>
+                                        <option value="Basketball_Men">Basketball Men</option>
+                                        <option value="Basketball_Women">Basketball Women</option>
+                                        <option value="Volleyball_Men">Volleyball Men</option>
+                                        <option value="Volleyball_Women">Volleyball Women</option>
+                                        <option value="Archery_Men">Archery Men</option>
+                                        <option value="Archery_Women">Archery Women</option>
+                                        <option value="Arnis_Men">Arnis Men</option>
+                                        <option value="Arnis_Women">Arnis Women</option>
                                         <option value="Athletics">Athletics</option>
-                                        <option value="Swimming">Swimming</option>
-                                        <option value="Taekwondo">Taekwondo</option>
+                                        <option value="Badminton_Men">Badminton Men</option>
+                                        <option value="Badminton_Women">Badminton Women</option>
+                                        <option value="Baseball">Baseball</option>
+                                        <option value="Table_Tennis_Men">Table Tennis Men</option>
+                                        <option value="Table_Tennis_Women">Table Tennis Women</option>
+                                        <option value="Tennis_Men">Tennis Men</option>
+                                        <option value="Tennis_Women">Tennis Women</option>
+                                        <option value="Swimming_Men">Swimming Men</option>
+                                        <option value="Swimming_Women">Swimming Women</option>
+                                        <option value="Sepak_Takraw_Men">Sepak Takraw Men</option>
+                                        <option value="Sepak_Takraw_Women">Sepak Takraw Women</option>
+                                        <option value="Judo_Men">Judo Men</option>
+                                        <option value="Judo_Women">Judo Women</option>
+                                        <option value="Wushu_Sanda">Wushu Sanda</option>
+                                        <option value="Wushu_Taolu">Wushu Taolu</option>
+                                        <option value="Taekwondo_Men">Taekwondo Men</option>
+                                        <option value="Taekwondo_Women">Taekwondo Women</option>
                                         <option value="Chess">Chess</option>
                                         <option value="Football">Football</option>
+                                        <option value="Softball">Softball</option>
                                         <option value="Boxing">Boxing</option>
                                     </select>
                                 </div>
@@ -858,7 +880,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------
     (function initTabs(){
         const tabs = document.querySelectorAll('.tab-link');
-        const contents = document.querySelectorAll('.tab-pane');
+        const contents = document.querySelectorAll('.tab-pane');    
 
         const defaultTab = document.querySelector('.tab-link[href="#general-info"]');
         const defaultContent = byId('general-info');
@@ -989,27 +1011,122 @@ document.addEventListener('DOMContentLoaded', () => {
                     fetch(updateBase + '/' + selectedId, { headers: { 'Accept': 'application/json' } })
                         .then(r => r.json())
                         .then(full => {
-                            // populate general form fields from returned object
+                            console.log("Athlete Data Received:", full); // <--- Add this line!
+                            // ------------------------------------------------
+                            // 1. AUTO-FILL (Matches exact names)
+                            // ------------------------------------------------
                             for (const key in full) {
                                 try {
                                     const el = generalForm.querySelector(`[name="${key}"]`);
                                     if (!el) continue;
+                                    
                                     if (el.tagName === 'SELECT') {
+                                        // Smart Select: Tries to match text or value, ignoring case
+                                        let found = false;
                                         for (let i = 0; i < el.options.length; i++) {
-                                            if (String(el.options[i].value).trim().toLowerCase() === String(full[key]).trim().toLowerCase()) {
+                                            const optVal = String(el.options[i].value).trim().toLowerCase();
+                                            const dbVal = String(full[key]).trim().toLowerCase();
+                                            if (optVal === dbVal) {
                                                 el.selectedIndex = i;
+                                                found = true;
                                                 break;
                                             }
                                         }
                                     } else if (el.type === 'file') {
-                                        // skip
+                                        // skip files
                                     } else {
                                         el.value = full[key] ?? '';
                                     }
                                 } catch (err) { /* ignore DOM mismatches */ }
                             }
 
-                            // picture
+                            // ------------------------------------------------
+                            // 2. MANUAL MAPPING (Fixes the missing fields)
+                            // ------------------------------------------------
+                            
+                            // ------------------------------------------------
+                            // 2. MANUAL MAPPING (Fixes the missing fields)
+                            // ------------------------------------------------
+                            
+                            // ------------------------------------------------
+                            // 2. MANUAL MAPPING (Fixes the missing fields)
+                            // ------------------------------------------------
+                            
+                            // Fix Gender
+                            if (full.sex || full.gender) {
+                                const val = full.sex || full.gender;
+                                const el = generalForm.querySelector('[name="gender"]');
+                                if (el) {
+                                    for(let i=0; i<el.options.length; i++) {
+                                        if(el.options[i].value.toLowerCase() === val.toLowerCase()) el.selectedIndex = i;
+                                    }
+                                }
+                            }
+
+                            // Fix Sports Event
+                            if (full.sport || full.sport_event) {
+                                let val = String(full.sport || full.sport_event).trim().toLowerCase();
+                                const el = generalForm.querySelector('[name="sport_event"]');
+                                
+                                if (el) {
+                                    let found = false;
+
+                                    // Attempt 1: Exact Match (e.g., DB "basketball_men" -> Option "Basketball_Men")
+                                    for(let i=0; i<el.options.length; i++) {
+                                        if(el.options[i].value.toLowerCase() === val) {
+                                            el.selectedIndex = i;
+                                            found = true;
+                                            break;
+                                        }
+                                    }
+
+                                    // Attempt 2: Partial Match (Fallback for old data)
+                                    // If DB says "Basketball", it will auto-select "Basketball_Men" (the first match it finds)
+                                    if (!found) {
+                                        for(let i=0; i<el.options.length; i++) {
+                                            // Check if option value (e.g., "basketball_men") contains the DB value ("basketball")
+                                            if(el.options[i].value.toLowerCase().includes(val)) {
+                                                el.selectedIndex = i;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // --- FIX FOR PROVINCE (Aggressive Check) ---
+                            // We check every possible name the database might use
+                            const dbProvince = full.province || full.province_state || full.provinceState; 
+                            if (dbProvince) {
+                                // We try to find the input by ID first, then by Name
+                                const el = document.getElementById('province_state') || generalForm.querySelector('[name="province_state"]');
+                                if (el) el.value = dbProvince;
+                            }
+
+                            // Fix Status/Classification Mismatch
+                            if (full.status) {
+                                const el = generalForm.querySelector('[name="status"]');
+                                if (el) {
+                                    let dbStatus = String(full.status).trim().toLowerCase();
+                                    if (dbStatus === 'alumni') { dbStatus = 'graduated'; }
+                                    for(let i=0; i<el.options.length; i++) {
+                                        if(el.options[i].value.toLowerCase() === dbStatus) {
+                                            el.selectedIndex = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // Fix Birthdate
+                            if (full.birthdate) {
+                                const el = generalForm.querySelector('[name="birthdate"]');
+                                if (el) el.value = full.birthdate.split('T')[0].split(' ')[0]; 
+                            }
+
+                            // ------------------------------------------------
+                            // 3. PICTURE HANDLING
+                            // ------------------------------------------------
                             if (full.picture_url) {
                                 const preview = byId('picturePreview');
                                 const noPic = byId('noPictureText');
