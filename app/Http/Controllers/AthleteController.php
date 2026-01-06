@@ -81,17 +81,16 @@ class AthleteController extends Controller
             }
         }
 
-        // --- FIX FOR PROVINCE SAVING ---
-        // We check both inputs and save to the database column 'province_state' (or 'province')
+        // --- ADD THE FIX HERE ---
         if (isset($general['province_state'])) {
             $data['province_state'] = $general['province_state']; 
-            $data['province'] = $general['province_state']; // Try saving to both to be safe
+            $data['province'] = $general['province_state']; 
         } elseif (isset($general['province'])) {
             $data['province_state'] = $general['province'];
             $data['province'] = $general['province'];
         }
+        // ------------------------
 
-        // Set approval_status to pending for all new athletes
         $data['approval_status'] = 'pending';
 
         // Assign the logged-in coach automatically if user has a coach role
@@ -320,6 +319,14 @@ class AthleteController extends Controller
             }
         }
 
+        if (isset($general['province_state'])) {
+            $data['province_state'] = $general['province_state']; 
+            $data['province'] = $general['province_state']; 
+        } elseif (isset($general['province'])) {
+            $data['province_state'] = $general['province'];
+            $data['province'] = $general['province'];
+        }
+
         try {
             $updated = DB::transaction(function () use ($athlete, $data, $payload) {
                 $athlete->update($data);
@@ -477,6 +484,7 @@ class AthleteController extends Controller
                 'address' => $request->input('address'),
                 'city_municipality' => $request->input('city_municipality'),
                 'province_state' => $request->input('province') ?? $request->input('province_state'),
+                'province'       => $request->input('province') ?? $request->input('province_state'),
                 'zip_code' => $request->input('zip_code'),
 
                 // Academic

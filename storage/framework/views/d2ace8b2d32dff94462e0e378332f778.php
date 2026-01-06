@@ -16,7 +16,8 @@
         
         /* HIDE SECTIONS BY DEFAULT */
         #basic-info-section { display: none; }
-        #active-student-fields { display: none; }
+        #shared-fields { display: none; } /* Address & Academics (For Both) */
+        #active-student-fields { display: none; } /* Personal & Physical (Active Only) */
     </style>
 </head>
 <body>
@@ -99,21 +100,101 @@
                         <label class="form-label fw-bold">Sport Event <span class="text-danger">*</span></label>
                         <select name="sport_event" class="form-select" required>
                             <option value="">-- Select Sport --</option>
-                            <option value="Basketball">Basketball</option>
-                            <option value="Volleyball">Volleyball</option>
-                            <option value="Swimming">Swimming</option>
+                            <option value="Basketball_Men">Basketball Men</option>
+                            <option value="Basketball_Women">Basketball Women</option>
+                            <option value="Volleyball_Men">Volleyball Men</option>
+                            <option value="Volleyball_Women">Volleyball Women</option>
+                            <option value="Swimming_Men">Swimming Men</option>
+                            <option value="Swimming_Women">Swimming Women</option>
                             <option value="Athletics">Athletics</option>
-                            <option value="Badminton">Badminton</option>
-                            <option value="Sepak Takraw">Sepak Takraw</option>
-                            <option value="Table Tennis">Table Tennis</option>
+                            <option value="Badminton_Men">Badminton Men</option>
+                            <option value="Badminton_Women">Badminton Women</option>
+                            <option value="Sepak_Takraw_Men">Sepak Takraw Men</option>
+                            <option value="Sepak_Takraw_Women">Sepak Takraw Women</option>
+                            <option value="Table_Tennis_Men">Table Tennis Men</option>
+                            <option value="Table_Tennis_Women">Table Tennis Women</option>
+                            <option value="Tennis_Men">Tennis Men</option>
+                            <option value="Tennis_Women">Tennis Women</option>
                             <option value="Chess">Chess</option>
-                            <option value="Taekwondo">Taekwondo</option>
-                            <option value="Arnis">Arnis</option>
+                            <option value="Taekwondo_Men">Taekwondo Men</option>
+                            <option value="Taekwondo_Women">Taekwondo Women</option>
+                            <option value="Arnis_Men">Arnis Men</option>
+                            <option value="Arnis_Women">Arnis Women</option>
+                            <option value="Archery_Men">Archery Men</option>
+                            <option value="Archery_Women">Archery Women</option>
+                            <option value="Baseball">Baseball</option>
+                            <option value="Judo_Men">Judo Men</option>
+                            <option value="Judo_Women">Judo Women</option>
+                            <option value="Wushu_Sanda">Wushu Sanda</option>
+                            <option value="Wushu_Taolu">Wushu Taolu</option>
+                            <option value="Football">Football</option>
+                            <option value="Softball">Softball</option>
+                            <option value="Boxing">Boxing</option>
                         </select>
+                    </div>
+
+                    <div id="shared-fields">
+                        <h5 class="section-title">Contact & Address Information</h5>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                                <input type="text" name="contact_number" class="form-control" placeholder="09123456789">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Facebook/Social Link</label>
+                                <input type="url" name="facebook_link" class="form-control" placeholder="https://facebook.com/yourname">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Home Address (House No, Street, Subd.) <span class="text-danger">*</span></label>
+                            <input type="text" name="address" class="form-control">
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">City / Municipality <span class="text-danger">*</span></label>
+                                <input type="text" name="city_municipality" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Province</label>
+                                <input type="text" name="province_state" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Zip Code</label>
+                                <input type="text" name="zip_code" class="form-control">
+                            </div>
+                        </div>
+
+                        <h5 class="section-title">Academic Information</h5>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">College / Department</label>
+                                <input type="text" name="college" class="form-control" placeholder="e.g. CCS">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Course / Program <span class="text-danger">*</span></label>
+                                <input type="text" name="course" class="form-control" placeholder="e.g. BSIT">
+                            </div>
+                        </div>
                     </div>
 
                     <div id="active-student-fields">
                         
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Year Level</label>
+                                <select name="year_level" class="form-select">
+                                    <option value="">-- Select Year --</option>
+                                    <option value="1">1st Year</option>
+                                    <option value="2">2nd Year</option>
+                                    <option value="3">3rd Year</option>
+                                    <option value="4">4th Year</option>
+                                    <option value="5">5th Year</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <h5 class="section-title">Personal Details</h5>
                         <div class="row g-3 mb-3">
                             <div class="col-md-4">
@@ -178,62 +259,6 @@
                             </div>
                         </div>
 
-                        <h5 class="section-title">Contact & Address Information</h5>
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                                <input type="text" name="contact_number" class="form-control" placeholder="09123456789">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Facebook/Social Link</label>
-                                <input type="url" name="facebook_link" class="form-control" placeholder="https://facebook.com/yourname">
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Home Address (House No, Street, Subd.) <span class="text-danger">*</span></label>
-                            <input type="text" name="address" class="form-control">
-                        </div>
-
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-4">
-                                <label class="form-label">City / Municipality <span class="text-danger">*</span></label>
-                                <input type="text" name="city_municipality" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Province</label>
-                                <input type="text" name="province" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Zip Code</label>
-                                <input type="text" name="zip_code" class="form-control">
-                            </div>
-                        </div>
-
-                        <h5 class="section-title">Academic Information</h5>
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">College / Department</label>
-                                <input type="text" name="college" class="form-control" placeholder="e.g. CCS">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Course / Program <span class="text-danger">*</span></label>
-                                <input type="text" name="course" class="form-control" placeholder="e.g. BSIT">
-                            </div>
-                        </div>
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Year Level</label>
-                                <select name="year_level" class="form-select">
-                                    <option value="1">1st Year</option>
-                                    <option value="2">2nd Year</option>
-                                    <option value="3">3rd Year</option>
-                                    <option value="4">4th Year</option>
-                                    <option value="5">5th Year</option>
-                                </select>
-                            </div>
-                        </div>
-
                         <h5 class="section-title">In Case of Emergency</h5>
                         <div class="row g-3 mb-3">
                             <div class="col-md-5">
@@ -250,12 +275,13 @@
                             </div>
                         </div>
                     </div>
+                    
                     <div class="d-grid gap-2 mt-5">
                         <button type="submit" class="btn btn-success btn-lg text-white shadow fw-bold py-3">SUBMIT REGISTRATION</button>
                         <a href="<?php echo e(url('/')); ?>" class="text-center text-secondary mt-2 text-decoration-none">Cancel</a>
                     </div>
                 </div>
-                </form>
+            </form>
         </div>
     </div>
 </div>
@@ -264,36 +290,54 @@
     function toggleFields() {
         var status = document.getElementById("classification").value;
         var basicInfo = document.getElementById("basic-info-section");
+        var sharedFields = document.getElementById("shared-fields");
         var activeFields = document.getElementById("active-student-fields");
 
         // 1. Logic: Show/Hide Basic Info based on if *anything* is selected
         if (status === "") {
             basicInfo.style.display = "none";
+            sharedFields.style.display = "none";
             activeFields.style.display = "none";
         } else {
             basicInfo.style.display = "block";
+            // Address & Academic (Shared) always show if status is selected
+            sharedFields.style.display = "block";
             
             // 2. Logic: Show/Hide Extended Fields only if 'Active'
             if (status === "Active") {
                 activeFields.style.display = "block";
-                setRequired(true);
+                setRequired('Active');
             } else {
                 activeFields.style.display = "none";
-                setRequired(false);
+                setRequired('Alumni');
             }
         }
     }
 
-    function setRequired(isRequired) {
-        let fields = [
-            'birthdate', 'sex', 'contact_number', 'address', 
-            'city_municipality', 'course', 'emergency_person', 'emergency_contact'
-        ];
+    function setRequired(mode) {
+        // Shared fields are required for BOTH Active and Alumni
+        let sharedRequired = ['contact_number', 'address', 'city_municipality', 'course'];
         
-        fields.forEach(function(name) {
-            let element = document.getElementsByName(name)[0];
-            if(element) element.required = isRequired;
-        });
+        // Active fields are ONLY required for Active students
+        let activeRequired = ['birthdate', 'sex', 'emergency_person', 'emergency_contact'];
+
+        // Helper to toggle requirement
+        function toggle(list, isRequired) {
+            list.forEach(function(name) {
+                let element = document.getElementsByName(name)[0];
+                if(element) element.required = isRequired;
+            });
+        }
+
+        if (mode === 'Active') {
+            // Active needs EVERYTHING
+            toggle(sharedRequired, true);
+            toggle(activeRequired, true);
+        } else if (mode === 'Alumni') {
+            // Alumni only needs Shared
+            toggle(sharedRequired, true);
+            toggle(activeRequired, false);
+        }
     }
 </script>
 
