@@ -428,16 +428,18 @@ class AthleteController extends Controller
     public function storePublicRegistration(Request $request)
     {
         // 1. DEFINE VALIDATION RULES
+        // We make "Active-Only" fields nullable for Alumni so validation doesn't fail
         $rules = [
             'classification' => 'required|in:Active,Alumni',
-            'student_id' => 'required|string|unique:athletes,student_id',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'sport_event' => 'required|string',
+            'student_id'     => 'required|string|unique:athletes,student_id',
+            'first_name'     => 'required|string|max:255',
+            'last_name'      => 'required|string|max:255',
+            'email'          => 'required|email|max:255',
+            'sport_event'    => 'required|string',
+            'profile_picture'=> 'nullable|image|max:5120', // Added Image Validation
         ];
 
-        // 2. ADD STRICT RULES FOR ACTIVE STUDENTS
+        // 2. ADD STRICT RULES ONLY IF ACTIVE
         if ($request->classification === 'Active') {
             $rules['birthdate'] = 'required|date';
             $rules['sex'] = 'required|string';
@@ -450,12 +452,21 @@ class AthleteController extends Controller
         $validated = $request->validate($rules);
 
         try {
-            // 3. SAVE TO DATABASE
+            // 3. HANDLE IMAGE UPLOAD
+            $picturePath = null;
+            if ($request->hasFile('profile_picture')) {
+                $file = $request->file('profile_picture');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $path = $file->storeAs('uploads', $filename, 'public');
+                $picturePath = '/storage/' . $path;
+            }
+
+            // 4. SAVE TO DATABASE
             \App\Models\Athlete::create([
                 // Basic Info
                 'student_id' => $validated['student_id'],
                 'first_name' => $validated['first_name'],
-                'middle_name' => $request->input('middle_name'),
+                'middle_initial' => $request->input('middle_initial'),
                 'last_name' => $validated['last_name'],
                 'suffix' => $request->input('suffix'),
                 'email' => $validated['email'],
@@ -463,13 +474,15 @@ class AthleteController extends Controller
                 
                 // System Status
                 'status' => $validated['classification'],
+                'classification' => $validated['classification'],
                 'approval_status' => 'pending', 
+                'picture_path' => $picturePath,
 
-                // Personal Details
+                // Personal Details (MAPPING FIXES HERE)
                 'birthdate' => $request->input('birthdate'),
                 'age' => $request->input('age'),
-                'sex' => $request->input('sex'),
-                'civil_status' => $request->input('civil_status'),
+                'gender' => $request->input('sex'),              // Fixed: sex -> gender
+                'marital_status' => $request->input('civil_status'), // Fixed: civil_status -> marital_status
                 'place_of_birth' => $request->input('place_of_birth'),
                 'nationality' => $request->input('nationality'),
                 
@@ -480,11 +493,10 @@ class AthleteController extends Controller
 
                 // Contact
                 'contact_number' => $request->input('contact_number'),
-                'facebook' => $request->input('facebook_link'), // Ensure DB column is 'facebook' or 'facebook_link'
+                'facebook' => $request->input('facebook_link'),
                 'address' => $request->input('address'),
                 'city_municipality' => $request->input('city_municipality'),
-                'province_state' => $request->input('province') ?? $request->input('province_state'),
-                'province'       => $request->input('province') ?? $request->input('province_state'),
+                'province_state' => $request->input('province_state'),
                 'zip_code' => $request->input('zip_code'),
 
                 // Academic
@@ -498,11 +510,11 @@ class AthleteController extends Controller
                 'emergency_relationship' => $request->input('emergency_relationship'),
             ]);
 
-            return back()->with('success', 'Registration submitted successfully! Please wait for SDO verification.');
+            return redirect()->back()->with('success', 'Registration submitted successfully! Please wait for SDO verification.');
 
         } catch (\Exception $e) {
-            // This will help you find missing columns if the database crashes
-            return back()->with('error', 'Database Error: ' . $e->getMessage())->withInput();
+            // Debugging: If it fails, this will tell you EXACTLY why (e.g., "Column not found")
+            dd($e->getMessage()); 
         }
     }
 }

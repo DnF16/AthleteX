@@ -109,7 +109,7 @@
                                                 <span class="text-muted small"><?php echo e($p->email); ?></span>
                                             </div>
                                         </td>
-                                        <td><span class="badge bg-info text-dark"><?php echo e($p->sport); ?></span></td>
+                                        <td><span class="badge bg-info text-dark"><?php echo e($p->sport_event); ?></span></td>
                                         <td class="text-secondary small">
                                             <?php echo e($p->created_at->format('M d, Y')); ?> <br>
                                             <?php echo e($p->created_at->format('h:i A')); ?>

@@ -108,7 +108,7 @@
                                                 <span class="text-muted small">{{ $p->email }}</span>
                                             </div>
                                         </td>
-                                        <td><span class="badge bg-info text-dark">{{ $p->sport }}</span></td>
+                                        <td><span class="badge bg-info text-dark">{{ $p->sport_event }}</span></td>
                                         <td class="text-secondary small">
                                             {{ $p->created_at->format('M d, Y') }} <br>
                                             {{ $p->created_at->format('h:i A') }}
