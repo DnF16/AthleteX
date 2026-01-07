@@ -18,6 +18,14 @@
         #basic-info-section { display: none; }
         #shared-fields { display: none; } /* Address & Academics (For Both) */
         #active-student-fields { display: none; } /* Personal & Physical (Active Only) */
+
+        /* MOBILE RESPONSIVENESS FIX */
+        @media (max-width: 768px) {
+            .form-header { padding: 20px; }
+            .form-section { padding: 20px 15px; }
+            .form-container { margin: 10px; }
+            .btn-lg { width: 100%; } /* Make submit button full width on phone */
+        }
     </style>
 </head>
 <body>

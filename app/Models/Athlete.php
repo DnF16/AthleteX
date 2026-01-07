@@ -56,7 +56,7 @@ class Athlete extends Model
         'picture_path',
         'notes',
         'inactive_date',
-
+        
         // Approval workflow
         'approval_status',
         'approval_notes',
