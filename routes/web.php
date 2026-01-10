@@ -69,6 +69,8 @@ Route::post('/athletes', [AthleteController::class, 'store'])->name('athletes.st
 Route::get('/athletes/search', [AthleteController::class, 'search'])->name('athletes.search');
 Route::get('/athletes/{athlete}', [AthleteController::class, 'show'])->name('athletes.show');
 Route::put('/athletes/{athlete}', [AthleteController::class, 'update'])->name('athletes.update');
+Route::get('/athlete/{id}/print', [App\Http\Controllers\AthleteController::class, 'printProfile'])->name('athlete.print');
+
 
 // Related Athlete Tables (Achievements, Grades, Fees, Work)
 // Note: You might need to import AchievementController if it exists, otherwise keep as is.

@@ -276,16 +276,15 @@ class AthleteController extends Controller
     // Show Single Athlete Profile (Handles BOTH Form Search & View Page)
     public function show(\Illuminate\Http\Request $request, $id)
     {
-        // 1. Find the athlete by ID (and load their records)
+        // 1. Find the athlete
         $athlete = \App\Models\Athlete::with(['achievements', 'academicEvaluations', 'feesDiscounts', 'workHistories'])->findOrFail($id);
 
-        // 2. SMART CHECK: Is this the Search Bar asking for data?
+        // 2. CHECK: Is the browser asking for JSON? (The JavaScript fetch does this)
         if ($request->wantsJson()) {
-            // YES! Return the raw data so the form can auto-fill
             return response()->json($athlete);
         }
 
-        // 3. NO, it's a human clicking "View". Return the Green Profile Page.
+        // 3. Otherwise, return the normal Profile View
         return view('features.athlete_profile', compact('athlete'));
     }
 
@@ -516,5 +515,14 @@ class AthleteController extends Controller
             // Debugging: If it fails, this will tell you EXACTLY why (e.g., "Column not found")
             dd($e->getMessage()); 
         }
+    }
+
+    public function printProfile($id)
+    {
+        // 1. Find the athlete
+        $athlete = \App\Models\Athlete::findOrFail($id);
+
+        // 2. Return the special "Paper" view
+        return view('features.print_profile', compact('athlete'));
     }
 }

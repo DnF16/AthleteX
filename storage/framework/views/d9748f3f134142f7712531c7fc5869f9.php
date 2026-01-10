@@ -47,10 +47,15 @@
                 </div>
 
                 <div class="flex gap-3">
-                    
-                    <a href="<?php echo e(route('student.athlete')); ?>?search=<?php echo e($athlete->student_id); ?>" 
-                       class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg font-medium transition backdrop-blur-sm border border-white border-opacity-30">
+                    <a href="<?php echo e(route('student.athlete')); ?>?id=<?php echo e($athlete->id); ?>" 
+                    class="bg-white bg-opacity-20 hover:bg-opacity-30 text-black px-4 py-2 rounded-lg font-medium transition backdrop-blur-sm border border-white border-opacity-30">
                         Edit Profile
+                    </a>
+
+                    <a href="<?php echo e(route('athlete.print', $athlete->id)); ?>" target="_blank" 
+                    class="bg-white text-green-700 hover:bg-gray-100 px-4 py-2 rounded-lg font-bold transition shadow-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        Generate Report
                     </a>
                 </div>
             </div>
