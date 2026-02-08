@@ -37,4 +37,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Coach::class);
     }
+
+    // Relationship to Athlete (for users with role 'user')
+    public function athlete()
+    {
+        return $this->hasOne(Athlete::class);
+    }
 }

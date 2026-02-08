@@ -56,18 +56,11 @@ class Athlete extends Model
         'picture_path',
         'notes',
         'inactive_date',
-
-        // Approval workflow
-        'approval_status',
-        'approval_notes',
-        'approved_at',
-        'approved_by',
     ];
 
     // Cast fields to proper types
     protected $casts = [
         'birthdate' => 'date',
-        'approved_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

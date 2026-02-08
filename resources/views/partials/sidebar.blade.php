@@ -66,11 +66,6 @@
             {{-- Admin-only links --}}
             @if(auth()->check() && auth()->user()->role === 'admin')
                 <li>
-                    <a href="{{ route('approvals.pending') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
-                        <i class="bi bi-bell-fill mr-2"></i> Athlete Approvals
-                    </a>
-                </li>
-                <li>
                     <a href="{{ route('admin.general') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
                         <i class="bi bi-person-gear mr-2"></i> Admin
                     </a>

@@ -388,7 +388,8 @@
 
                             <div class="flex flex-col items-center border border-dashed border-gray-400 rounded-lg p-3 bg-white mb-4">  
                                 <span id="selected_name" class="mt-2 text-gray-800 font-semibold">
-                                    <?php echo e($selectedAthlete->name ?? 'No athlete selected'); ?>
+                                    <?php echo e($selectedAthlete->full_name ?? 'No athlete selected'); ?>
+
 
                                 </span>
                             </div>

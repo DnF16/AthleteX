@@ -12,7 +12,6 @@ use App\Http\Controllers\WorkHistoryController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route as Router;
 use App\Http\Controllers\CoachController;
-use App\Http\Controllers\ApprovalController;
 
 // Route::get('/', function () {
 //     return view('log.login');   
@@ -196,11 +195,4 @@ Route::post('/coach-work-history', [CoachWorkHistoryController::class, 'store'])
 Route::get('/coach-work-history/{coach_id}', [CoachWorkHistoryController::class, 'show']);
 
 // =================================================================
-// Admin Athlete Approval Routes
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/approvals', [ApprovalController::class, 'pendingApprovals'])->name('approvals.pending');
-    Route::get('/approvals/{athlete}', [ApprovalController::class, 'show'])->name('approvals.show');
-    Route::post('/approvals/{athlete}/approve', [ApprovalController::class, 'approve'])->name('approvals.approve');
-    Route::post('/approvals/{athlete}/decline', [ApprovalController::class, 'decline'])->name('approvals.decline');
-});
 

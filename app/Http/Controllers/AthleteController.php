@@ -18,12 +18,16 @@ class AthleteController extends Controller
     public function index()
     {
         // Admins see all athletes with all statuses
-        // Coaches see only approved athletes
+        // Coaches see only their assigned approved athletes
         if (auth()->user()->role === 'admin') {
             $athletes = Athlete::all();
+        } elseif (auth()->user()->role === 'coach' && auth()->user()->coach) {
+            // Coaches see only athletes assigned to them
+            $athletes = Athlete::where('coach_id', auth()->user()->coach->id)
+                ->get();
         } else {
-            // Non-admin users (coaches) only see approved athletes
-            $athletes = Athlete::where('approval_status', 'approved')->get();
+            // Other users (e.g., athletes) see nothing or handle differently
+            $athletes = collect(); // Empty collection
         }
         return view('athlete_lists.athlete_lists', compact('athletes'));
     }
@@ -81,8 +85,8 @@ class AthleteController extends Controller
             }
         }
 
-        // Set approval_status to pending for all new athletes
-        $data['approval_status'] = 'pending';
+        // Set approval_status to approved
+        $data['approval_status'] = 'approved';
 
         // Assign the logged-in coach automatically if user has a coach role
         if (auth()->check() && auth()->user()->role === 'coach' && auth()->user()->coach) {
