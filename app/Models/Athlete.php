@@ -13,32 +13,43 @@ class Athlete extends Model
         'student_id',
         'coach_id',
         'first_name',
-        'last_name',
+        'last_name',     
+        'middle_initial',
+        'suffix',           // Added
         'course',
+        'college',          // ADDED (Was missing)
         'year_level',
         'sport',
-
-        // additional fields used by views/forms
-        'full_name',
-        'athlete_id',
-        'middle_initial',
         'sport_event',
         'status',
         'classification',
-        'gender',
+        
+        // Personal
+        'gender',           // Matches DB column
         'birthdate',
         'age',
         'blood_type',
         'email',
         'facebook',
-        'marital_status',
+        'marital_status',   // Matches DB column
+        'nationality',      // ADDED (Was missing)
+        'place_of_birth',   // ADDED (Was missing)
+        
+        // Physical
+        'height',           // ADDED (Was missing)
+        'weight',           // ADDED (Was missing)
+
+        // Contact
         'contact_number',
         'address',
         'city_municipality',
         'province_state',
         'zip_code',
+        
+        // Emergency
         'emergency_person',
         'emergency_contact',
+
         'coach_name',
         'date_joined',
         'term_graduated',
@@ -56,9 +67,14 @@ class Athlete extends Model
         'picture_path',
         'notes',
         'inactive_date',
+
+        'emergency_relationship', // ADDED (Was missing)
+
+        // System
+        'picture_path',
+
     ];
 
-    // Cast fields to proper types
     protected $casts = [
         'birthdate' => 'date',
         'created_at' => 'datetime',

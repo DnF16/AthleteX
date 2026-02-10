@@ -205,4 +205,29 @@ class AdminController extends Controller
         \App\Models\Holiday::forceCreate($request->except('_token'));
         return back()->with('success', 'Holiday Added Successfully!');
     }
+
+    // Approve the pending registration
+    public function approveAthlete($id)
+    {
+        $athlete = \App\Models\Athlete::findOrFail($id);
+        
+        // Change status to 'approved' so they appear in the main list
+        $athlete->status = 'approved';
+        $athlete->save();
+
+        return back()->with('success', 'Athlete has been successfully verified and added to the official list.');
+    }
+
+    // Reject and delete the registration
+    public function rejectAthlete($id)
+    {
+        $athlete = \App\Models\Athlete::findOrFail($id);
+        $athlete->delete();
+
+        return back()->with('success', 'Registration request rejected and removed.');
+    }
+
+    public function approvals() {
+    return view('features.admin_approvals');
+    }
 }

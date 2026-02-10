@@ -364,8 +364,7 @@
 
                             <div class="flex flex-col items-center border border-dashed border-gray-400 rounded-lg p-3 bg-white mb-4">  
                                 <span id="selected_name" class="mt-2 text-gray-800 font-semibold">
-                                    <?php echo e($selectedAthlete->full_name ?? 'No athlete selected'); ?>
-
+                                    <?php echo e($selectedAthlete->name ?? 'No athlete selected'); ?>
 
                                 </span>
                             </div>
@@ -1298,4 +1297,4 @@
 
 
 <?php $__env->stopSection(); ?>
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\AthleteX\resources\views/features/student_athlete.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp\htdocs\AthleteX\resources\views/features/student_athlete.blade.php ENDPATH**/ ?>
