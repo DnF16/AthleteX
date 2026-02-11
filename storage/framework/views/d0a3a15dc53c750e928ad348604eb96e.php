@@ -1,261 +1,153 @@
-<?php $__env->startSection('title', 'Athlete Approvals'); ?>
+ 
 
 <?php $__env->startSection('content'); ?>
-<div class="space-y-6 w-full">
-    <!-- Page Header -->
-    <div class="bg-white p-6">
-        <h1 class="text-3xl font-bold text-gray-800">Athlete Approvals</h1>
-        <p class="text-gray-600 mt-2">Review and approve athlete submissions from coaches</p>
-    </div>
-
-    <?php if($errors->any()): ?>
-        <div class="bg-red-50 border border-red-200 rounded p-4">
-            <div class="text-red-800 font-semibold">Errors:</div>
-            <ul class="text-red-700 mt-2">
-                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <li>• <?php echo e($error); ?></li>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            </ul>
+<div class="container-fluid">
+    <div class="row">
+        
+        <div class="col-md-2 p-0">
+        <?php echo $__env->make('partials.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         </div>
-    <?php endif; ?>
 
-    <?php if(session('success')): ?>
-        <div class="bg-green-50 border border-green-200 rounded p-4 text-green-800">
-            <?php echo e(session('success')); ?>
+        <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body" style="background-color: #e8f5e9; border-left: 5px solid #2e4e1f;">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="fw-bold text-success mb-1">
+                                <i class="fas fa-share-alt me-2"></i>Registration Form Link
+                            </h5>
+                            <p class="text-muted small mb-0">
+                                Copy this link and send it to students or alumni. They can access the form without logging in.
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-white" 
+                                       value="<?php echo e(route('alumni.register.show')); ?>" 
+                                       id="regLink" readonly>
+                                
+                                <button class="btn btn-success" onclick="copyToClipboard()">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                                
+                                <a href="<?php echo e(route('alumni.register.show')); ?>" target="_blank" class="btn btn-outline-success">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        </div>
-    <?php endif; ?>
+            <script>
+                function copyToClipboard() {
+                    // Get the text field
+                    var copyText = document.getElementById("regLink");
 
-    <!-- Pending Approvals Tab -->
-    <div class="bg-white rounded-lg shadow">
-        <div class="border-b border-gray-200">
-            <div class="px-6 py-4 bg-yellow-50">
-                <h2 class="text-xl font-semibold text-gray-800">
-                    <i class="bi bi-hourglass-split text-yellow-600 mr-2"></i>
-                    Pending Approvals (<?php echo e($pendingAthletes->count()); ?>)
+                    // Select the text field
+                    copyText.select();
+                    copyText.setSelectionRange(0, 99999); // For mobile devices
+
+                    // Copy the text inside the text field
+                    navigator.clipboard.writeText(copyText.value);
+
+                    // Alert the user
+                    alert("Link copied! You can now paste it in Messenger or Email.");
+                }
+            </script>
+
+        <div class="col-md-10 p-4 bg-light">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-success">
+                    <i class="fas fa-user-check me-2"></i> Pending Verifications
                 </h2>
             </div>
-        </div>
 
-        <?php if($pendingAthletes->count() > 0): ?>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 border-b">
-                        <tr>
-                            <th class="px-6 py-3 text-left font-semibold text-gray-700">Athlete Name</th>
-                            <th class="px-6 py-3 text-left font-semibold text-gray-700">Coach</th>
-                            <th class="px-6 py-3 text-left font-semibold text-gray-700">Sport</th>
-                            <th class="px-6 py-3 text-left font-semibold text-gray-700">Submitted</th>
-                            <th class="px-6 py-3 text-center font-semibold text-gray-700">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php $__currentLoopData = $pendingAthletes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $athlete): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="px-6 py-4">
-                                    <div class="font-semibold text-gray-800">
-                                        <?php echo e($athlete->first_name); ?> <?php echo e($athlete->last_name); ?>
+            <?php if(session('success')): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i> <?php echo e(session('success')); ?>
 
-                                    </div>
-                                    <div class="text-sm text-gray-500">ID: <?php echo e($athlete->student_id); ?></div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-gray-700">
-                                        <?php echo e($athlete->coach?->coach_first_name); ?> <?php echo e($athlete->coach?->coach_last_name ?? 'N/A'); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php endif; ?>
 
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
-                                        <?php echo e($athlete->coach_sport_event ?? $athlete->sport ?? 'N/A'); ?>
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold text-secondary">Alumni Registration Requests</h5>
+                </div>
+                <div class="card-body p-0">
+                    
+                    <?php
+                        // Fetch only the 'pending' athletes
+                        $pendings = \App\Models\Athlete::where('approval_status', 'pending')->latest()->get();
+                    ?>
 
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-gray-600">
-                                    <?php echo e($athlete->created_at ? (is_string($athlete->created_at) ? $athlete->created_at : $athlete->created_at->format('M d, Y H:i')) : 'N/A'); ?>
+                    <?php if($pendings->isEmpty()): ?>
+                        <div class="text-center py-5">
+                            <i class="fas fa-clipboard-check text-muted mb-3" style="font-size: 3rem;"></i>
+                            <p class="text-muted fs-5">All caught up! No pending requests.</p>
+                        </div>
+                    <?php else: ?>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light text-secondary">
+                                    <tr>
+                                        <th class="ps-4">Student ID</th>
+                                        <th>Full Name</th>
+                                        <th>Sport Event</th>
+                                        <th>Date Submitted</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php $__currentLoopData = $pendings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <tr>
+                                        <td class="ps-4 fw-bold text-dark"><?php echo e($p->student_id); ?></td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-semibold"><?php echo e($p->first_name); ?> <?php echo e($p->last_name); ?></span>
+                                                <span class="text-muted small"><?php echo e($p->email); ?></span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-info text-dark"><?php echo e($p->sport_event); ?></span></td>
+                                        <td class="text-secondary small">
+                                            <?php echo e($p->created_at->format('M d, Y')); ?> <br>
+                                            <?php echo e($p->created_at->format('h:i A')); ?>
 
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <div class="flex gap-2 justify-center">
-                                        <a href="<?php echo e(route('approvals.show', $athlete)); ?>"
-                                            class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs font-semibold">
-                                            View
-                                        </a>
-                                        <form action="<?php echo e(route('approvals.approve', $athlete)); ?>" method="POST" class="inline">
-                                            <?php echo csrf_field(); ?>
-                                            <button type="submit"
-                                                class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-semibold"
-                                                onclick="return confirm('Approve this athlete?');">
-                                                Approve
-                                            </button>
-                                        </form>
-                                        <button onclick="openDeclineModal(<?php echo e($athlete->id); ?>)"
-                                            class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-semibold">
-                                            Decline
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php else: ?>
-            <div class="p-8 text-center text-gray-500">
-                <i class="bi bi-check-circle text-4xl text-green-500 mb-3"></i>
-                <p class="font-semibold">No pending approvals!</p>
-                <p class="text-sm">All athlete submissions have been reviewed.</p>
-            </div>
-        <?php endif; ?>
-    </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center gap-2">
+                                                
+                                                <form action="<?php echo e(route('admin.approve.athlete', $p->id)); ?>" method="POST">
+                                                    <?php echo csrf_field(); ?>
+                                                    <button type="submit" class="btn btn-success btn-sm px-3" 
+                                                            onclick="return confirm('Are you sure you want to verify and approve <?php echo e($p->first_name); ?>?')">
+                                                        <i class="fas fa-check me-1"></i> Approve
+                                                    </button>
+                                                </form>
 
-    <!-- Recently Approved -->
-    <?php if($approvedAthletes->count() > 0): ?>
-        <div class="bg-white rounded-lg shadow">
-            <div class="border-b border-gray-200">
-                <div class="px-6 py-4 bg-green-50">
-                    <h2 class="text-lg font-semibold text-gray-800">
-                        <i class="bi bi-check-circle text-green-600 mr-2"></i>
-                        Recently Approved
-                    </h2>
+                                                <form action="<?php echo e(route('admin.reject.athlete', $p->id)); ?>" method="POST">
+                                                    <?php echo csrf_field(); ?>
+                                                    <?php echo method_field('DELETE'); ?>
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm px-3"
+                                                            onclick="return confirm('Are you sure you want to delete this request?')">
+                                                        <i class="fas fa-trash-alt me-1"></i> Reject
+                                                    </button>
+                                                </form>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 border-b">
-                        <tr>
-                            <th class="px-6 py-3 text-left font-semibold text-gray-700">Athlete Name</th>
-                            <th class="px-6 py-3 text-left font-semibold text-gray-700">Coach</th>
-                            <th class="px-6 py-3 text-left font-semibold text-gray-700">Approved By</th>
-                            <th class="px-6 py-3 text-left font-semibold text-gray-700">Approved Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php $__currentLoopData = $approvedAthletes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $athlete): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="px-6 py-4">
-                                    <span class="font-semibold text-gray-800">
-                                        <?php echo e($athlete->first_name); ?> <?php echo e($athlete->last_name); ?>
 
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-gray-700">
-                                    <?php echo e($athlete->coach?->coach_first_name); ?> <?php echo e($athlete->coach?->coach_last_name ?? 'N/A'); ?>
-
-                                </td>
-                                <td class="px-6 py-4 text-gray-700">
-                                    <?php echo e($athlete->approver?->name ?? 'N/A'); ?>
-
-                                </td>
-                                <td class="px-6 py-4 text-gray-600">
-                                    <?php echo e($athlete->approved_at?->format('M d, Y H:i') ?? 'N/A'); ?>
-
-                                </td>
-                            </tr>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </tbody>
-                </table>
-            </div>
         </div>
-    <?php endif; ?>
-
-    <!-- Recently Declined -->
-    <?php if($declinedAthletes->count() > 0): ?>
-        <div class="bg-white rounded-lg shadow">
-            <div class="border-b border-gray-200">
-                <div class="px-6 py-4 bg-red-50">
-                    <h2 class="text-lg font-semibold text-gray-800">
-                        <i class="bi bi-x-circle text-red-600 mr-2"></i>
-                        Recently Declined
-                    </h2>
-                </div>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 border-b">
-                        <tr>
-                            <th class="px-6 py-3 text-left font-semibold text-gray-700">Athlete Name</th>
-                            <th class="px-6 py-3 text-left font-semibold text-gray-700">Coach</th>
-                            <th class="px-6 py-3 text-left font-semibold text-gray-700">Declined By</th>
-                            <th class="px-6 py-3 text-left font-semibold text-gray-700">Reason</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php $__currentLoopData = $declinedAthletes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $athlete): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="px-6 py-4">
-                                    <span class="font-semibold text-gray-800">
-                                        <?php echo e($athlete->first_name); ?> <?php echo e($athlete->last_name); ?>
-
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-gray-700">
-                                    <?php echo e($athlete->coach?->coach_first_name); ?> <?php echo e($athlete->coach?->coach_last_name ?? 'N/A'); ?>
-
-                                </td>
-                                <td class="px-6 py-4 text-gray-700">
-                                    <?php echo e($athlete->approver?->name ?? 'N/A'); ?>
-
-                                </td>
-                                <td class="px-6 py-4 text-gray-600">
-                                    <span class="text-xs"><?php echo e($athlete->approval_notes ?? 'No reason provided'); ?></span>
-                                </td>
-                            </tr>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    <?php endif; ?>
-</div>
-
-<!-- Decline Modal -->
-<div id="declineModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Decline Athlete Submission</h2>
-        <form id="declineForm" method="POST">
-            <?php echo csrf_field(); ?>
-            <div class="mb-4">
-                <label for="approval_notes" class="block text-sm font-semibold text-gray-700 mb-2">Reason for Decline</label>
-                <textarea id="approval_notes" name="approval_notes" required
-                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-600"
-                    placeholder="Please provide a reason for declining this athlete..."
-                    rows="4"></textarea>
-                <p class="text-xs text-gray-500 mt-1">This will be sent to the coach</p>
-            </div>
-            <div class="flex gap-3">
-                <button type="button" onclick="closeDeclineModal()"
-                    class="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 text-gray-800 font-semibold">
-                    Cancel
-                </button>
-                <button type="submit"
-                    class="flex-1 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-semibold">
-                    Decline
-                </button>
-            </div>
-        </form>
     </div>
 </div>
-
-<script>
-    function openDeclineModal(athleteId) {
-        const form = document.getElementById('declineForm');
-        form.action = `/approvals/${athleteId}/decline`;
-        document.getElementById('declineModal').classList.remove('hidden');
-    }
-
-    function closeDeclineModal() {
-        document.getElementById('declineModal').classList.add('hidden');
-    }
-
-    // Close modal when clicking outside
-    document.getElementById('declineModal')?.addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeDeclineModal();
-        }
-    });
-</script>
-
 <?php $__env->stopSection(); ?>
-
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp\htdocs\AthleteX\resources\views/features/approvals.blade.php ENDPATH**/ ?>

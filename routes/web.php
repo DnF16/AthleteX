@@ -150,16 +150,16 @@ Route::prefix('admin')
 
     // 2. APPROVALS (UPDATED: Using AthleteController to match your Blade file)
     // This is the Page
-    Route::get('/approvals', [AthleteController::class, 'showApprovals'])->name('approvals.index');
+    Route::get('/approvals', [AthleteController::class, 'showApprovals'])->name('approvals');
     
     // This is the View Profile button
     Route::get('/approvals/{id}/view', [AthleteController::class, 'show'])->name('approvals.show');
 
     // These are the Actions (Approve/Reject)
     // Note: I mapped these to match the names in your approvals.blade.php
-    Route::post('/approvals/{id}/approve', [AthleteController::class, 'approve'])->name('approvals.approve');
-    Route::post('/approvals/{id}/decline', [AthleteController::class, 'decline'])->name('approvals.decline');
-
+    // Fixed: Using the old names so the View doesn't crash
+    Route::post('/approvals/{id}/approve', [AthleteController::class, 'approve'])->name('approve.athlete');
+    Route::post('/approvals/{id}/decline', [AthleteController::class, 'decline'])->name('reject.athlete');
     // 3. Other Admin Actions
     Route::post('/save-settings', [AdminController::class, 'saveSettings'])->name('saveSettings');
     Route::post('/add-class', [AdminController::class, 'addClass'])->name('addClass');

@@ -36,6 +36,13 @@
                 </div>
             @endif
 
+            @if(session('error'))
+                <div class="alert alert-danger d-flex align-items-center mb-4">
+                    <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
+                    <div>{{ session('error') }}</div>
+                </div>
+            @endif
+
             @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul class="mb-0">
@@ -72,21 +79,17 @@
                     </div>
 
                     <div class="row g-3 mb-3">
-                        <div class="col-md-4">
+                        <div class="col-md-5">
                             <label class="form-label fw-bold">First Name <span class="text-danger">*</span></label>
                             <input type="text" name="first_name" class="form-control" value="{{ old('first_name') }}" required>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Middle Initial</label>
-                            <input type="text" name="middle_initial" class="form-control" value="{{ old('middle_initial') }}">
+                        <div class="col-md-2">
+                            <label class="form-label">M.I.</label>
+                            <input type="text" name="middle_initial" class="form-control" maxlength="3" value="{{ old('middle_initial') }}">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-5">
                             <label class="form-label fw-bold">Last Name <span class="text-danger">*</span></label>
                             <input type="text" name="last_name" class="form-control" value="{{ old('last_name') }}" required>
-                        </div>
-                        <div class="col-md-1">
-                            <label class="form-label">Suffix</label>
-                            <input type="text" name="suffix" class="form-control" value="{{ old('suffix') }}">
                         </div>
                     </div>
 
@@ -101,34 +104,80 @@
                         <select name="sport_event" class="form-select" required>
                             <option value="">-- Select Sport --</option>
                             <optgroup label="Ball Games">
-                                <option value="Basketball_Men" {{ old('sport_event') == 'Basketball_Men' ? 'selected' : '' }}>Basketball (Men)</option>
-                                <option value="Basketball_Women" {{ old('sport_event') == 'Basketball_Women' ? 'selected' : '' }}>Basketball (Women)</option>
-                                <option value="Volleyball_Men" {{ old('sport_event') == 'Volleyball_Men' ? 'selected' : '' }}>Volleyball (Men)</option>
-                                <option value="Volleyball_Women" {{ old('sport_event') == 'Volleyball_Women' ? 'selected' : '' }}>Volleyball (Women)</option>
-                                <option value="Football" {{ old('sport_event') == 'Football' ? 'selected' : '' }}>Football</option>
-                                <option value="Softball" {{ old('sport_event') == 'Softball' ? 'selected' : '' }}>Softball</option>
-                                <option value="Baseball" {{ old('sport_event') == 'Baseball' ? 'selected' : '' }}>Baseball</option>
+                                <option value="Basketball_Men">Basketball (Men)</option>
+                                <option value="Basketball_Women">Basketball (Women)</option>
+                                <option value="Volleyball_Men">Volleyball (Men)</option>
+                                <option value="Volleyball_Women">Volleyball (Women)</option>
+                                <option value="Football">Football</option>
+                                <option value="Softball">Softball</option>
+                                <option value="Baseball">Baseball</option>
                             </optgroup>
                             <optgroup label="Racket Sports">
-                                <option value="Badminton_Men" {{ old('sport_event') == 'Badminton_Men' ? 'selected' : '' }}>Badminton (Men)</option>
-                                <option value="Badminton_Women" {{ old('sport_event') == 'Badminton_Women' ? 'selected' : '' }}>Badminton (Women)</option>
-                                <option value="Table_Tennis_Men" {{ old('sport_event') == 'Table_Tennis_Men' ? 'selected' : '' }}>Table Tennis (Men)</option>
-                                <option value="Table_Tennis_Women" {{ old('sport_event') == 'Table_Tennis_Women' ? 'selected' : '' }}>Table Tennis (Women)</option>
-                                <option value="Tennis_Men" {{ old('sport_event') == 'Tennis_Men' ? 'selected' : '' }}>Tennis (Men)</option>
-                                <option value="Tennis_Women" {{ old('sport_event') == 'Tennis_Women' ? 'selected' : '' }}>Tennis (Women)</option>
+                                <option value="Badminton_Men">Badminton (Men)</option>
+                                <option value="Badminton_Women">Badminton (Women)</option>
+                                <option value="Table_Tennis_Men">Table Tennis (Men)</option>
+                                <option value="Table_Tennis_Women">Table Tennis (Women)</option>
+                                <option value="Tennis_Men">Tennis (Men)</option>
+                                <option value="Tennis_Women">Tennis (Women)</option>
                             </optgroup>
                             <optgroup label="Combat Sports & Others">
-                                <option value="Taekwondo_Men" {{ old('sport_event') == 'Taekwondo_Men' ? 'selected' : '' }}>Taekwondo (Men)</option>
-                                <option value="Taekwondo_Women" {{ old('sport_event') == 'Taekwondo_Women' ? 'selected' : '' }}>Taekwondo (Women)</option>
-                                <option value="Arnis_Men" {{ old('sport_event') == 'Arnis_Men' ? 'selected' : '' }}>Arnis (Men)</option>
-                                <option value="Arnis_Women" {{ old('sport_event') == 'Arnis_Women' ? 'selected' : '' }}>Arnis (Women)</option>
-                                <option value="Boxing" {{ old('sport_event') == 'Boxing' ? 'selected' : '' }}>Boxing</option>
-                                <option value="Sepak_Takraw" {{ old('sport_event') == 'Sepak_Takraw' ? 'selected' : '' }}>Sepak Takraw</option>
-                                <option value="Chess" {{ old('sport_event') == 'Chess' ? 'selected' : '' }}>Chess</option>
-                                <option value="Swimming" {{ old('sport_event') == 'Swimming' ? 'selected' : '' }}>Swimming</option>
-                                <option value="Athletics" {{ old('sport_event') == 'Athletics' ? 'selected' : '' }}>Athletics</option>
+                                <option value="Taekwondo_Men">Taekwondo (Men)</option>
+                                <option value="Taekwondo_Women">Taekwondo (Women)</option>
+                                <option value="Arnis_Men">Arnis (Men)</option>
+                                <option value="Arnis_Women">Arnis (Women)</option>
+                                <option value="Boxing">Boxing</option>
+                                <option value="Sepak_Takraw">Sepak Takraw</option>
+                                <option value="Chess">Chess</option>
+                                <option value="Swimming">Swimming</option>
+                                <option value="Athletics">Athletics</option>
                             </optgroup>
                         </select>
+                    </div>
+                </div>
+
+                <div id="active-student-fields">
+                    <h5 class="section-title">Personal Details</h5>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Birthdate <span class="text-danger">*</span></label>
+                            <input type="date" name="birthdate" class="form-control" value="{{ old('birthdate') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Age</label>
+                            <input type="number" name="age" class="form-control" value="{{ old('age') }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Sex <span class="text-danger">*</span></label>
+                            <select name="sex" class="form-select">
+                                <option value="">Select</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Civil Status</label>
+                            <select name="civil_status" class="form-select">
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Blood Type</label>
+                            <select name="blood_type" class="form-select">
+                                <option value="">Unknown</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -167,109 +216,34 @@
 
                     <h5 class="section-title">Academic Information</h5>
                     <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">College / Department</label>
-                            <input type="text" name="college" class="form-control" placeholder="e.g. CCS" value="{{ old('college') }}">
-                        </div>
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <label class="form-label">Course / Program <span class="text-danger">*</span></label>
                             <input type="text" name="course" class="form-control" placeholder="e.g. BSIT" value="{{ old('course') }}">
                         </div>
-                    </div>
-                </div>
-
-                <div id="active-student-fields">
-                    <h5 class="section-title">Personal Details</h5>
-                    <div class="row g-3 mb-3">
                         <div class="col-md-4">
-                            <label class="form-label">Birthdate <span class="text-danger">*</span></label>
-                            <input type="date" name="birthdate" class="form-control" value="{{ old('birthdate') }}">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Age</label>
-                            <input type="number" name="age" class="form-control" value="{{ old('age') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Sex <span class="text-danger">*</span></label>
-                            <select name="sex" class="form-select">
-                                <option value="">Select</option>
-                                <option value="Male" {{ old('sex') == 'Male' ? 'selected' : '' }}>Male</option>
-                                <option value="Female" {{ old('sex') == 'Female' ? 'selected' : '' }}>Female</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Civil Status</label>
-                            <select name="civil_status" class="form-select">
-                                <option value="Single" {{ old('civil_status') == 'Single' ? 'selected' : '' }}>Single</option>
-                                <option value="Married" {{ old('civil_status') == 'Married' ? 'selected' : '' }}>Married</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Place of Birth</label>
-                            <input type="text" name="place_of_birth" class="form-control" value="{{ old('place_of_birth') }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Nationality</label>
-                            <input type="text" name="nationality" class="form-control" value="Filipino" value="{{ old('nationality') }}">
-                        </div>
-                    </div>
-
-                    <h5 class="section-title">Physical Attributes</h5>
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Height (cm)</label>
-                            <input type="number" step="0.01" name="height" class="form-control" placeholder="175" value="{{ old('height') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Weight (kg)</label>
-                            <input type="number" step="0.01" name="weight" class="form-control" placeholder="65" value="{{ old('weight') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Blood Type</label>
-                            <select name="blood_type" class="form-select">
-                                <option value="">Unknown</option>
-                                <option value="A+" {{ old('blood_type') == 'A+' ? 'selected' : '' }}>A+</option>
-                                <option value="A-" {{ old('blood_type') == 'A-' ? 'selected' : '' }}>A-</option>
-                                <option value="B+" {{ old('blood_type') == 'B+' ? 'selected' : '' }}>B+</option>
-                                <option value="B-" {{ old('blood_type') == 'B-' ? 'selected' : '' }}>B-</option>
-                                <option value="O+" {{ old('blood_type') == 'O+' ? 'selected' : '' }}>O+</option>
-                                <option value="O-" {{ old('blood_type') == 'O-' ? 'selected' : '' }}>O-</option>
-                                <option value="AB+" {{ old('blood_type') == 'AB+' ? 'selected' : '' }}>AB+</option>
-                                <option value="AB-" {{ old('blood_type') == 'AB-' ? 'selected' : '' }}>AB-</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
                             <label class="form-label">Year Level</label>
                             <select name="year_level" class="form-select">
                                 <option value="">-- Select --</option>
-                                <option value="1" {{ old('year_level') == '1' ? 'selected' : '' }}>1st Year</option>
-                                <option value="2" {{ old('year_level') == '2' ? 'selected' : '' }}>2nd Year</option>
-                                <option value="3" {{ old('year_level') == '3' ? 'selected' : '' }}>3rd Year</option>
-                                <option value="4" {{ old('year_level') == '4' ? 'selected' : '' }}>4th Year</option>
+                                <option value="1">1st Year</option>
+                                <option value="2">2nd Year</option>
+                                <option value="3">3rd Year</option>
+                                <option value="4">4th Year</option>
                             </select>
                         </div>
                     </div>
 
-                    <h5 class="section-title">In Case of Emergency</h5>
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-5">
-                            <label class="form-label">Contact Person Name <span class="text-danger">*</span></label>
-                            <input type="text" name="emergency_person" class="form-control" value="{{ old('emergency_person') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Emergency Number <span class="text-danger">*</span></label>
-                            <input type="text" name="emergency_contact" class="form-control" value="{{ old('emergency_contact') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Relationship</label>
-                            <input type="text" name="emergency_relationship" class="form-control" value="{{ old('emergency_relationship') }}">
-                        </div>
+                    <div id="emergency-section">
+                        <h5 class="section-title">In Case of Emergency</h5>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Contact Person Name <span class="text-danger">*</span></label>
+                                <input type="text" name="emergency_person" class="form-control" value="{{ old('emergency_person') }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Emergency Number <span class="text-danger">*</span></label>
+                                <input type="text" name="emergency_contact" class="form-control" value="{{ old('emergency_contact') }}">
+                            </div>
+                            </div>
                     </div>
                 </div>
                 
@@ -292,6 +266,7 @@
         var basicInfo = document.getElementById("basic-info-section");
         var sharedFields = document.getElementById("shared-fields");
         var activeFields = document.getElementById("active-student-fields");
+        var emergencySection = document.getElementById("emergency-section"); // Logic for Emergency
 
         if (status === "") {
             basicInfo.style.display = "none";
@@ -303,9 +278,11 @@
             
             if (status === "Active") {
                 activeFields.style.display = "block";
+                emergencySection.style.display = "block"; // Show Emergency
                 setRequired('Active');
             } else {
                 activeFields.style.display = "none";
+                emergencySection.style.display = "none"; // Hide Emergency for Alumni
                 setRequired('Alumni');
             }
         }
@@ -313,13 +290,13 @@
 
     function setRequired(mode) {
         // ALWAYS required
-        let alwaysRequired = ['student_id', 'email', 'first_name', 'last_name', 'middle_initial', 'sport_event'];
+        let alwaysRequired = ['student_id', 'email', 'first_name', 'last_name', 'sport_event'];
         
         // SHARED required
         let sharedRequired = ['contact_number', 'address', 'city_municipality', 'course'];
         
         // ACTIVE ONLY required
-        let activeRequired = ['birthdate', 'gender', 'emergency_person', 'emergency_contact'];
+        let activeRequired = ['birthdate', 'sex', 'emergency_person', 'emergency_contact'];
 
         function setList(names, isRequired) {
             names.forEach(name => {

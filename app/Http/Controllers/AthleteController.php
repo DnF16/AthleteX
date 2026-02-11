@@ -346,8 +346,10 @@ class AthleteController extends Controller
         return view('features.alumni_registration');
     }
 
+    // 2. Save the data as "Pending"
     public function storePublicRegistration(Request $request)
     {
+        // 1. DEFINE VALIDATION RULES
         $rules = [
             'classification' => 'required|in:Active,Alumni',
             'student_id'     => 'required|string|unique:athletes,student_id',
@@ -356,8 +358,11 @@ class AthleteController extends Controller
             'email'          => 'required|email|max:255',
             'sport_event'    => 'required|string',
             'profile_picture'=> 'nullable|image|max:5120',
+            // Added course validation since we are keeping it
+            'course'         => 'nullable|string|max:255', 
         ];
 
+        // 2. ADD STRICT RULES ONLY IF ACTIVE
         if ($request->classification === 'Active') {
             $rules['birthdate'] = 'required|date';
             $rules['sex'] = 'required|string';
@@ -370,6 +375,7 @@ class AthleteController extends Controller
         $validated = $request->validate($rules);
 
         try {
+            // 3. HANDLE IMAGE UPLOAD
             $picturePath = null;
             if ($request->hasFile('profile_picture')) {
                 $file = $request->file('profile_picture');
@@ -378,6 +384,7 @@ class AthleteController extends Controller
                 $picturePath = '/storage/' . $path;
             }
 
+            // 4. SAVE TO DATABASE
             \App\Models\Athlete::create([
                 // Basic Info
                 'student_id' => $validated['student_id'],
@@ -387,8 +394,8 @@ class AthleteController extends Controller
                 'email' => $validated['email'],
                 'sport_event' => $validated['sport_event'],
                 
-                // System Status (THE FIX IS HERE)
-                'status' => 'Pending',                     // <--- FORCE PENDING
+                // System Status
+                'status' => 'Pending', 
                 'classification' => $validated['classification'],
                  
                 'picture_path' => $picturePath,
@@ -408,7 +415,8 @@ class AthleteController extends Controller
                 'province_state' => $request->input('province_state'),
                 'zip_code' => $request->input('zip_code'),
 
-                // Academic
+                // Academic (WE KEPT COURSE, DELETED THE REST)
+                'course' => $request->input('course'),      // <--- Kept this!
                 'year_level' => $request->input('year_level'),
 
                 // Emergency
@@ -419,8 +427,7 @@ class AthleteController extends Controller
             return redirect()->back()->with('success', 'Registration submitted successfully! Please wait for SDO verification.');
 
         } catch (\Exception $e) {
-            // Debugging: If it fails, this will tell you EXACTLY why
-            dd($e->getMessage()); 
+            return back()->with('error', 'Error saving registration: ' . $e->getMessage());
         }
     }
 
