@@ -150,6 +150,7 @@ Route::prefix('admin')
     Route::get('/certificates', [AdminController::class, 'certificates'])->name('certificates');
     Route::get('/grades', [AdminController::class, 'grades'])->name('grades');
     Route::get('/transactions', [AdminController::class, 'transactions'])->name('transactions');
+    Route::get('/athletes/pending', [AthleteController::class, 'showPending'])->name('athletes.pending');
 
     // 2. Pending Approvals Page (FIXED: removed extra /admin)
     Route::get('/approvals', [AdminController::class, 'approvals'])->name('approvals');

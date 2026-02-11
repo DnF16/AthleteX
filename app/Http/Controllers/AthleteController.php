@@ -18,18 +18,34 @@ class AthleteController extends Controller
     public function index()
     {
         // Admins see all athletes with all statuses
-        // Coaches see only their assigned approved athletes
+        // FIX: Changed to ONLY show 'Active' athletes. 
+        // (Pending athletes will go to the Approval Page instead).
         if (auth()->user()->role === 'admin') {
-            $athletes = Athlete::all();
+            
+            $athletes = Athlete::where('status', 'Active')->get(); // <--- CHANGE 1
+
         } elseif (auth()->user()->role === 'coach' && auth()->user()->coach) {
-            // Coaches see only athletes assigned to them
+            
+            // Coaches see only athletes assigned to them AND are Active
             $athletes = Athlete::where('coach_id', auth()->user()->coach->id)
+                ->where('status', 'Active') // <--- CHANGE 2
                 ->get();
+
         } else {
             // Other users (e.g., athletes) see nothing or handle differently
             $athletes = collect(); // Empty collection
         }
+        
         return view('features.athlete_lists', compact('athletes'));
+    }
+
+    public function showPending()
+    {
+        // Only get athletes with 'Pending' status
+        $pending_athletes = Athlete::where('status', 'Pending')->get();
+        
+        // Make sure you create this view file: resources/views/features/approval_page.blade.php
+        return view('features.approval_page', compact('pending_athletes'));
     }
 
     public function create()
@@ -468,9 +484,9 @@ class AthleteController extends Controller
                 $path = $file->storeAs('uploads', $filename, 'public');
                 $picturePath = '/storage/' . $path;
             }
-
-            // 4. SAVE TO DATABASE
-            \App\Models\Athlete::create([
+            
+                // 4. SAVE TO DATABASE
+                \App\Models\Athlete::create([
                 // Basic Info
                 'student_id' => $validated['student_id'],
                 'first_name' => $validated['first_name'],
@@ -479,9 +495,9 @@ class AthleteController extends Controller
                 'email' => $validated['email'],
                 'sport_event' => $validated['sport_event'],
                 
-                // System Status
-                'status' => $validated['classification'],
-                'classification' => $validated['classification'],
+                // System Status (THE FIX IS HERE)
+                'status' => 'Pending',                     // <--- FORCE PENDING
+                'classification' => $validated['classification'], // Keep their choice here
                  
                 'picture_path' => $picturePath,
 
