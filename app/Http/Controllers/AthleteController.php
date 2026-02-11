@@ -77,17 +77,18 @@ class AthleteController extends Controller
         return redirect()->back()->with('success', 'Athlete approved successfully.');
     }
 
+    // Logic for the "Decline" Modal -> NOW DELETES DATA
     public function decline(Request $request, $id)
     {
         $athlete = Athlete::findOrFail($id);
 
-        $athlete->update([
-            'status' => 'Declined',
-            'approval_status' => 'declined',
-            'approval_notes' => $request->approval_notes,
-        ]);
+        // Optional: You could send an email here telling them WHY they were rejected
+        // Mail::to($athlete->email)->send(new RejectionMail($request->approval_notes));
 
-        return redirect()->back()->with('success', 'Athlete application declined.');
+        // PERMANENTLY DELETE THE RECORD
+        $athlete->delete();
+
+        return redirect()->back()->with('success', 'Athlete application has been rejected and deleted.');
     }
 
     // Keep this simple alias for the pending route if needed

@@ -126,11 +126,12 @@
                                                     </button>
                                                 </form>
 
-                                                <form action="<?php echo e(route('admin.reject.athlete', $p->id)); ?>" method="POST">
+                                                <form action="<?php echo e(route('admin.reject.athlete', $p->id)); ?>" method="POST" class="d-inline">
                                                     <?php echo csrf_field(); ?>
-                                                    <?php echo method_field('DELETE'); ?>
+                                                    
+                                                    
                                                     <button type="submit" class="btn btn-outline-danger btn-sm px-3"
-                                                            onclick="return confirm('Are you sure you want to delete this request?')">
+                                                            onclick="return confirm('Are you sure you want to reject this request?')">
                                                         <i class="fas fa-trash-alt me-1"></i> Reject
                                                     </button>
                                                 </form>

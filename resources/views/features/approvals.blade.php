@@ -124,11 +124,12 @@
                                                     </button>
                                                 </form>
 
-                                                <form action="{{ route('admin.reject.athlete', $p->id) }}" method="POST">
+                                                <form action="{{ route('admin.reject.athlete', $p->id) }}" method="POST" class="d-inline">
                                                     @csrf
-                                                    @method('DELETE')
+                                                    {{-- REMOVED @method('DELETE') HERE --}}
+                                                    
                                                     <button type="submit" class="btn btn-outline-danger btn-sm px-3"
-                                                            onclick="return confirm('Are you sure you want to delete this request?')">
+                                                            onclick="return confirm('Are you sure you want to reject this request?')">
                                                         <i class="fas fa-trash-alt me-1"></i> Reject
                                                     </button>
                                                 </form>
