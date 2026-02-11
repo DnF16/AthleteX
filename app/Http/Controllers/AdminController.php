@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Setting;
 use App\Models\Course;
 use App\Models\User;
+use App\Models\Coach;
 use App\Models\TransactionItem;
 use App\Models\Holiday; // Added for scheduling
 use App\Models\Certificate; // Added for certificates
@@ -111,7 +112,31 @@ class AdminController extends Controller
             'coach_sport' => $validated['coach_sport'],
         ]);
 
-        return back()->with('success', "Coach user account '{$user->email}' created successfully for {$validated['coach_sport']}! They can now login.");
+        // 3. Attempt to find or create a minimal Coach profile and link it to the user
+        // First try to find an existing coach by email
+        $coach = Coach::where('coach_email', $user->email)->first();
+        if (!$coach) {
+            // Split name into first and last if possible
+            $nameParts = preg_split('/\s+/', trim($user->name));
+            $first = $nameParts[0] ?? $user->name;
+            $last = count($nameParts) > 1 ? array_pop($nameParts) : '';
+
+            $coach = Coach::create([
+                'coach_first_name' => $first,
+                'coach_last_name' => $last ?: $first,
+                'coach_email' => $user->email,
+                'coach_sport_event' => $validated['coach_sport'],
+            ]);
+        }
+
+        // Link the user to the coach profile
+        $user->coach_id = $coach->id;
+        if (empty($user->coach_sport)) {
+            $user->coach_sport = $validated['coach_sport'];
+        }
+        $user->save();
+
+        return back()->with('success', "Coach user account '{$user->email}' created and linked to coach profile (ID: {$coach->id}) for {$validated['coach_sport']}.");
     }
     
     public function addClass(Request $request) {

@@ -5,7 +5,11 @@
     </div>
     <?php
         // 1. Count Pending Approvals for the Notification Badge
+<<<<<<< HEAD
         $pendingCount = \App\Models\Athlete::where('approval_status', 'pending')->count();
+=======
+        $pendingCount = \App\Models\Athlete::where('status', 'pending')->count();
+>>>>>>> publicform-fix
 
         $admin_links = [
             'general' => ['name' => 'General Information', 'icon' => 'fas fa-info-circle'],

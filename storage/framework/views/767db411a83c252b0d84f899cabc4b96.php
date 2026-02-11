@@ -79,11 +79,7 @@
                     
                     <?php
                         // Fetch only the 'pending' athletes
-<<<<<<< HEAD
-                        $pendings = \App\Models\Athlete::where('approval_status', 'pending')->latest()->get();
-=======
                         $pendings = \App\Models\Athlete::where('status', 'pending')->latest()->get();
->>>>>>> publicform-fix
                     ?>
 
                     <?php if($pendings->isEmpty()): ?>
@@ -154,4 +150,4 @@
     </div>
 </div>
 <?php $__env->stopSection(); ?>
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp\htdocs\AthleteX\resources\views/features/admin_approvals.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\AthleteX\resources\views/features/admin_approvals.blade.php ENDPATH**/ ?>

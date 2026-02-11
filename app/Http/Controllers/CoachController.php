@@ -197,6 +197,21 @@ class CoachController extends Controller
                     }
                 }
 
+                // If the current authenticated user is a coach user, link the newly
+                // created coach profile to their user record so subsequent loads
+                // (auth()->user()->coach) return the correct model.
+                if (auth()->check()) {
+                    $user = auth()->user();
+                    if ($user->role === 'coach') {
+                        $user->coach_id = $c->id;
+                        // Preserve existing coach_sport on user if coach data doesn't include one
+                        if (empty($user->coach_sport) && !empty($c->coach_sport_event)) {
+                            $user->coach_sport = $c->coach_sport_event;
+                        }
+                        $user->save();
+                    }
+                }
+
                 return $c;
             });
 

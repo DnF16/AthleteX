@@ -57,11 +57,34 @@ class Athlete extends Model
         'approval_notes',
         'approved_at',
         'approved_by',
+
+        'coach_name',
+        'date_joined',
+        'term_graduated',
+        'asst_coach',
+        'total_unit',
+        'year_graduated',
+        'tuition_fee',
+        'misc_fee',
+        'other_charges',
+        'total_assessment',
+        'total_discount',
+        'balance',
+        'current_work',
+        'current_company',
+        'picture_path',
+        'notes',
+        'inactive_date',
+
+        'emergency_relationship', // ADDED (Was missing)
+
+        // System
+        'picture_path',
+
     ];
 
     protected $casts = [
         'birthdate' => 'date',
-        'approved_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
