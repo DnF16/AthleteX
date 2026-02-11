@@ -126,7 +126,6 @@
 
                                                 <form action="{{ route('admin.reject.athlete', $p->id) }}" method="POST" class="d-inline">
                                                     @csrf
-                                                    {{-- REMOVED @method('DELETE') HERE --}}
                                                     
                                                     <button type="submit" class="btn btn-outline-danger btn-sm px-3"
                                                             onclick="return confirm('Are you sure you want to reject this request?')">
