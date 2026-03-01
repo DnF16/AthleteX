@@ -251,18 +251,21 @@
                         <div class="grid grid-cols-3 gap-4 mb-4">
                             <div class="mb-4">
                                 <label class="block text-gray-700 font-bold mb-2">Coach</label>
-                                <div class="p-2 border rounded bg-gray-100 text-gray-700">
+                                <div id="coachDisplay" class="p-2 border rounded bg-gray-100 text-gray-700">
                                     <?php
-                                        // Safety check: Ensure User exists AND Coach relationship exists
-                                        $currentCoach = optional(Auth::user())->coach; 
+                                        // display either the selected athlete's coach (if available) or
+                                        // fall back to the logged-in user's coach (useful when a coach
+                                        // is creating a new athlete). An admin will not have a coach,
+                                        // so the JS will update this text after an athlete is loaded.
+                                        $currentCoach = $selectedAthlete->coach ?? optional(Auth::user())->coach;
                                     ?>
-                                    
+
                                     <?php echo e($currentCoach ? $currentCoach->coach_first_name . ' ' . $currentCoach->coach_last_name : 'No coach assigned'); ?>
 
                                 </div>
                             </div>
                             
-                            <input type="hidden" name="coach_id" value="<?php echo e($currentCoach ? $currentCoach->id : ''); ?>">
+                            <input type="hidden" name="coach_id" id="coach_id_input" value="<?php echo e($currentCoach ? $currentCoach->id : ''); ?>">
                             <div class="flex items-center">
                                 <label for="date_joined" class="w-1/3 text-gray-700 font-medium">Date Joined (Varsity)</label>
                                 <input type="date" id="date_joined" name="date_joined"
@@ -987,6 +990,22 @@
                     }
                     const selectedName = byId('selected_name');
                     if (selectedName) selectedName.textContent = full.full_name || full.first_name + ' ' + full.last_name;
+
+                    // update coach display (admin will rely on this because Auth user has no coach)
+                    const coachDisplayEl = byId('coachDisplay');
+                    if (coachDisplayEl) {
+                        let coachName = '';
+                        if (full.coach_name) {
+                            coachName = full.coach_name;
+                        } else if (full.coach && (full.coach.coach_first_name || full.coach.coach_last_name)) {
+                            coachName = `${full.coach.coach_first_name || ''} ${full.coach.coach_last_name || ''}`.trim();
+                        }
+                        coachDisplayEl.textContent = coachName || 'No coach assigned';
+                    }
+                    const coachInputEl = byId('coach_id_input');
+                    if (coachInputEl && full.coach_id) {
+                        coachInputEl.value = full.coach_id;
+                    }
 
                     // 2. POPULATE TABLES
                     // Achievements

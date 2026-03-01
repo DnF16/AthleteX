@@ -6,8 +6,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Middleware\AdminMiddleware;
 
 // Controllers
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\AthleteController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AcademicEvaluationController;
 use App\Http\Controllers\FeesDiscountController;
 use App\Http\Controllers\WorkHistoryController;
@@ -55,7 +57,9 @@ Route::post('/alumni-registration', [AthleteController::class, 'storePublicRegis
 // AUTHENTICATED ROUTES (Login Required)
 // ==============================================================
 
-Route::get('/dashboard', function () { return view('features.dashboard'); })->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+
 Route::get('/coach', function () { return view('features.coach'); })->name('coach');
 Route::get('/schedule', function () { return view('features.schedule'); })->name('schedule');
 Route::get('/sports', function () { return view('features.sports'); })->name('sports');
@@ -88,6 +92,11 @@ Route::get('/fees-discounts/{athlete_id}', [FeesDiscountController::class, 'show
 
 Route::post('/work-history', [WorkHistoryController::class, 'store']);
 Route::get('/work-history/{athlete_id}', [WorkHistoryController::class, 'show']);
+
+// Shared Attendance History for both Admin and Coach
+Route::get('/attendance/history', [AttendanceController::class, 'history'])
+    ->name('attendance.history')
+    ->middleware('auth');
 
 
 // ==============================================================
@@ -132,6 +141,19 @@ Route::post('/coach-work-history', [CoachWorkHistoryController::class, 'store'])
 Route::put('/coach-work-history/{id}', [CoachWorkHistoryController::class, 'update']);
 Route::delete('/coach-work-history/{id}', [CoachWorkHistoryController::class, 'destroy']);
 
+// attendace route
+Route::prefix('coach')
+    ->name('coach.')
+    ->middleware(['auth'])
+    ->group(function () {
+
+        Route::get('/attendance', [AttendanceController::class, 'coachIndex'])
+            ->name('attendance.index');
+        
+        Route::post('/attendance', [AttendanceController::class, 'store'])
+            ->name('attendance.store');
+    });
+
 
 // ==============================================================
 // ADMIN PANEL ROUTES (Protected)
@@ -167,6 +189,10 @@ Route::prefix('admin')
     Route::post('/users/create-coach', [AdminController::class, 'createCoachUser'])->name('createCoachUser');
     Route::post('/add-holiday', [AdminController::class, 'addHoliday'])->name('addHoliday');
     Route::post('/add-certificate', [AdminController::class, 'addCertificate'])->name('addCertificate');
+
+    // attendance route
+    Route::get('/attendance', [AttendanceController::class, 'adminIndex'])
+    ->name('attendance'); 
 
 
     Route::get('/sports/filter/{sport}', [SportsController::class, 'filter'])->name('sports.filter');

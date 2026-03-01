@@ -34,6 +34,17 @@
                     <i class="bi bi-person-walking mr-2"></i> Student–Athletes
                 </a>
             </li>
+            <?php
+                $attendanceRoute = auth()->user()->role === 'admin'
+                    ? route('admin.attendance')
+                    : route('coach.attendance.index');
+            ?>
+
+            <li>
+                <a href="<?php echo e($attendanceRoute); ?>" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                    <i class="bi bi-calendar2-week mr-2"></i> Attendance
+                </a>
+            </li>
             <li>
                 <a href="<?php echo e(route('coach')); ?>" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
                     <i class="bi bi-people-fill mr-2"></i> Coaches

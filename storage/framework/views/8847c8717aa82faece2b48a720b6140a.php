@@ -1,0 +1,118 @@
+
+
+<?php $__env->startSection('title', 'Attendance History'); ?>
+
+<?php $__env->startSection('content'); ?>
+<div id="tab-content" class="bg-[#c5e0b4] p-8 rounded-lg w-full min-h-screen">
+    <div class="bg-white border-[12px] border-[#d1e9f0] p-1 shadow-sm">
+
+        <!-- Header -->
+        <div class="bg-[#5bc0de] text-white px-4 py-2 flex justify-between items-center">
+            <a href="<?php echo e($backRoute); ?>" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition flex items-center gap-1">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h2 class="text-lg font-bold flex-1 text-center">
+                Attendance History - <?php echo e($selectedMonth); ?> <?php echo e($selectedYear); ?>
+
+            </h2>
+            <div></div>
+        </div>
+
+        <!-- Month & Year Filter -->
+        <form method="GET" class="p-4 flex gap-4 items-center">
+            <label class="font-bold text-sm">Month:</label>
+            <select name="month" class="border rounded px-2 py-1">
+                <?php $__currentLoopData = $months; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $month): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($month); ?>" <?php echo e($selectedMonth == $month ? 'selected' : ''); ?>>
+                        <?php echo e($month); ?>
+
+                    </option>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </select>
+
+            <label class="font-bold text-sm">Year:</label>
+            <select name="year" class="border rounded px-2 py-1">
+                <?php for($y = date('Y'); $y >= 2020; $y--): ?>
+                    <option value="<?php echo e($y); ?>" <?php echo e($selectedYear == $y ? 'selected' : ''); ?>>
+                        <?php echo e($y); ?>
+
+                    </option>
+                <?php endfor; ?>
+            </select>
+
+            <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                View
+            </button>
+        </form>
+
+        <!-- Color Key -->
+        <div class="flex gap-4 px-4 pb-2 text-[10px] font-bold uppercase">
+            <span class="text-gray-600">Color Key:</span>
+            <div class="flex items-center gap-1"><span class="w-4 h-4 bg-green-500"></span> Present</div>
+            <div class="flex items-center gap-1"><span class="w-4 h-4 bg-yellow-400"></span> Late</div>
+            <div class="flex items-center gap-1"><span class="w-4 h-4 bg-blue-400"></span> Excused</div>
+            <div class="flex items-center gap-1"><span class="w-4 h-4 bg-red-500"></span> Unexcused</div>
+            <div class="flex items-center gap-1"><span class="w-4 h-4 bg-gray-200 border"></span> No Record</div>
+        </div>
+
+        <!-- Monthly Attendance Matrix -->
+        <div class="overflow-x-auto mt-4">
+            <table class="border-collapse text-xs w-full">
+                <thead>
+                    <tr class="bg-[#d1e9f0] text-[#333]">
+                        <th class="border p-2 sticky left-0 bg-[#d1e9f0] z-10 text-left w-36 min-w-[140px]">
+                            Athlete
+                        </th>
+
+                        <?php for($day = 1; $day <= $daysInMonth; $day++): ?>
+                            <th class="border p-1 text-center w-8">
+                                <?php echo e($day); ?>
+
+                            </th>
+                        <?php endfor; ?>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <?php $__empty_1 = true; $__currentLoopData = $athletes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $athlete): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <tr class="hover:bg-gray-50">
+                            <!-- Athlete Name -->
+                            <td class="border p-2 sticky left-0 bg-white font-semibold w-36 min-w-[140px]">
+                                <?php echo e($athlete->first_name); ?> <?php echo e($athlete->last_name); ?>
+
+                            </td>
+
+                            <!-- Daily Status -->
+                            <?php for($day = 1; $day <= $daysInMonth; $day++): ?>
+                                <?php
+                                    $date = \Carbon\Carbon::create($selectedYear, date('m', strtotime($selectedMonth)), $day)->format('Y-m-d');
+                                    $key = $athlete->id . '_' . $date;
+                                    $status = $attendanceMap[$key]->status ?? null;
+
+                                    $bgColor = match($status){
+                                        'present' => 'bg-green-500',
+                                        'tardy' => 'bg-yellow-400',
+                                        'excused' => 'bg-blue-400',
+                                        'unexcused' => 'bg-red-500',
+                                        default => 'bg-gray-200'
+                                    };
+                                ?>
+
+                                <td class="border w-8 h-8 <?php echo e($bgColor); ?>"></td>
+                            <?php endfor; ?>
+                        </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                        <tr>
+                            <td colspan="<?php echo e($daysInMonth + 1); ?>" class="text-center text-gray-500 p-4">
+                                No attendance records found.
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\AthleteX\resources\views/features/attendance_history.blade.php ENDPATH**/ ?>

@@ -102,9 +102,11 @@ class AthleteController extends Controller
         
 
 
-        // Assign the logged-in coach automatically if user has a coach role
-        if (auth()->check() && auth()->user()->role === 'coach' && auth()->user()->coach) {
-            $data['coach_id'] = auth()->user()->coach->id;
+        // Assign the logged-in coach automatically if user has a coach role.
+        // Fallback to the `coach_id` column on `users` when the relationship isn't loaded.
+        if (auth()->check() && auth()->user()->role === 'coach') {
+            $data['coach_id'] = auth()->user()->coach->id ?? auth()->user()->coach_id ?? null;
+            Log::info('Athlete store - assigning coach', ['user_id' => auth()->id(), 'assigned_coach_id' => $data['coach_id']]);
         }
         
 
@@ -245,6 +247,11 @@ class AthleteController extends Controller
                 'zip_code' => $a->zip_code,
                 'emergency_person' => $a->emergency_person,
                 'emergency_contact' => $a->emergency_contact,
+
+                // include the raw coach_id so client-side code can prefill hidden
+                // input if for some reason we ever used the search result directly.
+                'coach_id' => $a->coach_id,
+
                 'coach_name' => $a->coach
                 ? $a->coach->coach_first_name . ' ' . $a->coach->coach_last_name
                 : null,
@@ -286,7 +293,7 @@ class AthleteController extends Controller
     public function show(\Illuminate\Http\Request $request, $id)
     {
         // 1. Find the athlete
-        $athlete = \App\Models\Athlete::with(['achievements', 'academicEvaluations', 'feesDiscounts', 'workHistories'])->findOrFail($id);
+        $athlete = \App\Models\Athlete::with(['coach', 'achievements', 'academicEvaluations', 'feesDiscounts', 'workHistories'])->findOrFail($id);
 
         // 2. CHECK: Is the browser asking for JSON? (The JavaScript fetch does this)
         if ($request->wantsJson()) {

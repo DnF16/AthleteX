@@ -12,14 +12,29 @@
             <!-- KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
 
-                <!-- Total Athletes -->
-                <div class="bg-white p-5 rounded-xl shadow hover:shadow-lg transition">
-                    <p class="text-gray-500">Total Athletes</p>
-                    <h2 class="text-3xl font-bold text-green-600">
-                        <?php echo e($athletesCount ?? 0); ?>
+                <!-- Total Athletes and Alumni -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    </h2>
+                    <!-- Total Active Athletes -->
+                    <div class="bg-white p-5 rounded-xl shadow hover:shadow-lg transition">
+                        <p class="text-gray-500">Total Active Athletes</p>
+                        <h2 class="text-3xl font-bold text-green-600">
+                            <?php echo e($activeAthletesCount ?? 0); ?>
+
+                        </h2>
+                    </div>
+
+                    <!-- Total Alumni -->
+                    <div class="bg-white p-5 rounded-xl shadow hover:shadow-lg transition">
+                        <p class="text-gray-500">Total Alumni</p>
+                        <h2 class="text-3xl font-bold text-blue-600">
+                            <?php echo e($alumniCount ?? 0); ?>
+
+                        </h2>
+                    </div>
+                    
                 </div>
+
 
                 <!-- Total Coaches -->
                 <div class="bg-white p-5 rounded-xl shadow hover:shadow-lg transition">
