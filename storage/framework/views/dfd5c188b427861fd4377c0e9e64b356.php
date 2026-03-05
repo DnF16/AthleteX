@@ -4,7 +4,7 @@
 
 <?php echo $__env->make('partials.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-<div class="bg-light min-vh-100 p-4" style="margin-left: 256px;">
+<div class="bg-light min-vh-100 p-4">
     
     <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
         <h2 class="fw-bold text-success">
