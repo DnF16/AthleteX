@@ -127,6 +127,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/coach-work-history', [CoachWorkHistoryController::class, 'store']);
     Route::put('/coach-work-history/{id}', [CoachWorkHistoryController::class, 'update']);
     Route::delete('/coach-work-history/{id}', [CoachWorkHistoryController::class, 'destroy']);
+
+       // Tryout Schedules Management
+    Route::get('/admin/tryouts', [App\Http\Controllers\TryoutScheduleController::class, 'index'])->name('tryouts.index');
+    Route::post('/admin/tryouts/store', [App\Http\Controllers\TryoutScheduleController::class, 'store'])->name('tryouts.store');
+    Route::post('/admin/tryouts/{id}/delete', [App\Http\Controllers\TryoutScheduleController::class, 'destroy'])->name('tryouts.destroy');
+
 });
 
 
@@ -156,10 +162,9 @@ Route::prefix('admin')
     Route::get('/approvals/{id}/view', [AthleteController::class, 'show'])->name('approvals.show');
 
     // These are the Actions (Approve/Reject)
-    // Note: I mapped these to match the names in your approvals.blade.php
-    // Fixed: Using the old names so the View doesn't crash
     Route::post('/approvals/{id}/approve', [AthleteController::class, 'approve'])->name('approve.athlete');
     Route::post('/approvals/{id}/decline', [AthleteController::class, 'decline'])->name('reject.athlete');
+
     // 3. Other Admin Actions
     Route::post('/save-settings', [AdminController::class, 'saveSettings'])->name('saveSettings');
     Route::post('/add-class', [AdminController::class, 'addClass'])->name('addClass');
@@ -169,6 +174,6 @@ Route::prefix('admin')
     Route::post('/users/create-coach', [AdminController::class, 'createCoachUser'])->name('createCoachUser');
     Route::post('/add-holiday', [AdminController::class, 'addHoliday'])->name('addHoliday');
     Route::post('/add-certificate', [AdminController::class, 'addCertificate'])->name('addCertificate');
-
     Route::get('/sports/filter/{sport}', [SportsController::class, 'filter'])->name('sports.filter');
+    
 });

@@ -7,36 +7,50 @@ use App\Models\Achievement;
 use App\Models\AcademicEvaluation;
 use App\Models\FeesDiscount;
 use App\Models\WorkHistory;
+use App\Mail\TryoutScheduleMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+
 
 class AthleteController extends Controller
 {
     public function index()
     {
-        // Admins see all athletes with all statuses
-        // FIX: Changed to ONLY show 'Active' athletes. 
-        // (Pending athletes will go to the Approval Page instead).
         if (auth()->user()->role === 'admin') {
             
-            $athletes = Athlete::where('status', 'Active')->get();
+            // 1. Regular Active Athletes
+            $athletes = Athlete::where('status', 'Active')
+                               ->where('classification', '!=', 'Tryout') 
+                               ->get();
+
+            // 2. Passed Tryouts (Still considered Recruits)
+            $recruits = Athlete::where('status', 'Active')
+                               ->where('classification', 'Tryout') 
+                               ->get();
 
         } elseif (auth()->user()->role === 'coach' && auth()->user()->coach) {
             
-            // Coaches see only athletes assigned to them AND are Active
             $athletes = Athlete::where('coach_id', auth()->user()->coach->id)
                 ->where('status', 'Active')
+                ->where('classification', '!=', 'Tryout')
+                ->get();
+
+            $recruits = Athlete::where('coach_id', auth()->user()->coach->id)
+                ->where('status', 'Active')
+                ->where('classification', 'Tryout')
                 ->get();
 
         } else {
-            // Other users (e.g., athletes) see nothing or handle differently
-            $athletes = collect(); // Empty collection
+            $athletes = collect(); 
+            $recruits = collect(); 
         }
         
-        return view('features.athlete_lists', compact('athletes'));
+        // Pass BOTH lists to the view
+        return view('features.athlete_lists', compact('athletes', 'recruits'));
     }
 
     // ==========================================
@@ -65,7 +79,7 @@ class AthleteController extends Controller
         return view('features.approvals', compact('pendingAthletes', 'approvedAthletes', 'declinedAthletes'));
     }
 
-    public function approve($id)
+    public function approve(Request $request, $id)
     {
         $athlete = Athlete::findOrFail($id);
         
@@ -74,19 +88,23 @@ class AthleteController extends Controller
             'approval_status' => 'approved',
         ]);
 
+        // If it's a background request (AJAX), just send a silent success message
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Approved!']);
+        }
+
         return redirect()->back()->with('success', 'Athlete approved successfully.');
     }
 
-    // Logic for the "Decline" Modal -> NOW DELETES DATA
     public function decline(Request $request, $id)
     {
         $athlete = Athlete::findOrFail($id);
-
-        // Optional: You could send an email here telling them WHY they were rejected
-        // Mail::to($athlete->email)->send(new RejectionMail($request->approval_notes));
-
-        // PERMANENTLY DELETE THE RECORD
         $athlete->delete();
+
+        // If it's a background request (AJAX), send a silent success message
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Rejected and deleted!']);
+        }
 
         return redirect()->back()->with('success', 'Athlete application has been rejected and deleted.');
     }
@@ -352,15 +370,18 @@ class AthleteController extends Controller
     {
         // 1. DEFINE VALIDATION RULES
         $rules = [
-            'classification' => 'required|in:Active,Alumni',
-            'student_id'     => 'required|string|unique:athletes,student_id',
+            // ✨ THE FIX: Added 'Tryout' to the allowed list!
+            'classification' => 'required|in:Active,Alumni,Tryout',
+            
+            // MAGIC: Student ID is required UNLESS they are a Tryout applicant
+            'student_id'     => 'required_unless:classification,Tryout|nullable|string',
+            
             'first_name'     => 'required|string|max:255',
             'last_name'      => 'required|string|max:255',
             'email'          => 'required|email|max:255',
             'sport_event'    => 'required|string',
-            'profile_picture'=> 'nullable|image|max:5120',
-            // Added course validation since we are keeping it
             'course'         => 'nullable|string|max:255', 
+            // (Removed profile_picture validation here since we deleted it from the form)
         ];
 
         // 2. ADD STRICT RULES ONLY IF ACTIVE
@@ -375,20 +396,11 @@ class AthleteController extends Controller
 
         $validated = $request->validate($rules);
 
-        try {
-            // 3. HANDLE IMAGE UPLOAD
-            $picturePath = null;
-            if ($request->hasFile('profile_picture')) {
-                $file = $request->file('profile_picture');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $path = $file->storeAs('uploads', $filename, 'public');
-                $picturePath = '/storage/' . $path;
-            }
-
-            // 4. SAVE TO DATABASE
-            \App\Models\Athlete::create([
+       try {
+            // 3. SAVE TO DATABASE (Notice we added '$athlete =' here)
+            $athlete = \App\Models\Athlete::create([
                 // Basic Info
-                'student_id' => $validated['student_id'],
+                'student_id' => $request->input('student_id'), 
                 'first_name' => $validated['first_name'],
                 'middle_initial' => $request->input('middle_initial'),
                 'last_name' => $validated['last_name'],
@@ -398,33 +410,38 @@ class AthleteController extends Controller
                 // System Status
                 'status' => 'Pending', 
                 'classification' => $validated['classification'],
-                 
-                'picture_path' => $picturePath,
+                'picture_path' => null, 
 
-                // Personal Details
-                'birthdate' => $request->input('birthdate'),
-                'age' => $request->input('age'),
-                'gender' => $request->input('sex'),              
-                'marital_status' => $request->input('civil_status'), 
-                'blood_type' => $request->input('blood_type'),
-
-                // Contact
-                'contact_number' => $request->input('contact_number'),
-                'facebook' => $request->input('facebook_link'),
-                'address' => $request->input('address'),
-                'city_municipality' => $request->input('city_municipality'),
-                'province_state' => $request->input('province_state'),
-                'zip_code' => $request->input('zip_code'),
-
-                // Academic (WE KEPT COURSE, DELETED THE REST)
-                'course' => $request->input('course'),      // <--- Kept this!
+                // ... (Leave all your other fields exactly the same) ...
+                'course' => $request->input('course'),
                 'year_level' => $request->input('year_level'),
-
-                // Emergency
                 'emergency_person' => $request->input('emergency_person'),
                 'emergency_contact' => $request->input('emergency_contact'),
             ]);
 
+            // 4. THE NOTIFICATION TRICK 🪄
+            if ($validated['classification'] === 'Tryout') {
+                $schedule = \App\Models\TryoutSchedule::where('sport_event', $validated['sport_event'])->first();
+
+                if ($schedule) {
+                    
+                    // 📧 SEND THE AUTOMATED EMAIL HERE!
+                    //Mail::to($athlete->email)->send(new TryoutScheduleMail($athlete, $schedule));
+
+                    // Format the date and time nicely for the screen alert
+                    $date = \Carbon\Carbon::parse($schedule->tryout_date)->format('F d, Y');
+                    $time = \Carbon\Carbon::parse($schedule->tryout_time)->format('h:i A');
+                    $sportName = str_replace('_', ' ', $schedule->sport_event);
+                    
+                    $message = "Your tryout is scheduled on <strong>{$date}</strong> at <strong>{$time}</strong>. Venue: <strong>{$schedule->venue}</strong>. Notes: {$schedule->notes}";
+                    
+                    return redirect()->back()->with('tryout_success', $message); // Notice I changed this to 'tryout_success'
+                } else {
+                    return redirect()->back()->with('success', 'Registration Successful! The SDO has not posted a schedule for your sport yet. Keep an eye out for announcements.');
+                }
+            }
+
+            // Standard success message for Active/Alumni
             return redirect()->back()->with('success', 'Registration submitted successfully! Please wait for SDO verification.');
 
         } catch (\Exception $e) {

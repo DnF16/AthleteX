@@ -15,7 +15,7 @@
         .section-title { color: #2e4e1f; border-bottom: 2px solid #c4d79b; padding-bottom: 10px; margin-bottom: 20px; margin-top: 30px; font-weight: bold; }
         
         /* HIDE SECTIONS BY DEFAULT */
-        #basic-info-section, #shared-fields, #active-student-fields { display: none; }
+        #basic-info-section, #shared-fields, #active-student-fields, #tryout-alert { display: none; }
     </style>
 </head>
 <body>
@@ -53,7 +53,40 @@
                 </div>
             <?php endif; ?>
 
-            <form action="<?php echo e(route('alumni.register.submit')); ?>" method="POST" enctype="multipart/form-data">
+            <?php if(session('success')): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i> <?php echo e(session('success')); ?>
+
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
+            <?php if(session('tryout_success')): ?>
+                <div class="alert alert-success shadow-lg mb-4" style="background-color: #e8f5e9; border-left: 8px solid #2e4e1f; border-radius: 8px;">
+                    <h3 class="fw-bold text-success mb-3">
+                        <i class="fas fa-ticket-alt me-2"></i> Registration Confirmed!
+                    </h3>
+                    <p class="fs-5 mb-3">
+                        <?php echo session('tryout_success'); ?>
+
+                    </p>
+                    <hr class="border-success">
+                    <div class="d-flex align-items-center mt-3">
+                        <i class="fas fa-camera text-success fs-2 me-3"></i>
+                        <p class="mb-0 text-success fw-bold">
+                            Please take a screenshot of this digital pass and present it to the coaches on the day of your tryout. <br>
+                            <span class="small fw-normal text-muted fst-italic">(*Note: In the live production version, this schedule will also be sent to your registered email address).</span>
+                        </p>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <div id="tryout-alert" class="alert alert-info border-info mb-4">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <strong>Tryout Applicant:</strong> Please fill out your basic details. Your tryout schedule will be shown after submission.
+            </div>
+
+            <form action="<?php echo e(route('alumni.register.submit')); ?>" method="POST">
                 <?php echo csrf_field(); ?>
 
                 <div class="mb-4 bg-light p-4 rounded border border-success">
@@ -62,17 +95,18 @@
                         <option value="">-- Select Your Status --</option>
                         <option value="Active" <?php echo e(old('classification') == 'Active' ? 'selected' : ''); ?>>Active Student (New or Renewing)</option>
                         <option value="Alumni" <?php echo e(old('classification') == 'Alumni' ? 'selected' : ''); ?>>Alumni / Graduate</option>
+                        <option value="Tryout" <?php echo e(old('classification') == 'Tryout' ? 'selected' : ''); ?>>Tryout Applicant (New Recruit)</option>
                     </select>
                 </div>
 
                 <div id="basic-info-section">
                     <h5 class="section-title">Basic Identification</h5>
                     <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Student ID <span class="text-danger">*</span></label>
-                            <input type="text" name="student_id" class="form-control" value="<?php echo e(old('student_id')); ?>" required>
+                        <div class="col-md-4" id="student_id_container">
+                            <label class="form-label fw-bold">Student ID <span class="text-danger" id="id_star">*</span></label>
+                            <input type="text" name="student_id" class="form-control" value="<?php echo e(old('student_id')); ?>">
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-md-8" id="email_container">
                             <label class="form-label fw-bold">Email Address <span class="text-danger">*</span></label>
                             <input type="email" name="email" class="form-control" value="<?php echo e(old('email')); ?>" required>
                         </div>
@@ -91,12 +125,6 @@
                             <label class="form-label fw-bold">Last Name <span class="text-danger">*</span></label>
                             <input type="text" name="last_name" class="form-control" value="<?php echo e(old('last_name')); ?>" required>
                         </div>
-                    </div>
-
-                    <div class="mb-3">
-                         <label class="form-label fw-bold">ID Picture (2x2 or Passport) <span class="text-danger">*</span></label>
-                         <input type="file" name="profile_picture" class="form-control" accept="image/*">
-                         <div class="form-text">Accepted formats: JPG, PNG, JPEG</div>
                     </div>
 
                     <div class="mb-3">
@@ -243,7 +271,7 @@
                                 <label class="form-label">Emergency Number <span class="text-danger">*</span></label>
                                 <input type="text" name="emergency_contact" class="form-control" value="<?php echo e(old('emergency_contact')); ?>">
                             </div>
-                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -266,7 +294,13 @@
         var basicInfo = document.getElementById("basic-info-section");
         var sharedFields = document.getElementById("shared-fields");
         var activeFields = document.getElementById("active-student-fields");
-        var emergencySection = document.getElementById("emergency-section"); // Logic for Emergency
+        var emergencySection = document.getElementById("emergency-section");
+        var tryoutAlert = document.getElementById("tryout-alert");
+        var studentIdInput = document.getElementsByName("student_id")[0];
+        var idStar = document.getElementById("id_star");
+
+        // Reset display
+        tryoutAlert.style.display = "none";
 
         if (status === "") {
             basicInfo.style.display = "none";
@@ -274,28 +308,34 @@
             activeFields.style.display = "none";
         } else {
             basicInfo.style.display = "block";
-            sharedFields.style.display = "block";
             
             if (status === "Active") {
+                sharedFields.style.display = "block";
                 activeFields.style.display = "block";
-                emergencySection.style.display = "block"; // Show Emergency
+                if(emergencySection) emergencySection.style.display = "block";
+                idStar.style.display = "inline";
                 setRequired('Active');
-            } else {
+            } else if (status === "Tryout") {
+                sharedFields.style.display = "none"; // Hide course/address for tryouts
+                activeFields.style.display = "none"; // Hide age/sex for now
+                tryoutAlert.style.display = "block"; // Show tryout notice
+                idStar.style.display = "none"; // ID not required for recruits
+                setRequired('Tryout');
+            } else { // Alumni
+                sharedFields.style.display = "block";
                 activeFields.style.display = "none";
-                emergencySection.style.display = "none"; // Hide Emergency for Alumni
+                if(emergencySection) emergencySection.style.display = "none";
+                idStar.style.display = "inline";
                 setRequired('Alumni');
             }
         }
     }
 
     function setRequired(mode) {
-        // ALWAYS required
-        let alwaysRequired = ['student_id', 'email', 'first_name', 'last_name', 'sport_event'];
-        
-        // SHARED required
+        // Essential fields
+        let alwaysRequired = ['email', 'first_name', 'last_name', 'sport_event'];
+        let studentId = ['student_id'];
         let sharedRequired = ['contact_number', 'address', 'city_municipality', 'course'];
-        
-        // ACTIVE ONLY required
         let activeRequired = ['birthdate', 'sex', 'emergency_person', 'emergency_contact'];
 
         function setList(names, isRequired) {
@@ -306,11 +346,17 @@
         }
 
         if (mode === 'Active') {
+            setList(studentId, true);
             setList(sharedRequired, true);
             setList(activeRequired, true);
-        } else {
+        } else if (mode === 'Tryout') {
+            setList(studentId, false); // Recruiting applicants don't have IDs yet
+            setList(sharedRequired, false);
+            setList(activeRequired, false);
+        } else { // Alumni
+            setList(studentId, true);
             setList(sharedRequired, true);
-            setList(activeRequired, false); // Turn off required for hidden fields
+            setList(activeRequired, false);
         }
     }
 </script>
