@@ -16,13 +16,21 @@ return new class extends Migration
             $table->foreignId('athlete_id')
                   ->constrained('athletes')
                   ->onDelete('cascade');
-            $table->date('date');
+            $table->foreignId('coach_id')
+                  ->nullable()
+                  ->constrained('coaches')
+                  ->onDelete('set null');
+            $table->date('date')->default(\Carbon\Carbon::today());
             $table->enum('status', ['present', 'absent', 'late', 'excused'])->default('absent');
-            $table->string('remarks')->nullable();
+            $table->text('remarks')->nullable();
             $table->timestamps();
 
-            // Optional: unique constraint to prevent duplicate records for the same athlete/date
+            // Unique constraint to prevent duplicate records for the same athlete/date
             $table->unique(['athlete_id', 'date']);
+            
+            // Index for faster queries
+            $table->index('date');
+            $table->index('coach_id');
         });
     }
 

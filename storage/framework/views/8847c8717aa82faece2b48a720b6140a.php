@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Attendance History'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -9,10 +7,10 @@
         <!-- Header -->
         <div class="bg-[#5bc0de] text-white px-4 py-2 flex justify-between items-center">
             <a href="<?php echo e($backRoute); ?>" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition flex items-center gap-1">
-                <i class="bi bi-arrow-left"></i>
+                <i class="bi bi-arrow-left"></i> Back
             </a>
             <h2 class="text-lg font-bold flex-1 text-center">
-                Attendance History - <?php echo e($selectedMonth); ?> <?php echo e($selectedYear); ?>
+                📜 Attendance History - <?php echo e($selectedMonth); ?> <?php echo e($selectedYear); ?>
 
             </h2>
             <div></div>
@@ -51,7 +49,7 @@
             <div class="flex items-center gap-1"><span class="w-4 h-4 bg-green-500"></span> Present</div>
             <div class="flex items-center gap-1"><span class="w-4 h-4 bg-yellow-400"></span> Late</div>
             <div class="flex items-center gap-1"><span class="w-4 h-4 bg-blue-400"></span> Excused</div>
-            <div class="flex items-center gap-1"><span class="w-4 h-4 bg-red-500"></span> Unexcused</div>
+            <div class="flex items-center gap-1"><span class="w-4 h-4 bg-red-500"></span> Absent</div>
             <div class="flex items-center gap-1"><span class="w-4 h-4 bg-gray-200 border"></span> No Record</div>
         </div>
 
@@ -91,9 +89,9 @@
 
                                     $bgColor = match($status){
                                         'present' => 'bg-green-500',
-                                        'tardy' => 'bg-yellow-400',
+                                        'late' => 'bg-yellow-400',
                                         'excused' => 'bg-blue-400',
-                                        'unexcused' => 'bg-red-500',
+                                        'absent' => 'bg-red-500',
                                         default => 'bg-gray-200'
                                     };
                                 ?>

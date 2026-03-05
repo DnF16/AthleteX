@@ -37,12 +37,14 @@ class AttendanceController extends Controller
                 'last_name' => $athlete->last_name,
                 'sport_event' => $athlete->sport_event,
                 'status' => $todayAttendance?->status ?? 'unmarked',
+                'remarks' => $todayAttendance?->remarks ?? '',
                 'attendance_date' => $todayAttendance?->date ?? $today,
+                'isEditable' => true, // Today's records are always editable
             ];
         });
 
         // Pass both attendances and athletes to the view
-        return view('features.attendance', compact('attendances', 'athletes', 'athletesWithStatus'));
+        return view('features.attendance', compact('attendances', 'athletes', 'athletesWithStatus', 'today'));
     }
 
     public function adminIndex(Request $request)
@@ -98,7 +100,20 @@ class AttendanceController extends Controller
     public function store(Request $request)
     {
         $attendanceDate = $request->input('attendance_date');
+        $today = now()->toDateString();
+
+        // Only allow attendance recording for today
+        if ($attendanceDate !== $today) {
+            return back()->withErrors(['attendance_date' => 'Attendance can only be recorded for today.']);
+        }
+
         $attendanceData = $request->input('attendance', []);
+        $coachId = null;
+
+        // Get coach ID if user is a coach
+        if (auth()->user()->role === 'coach' && auth()->user()->coach) {
+            $coachId = auth()->user()->coach->id;
+        }
 
         foreach ($attendanceData as $athleteId => $data) {
             Attendance::updateOrCreate(
@@ -108,6 +123,8 @@ class AttendanceController extends Controller
                 ],
                 [
                     'status' => $data['status'] ?? 'present',
+                    'remarks' => $data['remarks'] ?? null,
+                    'coach_id' => $coachId,
                 ]
             );
         }

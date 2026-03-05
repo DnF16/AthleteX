@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Attendance'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -10,11 +8,14 @@
         <div class="bg-[#5bc0de] p-3 flex items-center justify-between mb-6">
             <div class="flex-1 text-center">
                 <h1 class="text-3xl font-bold text-gray-800 mb-0">Attendance</h1>
+                <?php if(isset($today)): ?>
+                    <p class="text-sm text-gray-600">Today: <?php echo e(\Carbon\Carbon::parse($today)->format('l, F j, Y')); ?></p>
+                <?php endif; ?>
             </div>
             <div>
                 <a href="<?php echo e(route('attendance.history')); ?>" 
                 class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-                    Attendance History
+                    📊 Attendance History
                 </a>
             </div>
         </div>
@@ -101,8 +102,15 @@
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Not Marked</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">—</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm"><?php echo e($athlete['remarks'] ?? '—'); ?></td>
                                 <td class="px-6 py-4 whitespace-nowrap"><?php echo e($athlete['attendance_date']); ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <?php if($athlete['isEditable'] && $athlete['attendance_date'] === $today): ?>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">✏️ Today</span>
+                                    <?php else: ?>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">📋 History</span>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                             <tr>
@@ -126,7 +134,8 @@
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Excused</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">—</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm"><?php echo e($attendance->remarks ?? '—'); ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap"><?php echo e(is_string($attendance->date) ? \Carbon\Carbon::parse($attendance->date)->format('Y-m-d') : $attendance->date->format('Y-m-d')); ?></td>
                             </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                             <tr>
@@ -154,11 +163,17 @@
                         <form method="POST" action="<?php echo e(route('coach.attendance.store')); ?>">
                             <?php echo csrf_field(); ?>
 
-                            <!-- Date Picker -->
-                            <div class="mb-3">
-                                <label class="form-label">Date</label>
-                                <input type="date" name="attendance_date" class="form-control" required>
-                            </div>
+                    <!-- Date Picker -->
+                    <div class="mb-3">
+                        <label class="form-label font-bold">Date (Today Only)</label>
+                        <input type="date" name="attendance_date" class="form-control" value="<?php echo e(isset($today) ? $today : now()->toDateString()); ?>" readonly>
+                        <small class="text-muted">Attendance can only be recorded for today.</small>
+                    </div>
+
+                    <!-- Info Alert -->
+                    <div class="alert alert-info mb-3 text-sm" role="alert">
+                        <strong>📋 How it works:</strong> Mark attendance today using the status buttons below. Tomorrow, new attendance records for that date will automatically become available. Past records remain in the <strong>Attendance History</strong>.
+                    </div>
 
                             <!-- Athlete Attendance Table -->
                             <div class="table-responsive mb-3">
@@ -168,10 +183,8 @@
                                             <th>#</th>
                                             <th>Athlete</th>
                                             <th>Sports</th>
-                                            <th>
-                                                Status
-                                            </th>
-                                            <th>Remarks</th>
+                                            <th>Status</th>
+                                            <th>Remarks (Optional)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -182,12 +195,12 @@
                                             <td><?php echo e($athlete->sport_event); ?></td>
                                             <td>
                                                 <input type="hidden" name="attendance[<?php echo e($athlete->id); ?>][status]" value="present" class="attendance-hidden">
-                                                <button type="button" class="btn btn-sm btn-outline-success attendance-toggle">
+                                                <button type="button" class="btn btn-sm btn-outline-success attendance-toggle" title="Click to cycle through statuses">
                                                     Present
                                                 </button>
                                             </td>
                                             <td>
-                                                <input type="text" name="attendance[<?php echo e($athlete->id); ?>][remarks]" class="form-control" placeholder="Optional">
+                                                <input type="text" name="attendance[<?php echo e($athlete->id); ?>][remarks]" class="form-control form-control-sm" placeholder="e.g., Injured, Early dismissal">
                                             </td>
                                         </tr>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

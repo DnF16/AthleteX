@@ -52,12 +52,12 @@
                     <i class="bi bi-calendar2-week mr-2"></i> Schedule
                 </a>
             </li>
-            <!-- <li>
+            <li>
                 <a href="#" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
-                    <i class="bi bi-journal-text mr-2"></i> Classes
+                    <i class="bi bi-journal-text mr-2"></i> Reports
                 </a>
             </li>
-            <li>
+            <!-- <li>
                 <a href="#" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
                     <i class="bi bi-trophy-fill mr-2 text-yellow-400"></i> Achievements
                 </a>
@@ -96,7 +96,7 @@
 
 
         <div class="mt-auto pt-4">
-            <a href="{{ route('log.login') }}" class="w-full block text-center px-4 py-2 rounded bg-red-600 hover:bg-red-700 transition text-white no-underline font-bold">
+            <a href="{{ route('login') }}" class="w-full block text-center px-4 py-2 rounded bg-red-600 hover:bg-red-700 transition text-white no-underline font-bold">
                 Logout
             </a>
         </div>

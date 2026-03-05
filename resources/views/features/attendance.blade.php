@@ -10,11 +10,14 @@
         <div class="bg-[#5bc0de] p-3 flex items-center justify-between mb-6">
             <div class="flex-1 text-center">
                 <h1 class="text-3xl font-bold text-gray-800 mb-0">Attendance</h1>
+                @if(isset($today))
+                    <p class="text-sm text-gray-600">Today: {{ \Carbon\Carbon::parse($today)->format('l, F j, Y') }}</p>
+                @endif
             </div>
             <div>
                 <a href="{{ route('attendance.history') }}" 
                 class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-                    Attendance History
+                    📊 Attendance History
                 </a>
             </div>
         </div>
@@ -99,8 +102,15 @@
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Not Marked</span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">—</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ $athlete['remarks'] ?? '—' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $athlete['attendance_date'] }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($athlete['isEditable'] && $athlete['attendance_date'] === $today)
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">✏️ Today</span>
+                                    @else
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">📋 History</span>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr>
@@ -124,7 +134,8 @@
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Excused</span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">—</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ $attendance->remarks ?? '—' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ is_string($attendance->date) ? \Carbon\Carbon::parse($attendance->date)->format('Y-m-d') : $attendance->date->format('Y-m-d') }}</td>
                             </tr>
                         @empty
                             <tr>
@@ -152,11 +163,17 @@
                         <form method="POST" action="{{ route('coach.attendance.store') }}">
                             @csrf
 
-                            <!-- Date Picker -->
-                            <div class="mb-3">
-                                <label class="form-label">Date</label>
-                                <input type="date" name="attendance_date" class="form-control" required>
-                            </div>
+                    <!-- Date Picker -->
+                    <div class="mb-3">
+                        <label class="form-label font-bold">Date (Today Only)</label>
+                        <input type="date" name="attendance_date" class="form-control" value="{{ isset($today) ? $today : now()->toDateString() }}" readonly>
+                        <small class="text-muted">Attendance can only be recorded for today.</small>
+                    </div>
+
+                    <!-- Info Alert -->
+                    <div class="alert alert-info mb-3 text-sm" role="alert">
+                        <strong>📋 How it works:</strong> Mark attendance today using the status buttons below. Tomorrow, new attendance records for that date will automatically become available. Past records remain in the <strong>Attendance History</strong>.
+                    </div>
 
                             <!-- Athlete Attendance Table -->
                             <div class="table-responsive mb-3">
@@ -166,10 +183,8 @@
                                             <th>#</th>
                                             <th>Athlete</th>
                                             <th>Sports</th>
-                                            <th>
-                                                Status
-                                            </th>
-                                            <th>Remarks</th>
+                                            <th>Status</th>
+                                            <th>Remarks (Optional)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -180,12 +195,12 @@
                                             <td>{{ $athlete->sport_event }}</td>
                                             <td>
                                                 <input type="hidden" name="attendance[{{ $athlete->id }}][status]" value="present" class="attendance-hidden">
-                                                <button type="button" class="btn btn-sm btn-outline-success attendance-toggle">
+                                                <button type="button" class="btn btn-sm btn-outline-success attendance-toggle" title="Click to cycle through statuses">
                                                     Present
                                                 </button>
                                             </td>
                                             <td>
-                                                <input type="text" name="attendance[{{ $athlete->id }}][remarks]" class="form-control" placeholder="Optional">
+                                                <input type="text" name="attendance[{{ $athlete->id }}][remarks]" class="form-control form-control-sm" placeholder="e.g., Injured, Early dismissal">
                                             </td>
                                         </tr>
                                         @endforeach
