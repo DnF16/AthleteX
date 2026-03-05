@@ -42,6 +42,17 @@
                     <i class="bi bi-calendar2-week mr-2"></i> Attendance
                 </a>
             </li>
+            @php
+                $reportsRoute = auth()->user()->role === 'admin'
+                    ? route('admin.reports')
+                    : route('coach.reports.index');
+            @endphp
+
+            <li>
+                <a href="{{ $reportsRoute }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                    <i class="bi bi-journal-text mr-2"></i> Reports
+                </a>
+            </li>
             <li>
                 <a href="{{ route('coach') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
                     <i class="bi bi-people-fill mr-2"></i> Coaches
@@ -50,11 +61,6 @@
             <li>
                 <a href="{{ route('schedule') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
                     <i class="bi bi-calendar2-week mr-2"></i> Schedule
-                </a>
-            </li>
-            <li>
-                <a href="#" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
-                    <i class="bi bi-journal-text mr-2"></i> Reports
                 </a>
             </li>
             <!-- <li>

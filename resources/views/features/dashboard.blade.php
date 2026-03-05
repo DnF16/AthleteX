@@ -62,25 +62,23 @@
             </div>
 
             <!-- Charts Section -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
-    <!-- Monthly Achievements -->
-    <div class="bg-white p-6 rounded-xl shadow h-96">
-        <h3 class="font-semibold text-lg mb-4">Achievements Per Month</h3>
-        <div class="h-[85%]">
-            <canvas id="achievementChart" class="w-full h-full"></canvas>
-        </div>
-    </div>
+                <!-- Monthly Achievements -->
+                <div class="bg-white p-6 rounded-xl shadow h-96">
+                    <h3 class="font-semibold text-lg mb-4">Achievements Per Month</h3>
+                    <div class="h-[85%]">
+                        <canvas id="achievementChart" class="w-full h-full"></canvas>
+                    </div>
+                </div>
 
-    <!-- Athlete Distribution by Category -->
-    <div class="bg-white p-6 rounded-xl shadow h-96">
-        <h3 class="font-semibold text-lg mb-4">Expenses</h3>
-        <div class="h-[85%]">
-            <canvas id="pieChart" class="w-full h-full"></canvas>
-        </div>
-    </div>
+                <!-- Schedule Calendar -->
+                <div class="bg-white p-6 rounded-xl shadow h-96">
+                    <h3 class="font-semibold text-lg mb-4">Schedule</h3>
+                    <div id="scheduleCalendar" class="h-[85%]"></div>
+                </div>
 
-</div>
+            </div>
 
 
         </main>
@@ -89,6 +87,10 @@
 
 {{-- Chart.js --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{{-- FullCalendar --}}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
 
 <script>
     /* -------------------------------
@@ -142,33 +144,27 @@
 
 
     /* -------------------------------
-       PIE CHART – Expenses
+       FullCalendar – Schedule
     --------------------------------*/
-    new Chart(document.getElementById('pieChart'), {
-        type: 'pie',
-        data: {
-            labels: expensesLabels,
-            datasets: [{
-                data: expensesData,
-                backgroundColor: [
-                    '#22c55e','#16a34a','#4ade80',
-                    '#86efac','#15803d','#10b981'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'bottom' },
-                tooltip: {
-                    callbacks: {
-                        label: ctx => `${ctx.label}: ${ctx.raw}`
-                    }
-                }
-            }
-        }
+    let scheduleEvents = @json($scheduleEvents ?? []);
 
+    document.addEventListener('DOMContentLoaded', function() {
+        let calendarEl = document.getElementById('scheduleCalendar');
+
+        let calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            height: '100%',
+            events: scheduleEvents,
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            eventColor: '#6366f1',
+            eventTextColor: '#fff'
+        });
+
+        calendar.render();
     });
 </script>
 

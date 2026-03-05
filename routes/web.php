@@ -24,6 +24,7 @@ use App\Http\Controllers\CoachSeminarController;
 use App\Http\Controllers\CoachWorkHistoryController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\SportsController; // Added this based on your code usage
+use App\Http\Controllers\ReportController;
 
 
 // ==============================================================
@@ -70,6 +71,14 @@ Route::post('/alumni-registration', [AthleteController::class, 'storePublicRegis
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Report Routes (accessible by both coach and admin)
+    Route::get('/reports/{report}/download', [\App\Http\Controllers\ReportController::class, 'download'])
+        ->name('reports.download');
+    Route::patch('/reports/{report}/mark-received', [\App\Http\Controllers\ReportController::class, 'markReceived'])
+        ->name('reports.mark-received');
+    Route::patch('/reports/{report}/mark-rejected', [\App\Http\Controllers\ReportController::class, 'markRejected'])
+        ->name('reports.mark-rejected');
 
     Route::get('/coach', function () { return view('features.coach'); })->name('coach');
     Route::get('/schedule', function () { return view('features.schedule'); })->name('schedule');
@@ -152,6 +161,13 @@ Route::middleware(['auth'])->group(function () {
             
             Route::post('/attendance', [AttendanceController::class, 'store'])
                 ->name('attendance.store');
+
+            // Coach Report Routes
+            Route::get('/reports', [ReportController::class, 'coachIndex'])
+                ->name('reports.index');
+            
+            Route::post('/reports', [ReportController::class, 'coachStore'])
+                ->name('reports.store');
         });
 
 });
@@ -193,7 +209,11 @@ Route::prefix('admin')
 
     // attendance route
     Route::get('/attendance', [AttendanceController::class, 'adminIndex'])
-    ->name('attendance'); 
+    ->name('attendance');
+
+    // admin reports route
+    Route::get('/reports', [ReportController::class, 'adminIndex'])
+        ->name('reports');
 
 
     Route::get('/sports/filter/{sport}', [SportsController::class, 'filter'])->name('sports.filter');

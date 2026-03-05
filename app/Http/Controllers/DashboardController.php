@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Athlete;
 use App\Models\Coach;
+use App\Models\Achievement;
 
 class DashboardController extends Controller
 {
@@ -18,7 +19,10 @@ class DashboardController extends Controller
 
         $coachesCount = Coach::count();
 
+        // Count achievements
+        $totalAchievements = Achievement::count();
+
         // Return the correct Blade file
-        return view('features.dashboard', compact('activeAthletesCount', 'alumniCount', 'coachesCount'));
+        return view('features.dashboard', compact('activeAthletesCount', 'alumniCount', 'coachesCount', 'totalAchievements'));
     }
 }
