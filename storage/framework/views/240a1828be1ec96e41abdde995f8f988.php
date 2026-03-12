@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATHLETIX Login</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <!-- offline tailwind css below -->
+     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css']); ?> 
 </head>
 <body class="flex flex-col items-center min-h-screen bg-gradient-to-br from-green-900 to-green-800">
 

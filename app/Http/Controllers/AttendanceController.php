@@ -182,7 +182,7 @@ class AttendanceController extends Controller
     $attendanceMap = [];
 
     foreach($attendances as $attendance){
-        $key = $attendance->athlete_id . '_' . $attendance->date;
+        $key = $attendance->athlete_id . '_' . \Carbon\Carbon::parse($attendance->date)->format('Y-m-d');
         $attendanceMap[$key] = $attendance;
     }
 

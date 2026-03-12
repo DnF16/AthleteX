@@ -82,8 +82,7 @@
                                 @php
                                     $date = \Carbon\Carbon::create($selectedYear, date('m', strtotime($selectedMonth)), $day)->format('Y-m-d');
                                     $key = $athlete->id . '_' . $date;
-                                    $status = $attendanceMap[$key]->status ?? null;
-
+                                    $status = strtolower($attendanceMap[$key]->status ?? '');
                                     $bgColor = match($status){
                                         'present' => 'bg-green-500',
                                         'late' => 'bg-yellow-400',
