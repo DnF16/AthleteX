@@ -25,15 +25,15 @@
             <div id="searchResults" class="mt-2 w-64 bg-white border border-gray-200 rounded shadow-sm hidden"></div>
         </div>
         <div class="flex justify-center space-x-2 mt-4">
-            <button id="saveBtn" type="submit" class="px-4 py-2 rounded bg-green-600 text-white bg-green-700 hover:bg-green-700 transition">
+            <button id="saveBtn" type="submit" class="px-4 py-2 rounded bg-green-600 text-white bg-green-700 hover:bg-green-700 transition cursor-pointer">
                 Save Athlete
             </button>
 
-            <button id="updateBtn" type="button" class="hidden px-4 py-2 rounded bg-blue-600 text-white bg-green-700 hover:bg-blue-700 transition">
+            <button id="updateBtn" type="button" class="hidden px-4 py-2 rounded bg-blue-600 text-white bg-green-700 hover:bg-blue-700 transition cursor-pointer">
                 Update Athlete
             </button>
 
-            <button type="button" onclick="resetForm()" class="px-4 py-2 rounded bg-gray-300 text-gray-800 hover:bg-gray-400 transition">
+            <button type="button" onclick="resetForm()" class="px-4 py-2 rounded bg-gray-300 text-gray-800 hover:bg-gray-400 transition cursor-pointer">
                 Cancel New
             </button>
         </div>
@@ -383,38 +383,13 @@
                             <div class="space-y-3 flex-1">
                                 <div class="flex items-center">
                                     <label class="w-1/3 text-sm font-medium text-gray-700">Sports Event</label>
-                                    <select name="sport_event" class="w-2/3 bg-blue-100 border border-gray-300 rounded px-2 py-1">
+                                    <select name="sport_event" class="w-2/3 bg-blue-100 border border-gray-300 rounded px-2 py-1" required>
                                         <option value="">-- Select Sport Event --</option>
-                                        <option value="Basketball_Men">Basketball Men</option>
-                                        <option value="Basketball_Women">Basketball Women</option>
-                                        <option value="Volleyball_Men">Volleyball Men</option>
-                                        <option value="Volleyball_Women">Volleyball Women</option>
-                                        <option value="Archery_Men">Archery Men</option>
-                                        <option value="Archery_Women">Archery Women</option>
-                                        <option value="Arnis_Men">Arnis Men</option>
-                                        <option value="Arnis_Women">Arnis Women</option>
-                                        <option value="Athletics">Athletics</option>
-                                        <option value="Badminton_Men">Badminton Men</option>
-                                        <option value="Badminton_Women">Badminton Women</option>
-                                        <option value="Baseball">Baseball</option>
-                                        <option value="Table_Tennis_Men">Table Tennis Men</option>
-                                        <option value="Table_Tennis_Women">Table Tennis Women</option>
-                                        <option value="Tennis_Men">Tennis Men</option>
-                                        <option value="Tennis_Women">Tennis Women</option>
-                                        <option value="Swimming_Men">Swimming Men</option>
-                                        <option value="Swimming_Women">Swimming Women</option>
-                                        <option value="Sepak_Takraw_Men">Sepak Takraw Men</option>
-                                        <option value="Sepak_Takraw_Women">Sepak Takraw Women</option>
-                                        <option value="Judo_Men">Judo Men</option>
-                                        <option value="Judo_Women">Judo Women</option>
-                                        <option value="Wushu_Sanda">Wushu Sanda</option>
-                                        <option value="Wushu_Taolu">Wushu Taolu</option>
-                                        <option value="Taekwondo_Men">Taekwondo Men</option>
-                                        <option value="Taekwondo_Women">Taekwondo Women</option>
-                                        <option value="Chess">Chess</option>
-                                        <option value="Football">Football</option>
-                                        <option value="Softball">Softball</option>
-                                        <option value="Boxing">Boxing</option>
+                                        @foreach($sports as $sport)
+                                            <option value="{{ $sport->name }}" {{ old('sport_event') == $sport->name ? 'selected' : '' }}>
+                                                {{ $sport->name }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
 
@@ -510,7 +485,7 @@
                 </div>
             </div>
 
-                <div id="AchievementModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div id="AchievementModal" class="hidden fixed inset-0  flex items-center justify-center z-50">
                     <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
                         
                         <button onclick="toggleAchievementModal(false)" 
@@ -597,7 +572,7 @@
             </div>
 
             <div id="academicModal" 
-                class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                class="hidden fixed inset-0  flex items-center justify-center z-50">
 
                 <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
 
@@ -685,7 +660,7 @@
             </div>
 
             <div id="feeModal" 
-                class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                class="hidden fixed inset-0  flex items-center justify-center z-50">
 
                 <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
 
@@ -696,60 +671,63 @@
 
                     <h2 class="text-xl font-bold mb-4 text-center text-white">Add Fee / Discount</h2>
 
-                    <form id="feeForm" class="space-y-4">
+                    <form id="feeForm" class="grid grid-cols-2 gap-4">
 
-                        <div>
-                            <label class="text-white font-medium">Academic Term and Year</label>
-                            <input type="text" name="academic_year" placeholder="Ex: 2025-2026"
-                                class="w-full border rounded px-3 py-2">
-                        </div>
+    <div class="col-start-2">
+        <label class="text-white font-medium">Academic Term and Year</label>
+        <input type="text" name="academic_year" placeholder="Ex: 2025-2026"
+            class="w-full border rounded px-3 py-2">
+    </div>
 
-                        <div>
-                            <label class="text-white font-medium">Total Units Enrolled</label>
-                            <input type="number" name="total_units" class="w-full border rounded px-3 py-2">
-                        </div>
+    <div class="col-start-1">
+        <label class="text-white font-medium">Total Units Enrolled</label>
+        <input type="number" name="total_units" class="w-full border rounded px-3 py-2">
+    </div>
 
-                        <div>
-                            <label class="text-white font-medium">Tuition Fee</label>
-                            <input type="number" name="tuition_fee" class="w-full border rounded px-3 py-2">
-                        </div>
+    <div class="col-start-2">
+        <label class="text-white font-medium">Tuition Fee</label>
+        <input type="number" name="tuition_fee" class="w-full border rounded px-3 py-2">
+    </div>
 
-                        <div>
-                            <label class="text-white font-medium">Miscellaneous Fee</label>
-                            <input type="number" name="miscellaneous_fee" class="w-full border rounded px-3 py-2">
-                        </div>
+    <div class="col-start-1">
+        <label class="text-white font-medium">Miscellaneous Fee</label>
+        <input type="number" name="miscellaneous_fee" class="w-full border rounded px-3 py-2">
+    </div>
 
-                        <div>
-                            <label class="text-white font-medium">Other Charges</label>
-                            <input type="number" name="other_charges" class="w-full border rounded px-3 py-2">
-                        </div>
+    <div class="col-start-2">
+        <label class="text-white font-medium">Other Charges</label>
+        <input type="number" name="other_charges" class="w-full border rounded px-3 py-2">
+    </div>
 
-                        <div>
-                            <label class="text-white font-medium">Total Assessment</label>
-                            <input type="number" name="total_assessment" class="w-full border rounded px-3 py-2">
-                        </div>
+    <div class="col-start-1">
+        <label class="text-white font-medium">Total Assessment</label>
+        <input type="number" name="total_assessment" class="w-full border rounded px-3 py-2">
+    </div>
 
-                        <div>
-                            <label class="text-white font-medium">Total Discount</label>
-                            <input type="number" name="total_discount" class="w-full border rounded px-3 py-2">
-                        </div>
+    <div class="col-start-2">
+        <label class="text-white font-medium">Total Discount</label>
+        <input type="number" name="total_discount" class="w-full border rounded px-3 py-2">
+    </div>
 
-                        <div>
-                            <label class="text-white font-medium">Remarks</label>
-                            <select name="remarks" class="w-full border rounded px-3 py-2">
-                                <option value="">Select</option>
-                                <option>Paid</option>
-                                <option>Pending</option>
-                                <option>Waived</option>
-                            </select>
-                        </div>
+    <div class="col-start-1">
+        <label class="text-white font-medium">Remarks</label>
+        <select name="remarks" class="w-full border rounded px-3 py-2">
+            <option value="">Select</option>
+            <option>Paid</option>
+            <option>Pending</option>
+            <option>Waived</option>
+        </select>
+    </div>
 
-                        <button type="submit" 
-                            class="bg-green-600 text-white w-full py-2 rounded-lg hover:bg-green-700">
-                            Save Record
-                        </button>
+    <!-- Full width button -->
+    <div class="col-span-2">
+        <button type="submit" 
+            class="bg-green-600 text-white w-full py-2 rounded-lg hover:bg-green-700">
+            Save Record
+        </button>
+    </div>
 
-                    </form>
+</form>
 
                 </div>
             </div>
@@ -786,7 +764,7 @@
             </div>
 
             <div id="workModal" 
-                class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                class="hidden fixed inset-0  flex items-center justify-center z-50">
 
                 <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
 
@@ -854,7 +832,9 @@
             <p>Stuydents ID content goes here...</p>
         </div>
 
-    </div> <script>
+    </div> 
+    
+    <script>
     document.addEventListener('DOMContentLoaded', () => {
         // -----------------------
         // Helpers
@@ -878,6 +858,62 @@
             fees: [],
             workHistory: []
         };
+
+        // Clear all form/UI state when no athlete is selected (or search is emptied)
+        function clearAthleteData() {
+            // reset form fields and mode
+            if (generalForm) {
+                generalForm.reset();
+            }
+            if (methodInput) {
+                methodInput.value = 'POST';
+            }
+            if (selectedIdInput) {
+                selectedIdInput.value = '';
+            }
+            if (saveBtn) {
+                saveBtn.classList.remove('hidden');
+            }
+            if (updateBtn) {
+                updateBtn.classList.add('hidden');
+            }
+
+            // reset display name
+            const selectedName = byId('selected_name');
+            if (selectedName) {
+                selectedName.textContent = 'No athlete selected';
+            }
+
+            // reset picture preview
+            const preview = byId('picturePreview');
+            const noPic = byId('noPictureText');
+            if (preview) {
+                preview.src = '';
+                preview.classList.add('hidden');
+            }
+            if (noPic) {
+                noPic.classList.remove('hidden');
+            }
+
+            // clear all dynamic tables
+            const achTbody = getAchievementsTbody();
+            if (achTbody) achTbody.innerHTML = '';
+            const gradesTbody = getGradesTbody();
+            if (gradesTbody) gradesTbody.innerHTML = '';
+            const feesTbody = getFeesTbody();
+            if (feesTbody) feesTbody.innerHTML = '';
+            const workTbody = getWorkTbody();
+            if (workTbody) workTbody.innerHTML = '';
+
+            // reset data object
+            window.newAthleteData = {
+                generalInfo: {},
+                achievements: [],
+                academicRecords: [],
+                fees: [],
+                workHistory: []
+            };
+        }
 
         // -----------------------
         // TAB SWITCHING
@@ -1090,11 +1126,16 @@
             const searchUrl = '{{ route('athletes.search') }}';
 
             searchInput.addEventListener('input', (e) => {
-                const v = e.target.value;
+                const v = e.target.value.trim();
                 if (timer) clearTimeout(timer);
-                if (!v || v.trim() === '') {
-                    resultsBox.innerHTML = ''; resultsBox.classList.add('hidden'); return;
+
+                if (!v) {
+                    resultsBox.innerHTML = '';
+                    resultsBox.classList.add('hidden');
+                    clearAthleteData(); // <-- Clear everything here
+                    return;
                 }
+
                 timer = setTimeout(() => {
                     fetch(searchUrl + '?q=' + encodeURIComponent(v), { headers: { 'Accept': 'application/json' } })
                         .then(r => r.json())
@@ -1107,7 +1148,7 @@
                                 div.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm';
                                 div.textContent = (item.full_name || item.first_name + ' ' + item.last_name) + ' (' + item.student_id + ')';
                                 div.onclick = () => {
-                                    loadAthleteData(item.id); // Call our shared load function
+                                    loadAthleteData(item.id);
                                     resultsBox.innerHTML = '';
                                     resultsBox.classList.add('hidden');
                                     searchInput.value = item.first_name + ' ' + item.last_name;
@@ -1240,8 +1281,14 @@
             });
         }
 
-        if (saveBtn) saveBtn.addEventListener('click', performFinalSave);
-        if (updateBtn) updateBtn.addEventListener('click', performFinalSave);
+        if (saveBtn) {
+            saveBtn.removeEventListener('click', performFinalSave);
+            saveBtn.addEventListener('click', performFinalSave);
+        }
+        if (updateBtn) {
+            updateBtn.removeEventListener('click', performFinalSave);
+            updateBtn.addEventListener('click', performFinalSave);
+        }
 
     }); // End DOMContentLoaded
 
