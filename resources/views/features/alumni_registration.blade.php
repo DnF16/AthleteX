@@ -15,7 +15,7 @@
         .section-title { color: #2e4e1f; border-bottom: 2px solid #c4d79b; padding-bottom: 10px; margin-bottom: 20px; margin-top: 30px; font-weight: bold; }
         
         /* HIDE SECTIONS BY DEFAULT */
-        #basic-info-section, #shared-fields, #active-student-fields, #tryout-alert { display: none; }
+        #basic-info-section, #shared-fields, #tryout-alert { display: none; }
     </style>
 </head>
 <body>
@@ -53,13 +53,6 @@
                 </div>
             @endif
 
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-
             @if(session('tryout_success'))
                 <div class="alert alert-success shadow-lg mb-4" style="background-color: #e8f5e9; border-left: 8px solid #2e4e1f; border-radius: 8px;">
                     <h3 class="fw-bold text-success mb-3">
@@ -91,9 +84,8 @@
                     <label class="form-label fw-bold h5">Step 1: Registration Type <span class="text-danger">*</span></label>
                     <select name="classification" id="classification" class="form-select form-select-lg border-success" required onchange="toggleFields()">
                         <option value="">-- Select Your Status --</option>
-                        <option value="Active" {{ old('classification') == 'Active' ? 'selected' : '' }}>Active Student (New or Renewing)</option>
-                        <option value="Alumni" {{ old('classification') == 'Alumni' ? 'selected' : '' }}>Alumni / Graduate</option>
                         <option value="Tryout" {{ old('classification') == 'Tryout' ? 'selected' : '' }}>Tryout Applicant (New Recruit)</option>
+                        <option value="Alumni" {{ old('classification') == 'Alumni' ? 'selected' : '' }}>Alumni / Graduate</option>
                     </select>
                 </div>
 
@@ -161,52 +153,6 @@
                     </div>
                 </div>
 
-                <div id="active-student-fields">
-                    <h5 class="section-title">Personal Details</h5>
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Birthdate <span class="text-danger">*</span></label>
-                            <input type="date" name="birthdate" class="form-control" value="{{ old('birthdate') }}">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Age</label>
-                            <input type="number" name="age" class="form-control" value="{{ old('age') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Sex <span class="text-danger">*</span></label>
-                            <select name="sex" class="form-select">
-                                <option value="">Select</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Civil Status</label>
-                            <select name="civil_status" class="form-select">
-                                <option value="Single">Single</option>
-                                <option value="Married">Married</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Blood Type</label>
-                            <select name="blood_type" class="form-select">
-                                <option value="">Unknown</option>
-                                <option value="A+">A+</option>
-                                <option value="A-">A-</option>
-                                <option value="B+">B+</option>
-                                <option value="B-">B-</option>
-                                <option value="O+">O+</option>
-                                <option value="O-">O-</option>
-                                <option value="AB+">AB+</option>
-                                <option value="AB-">AB-</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
                 <div id="shared-fields">
                     <h5 class="section-title">Contact & Address Information</h5>
                     <div class="row g-3 mb-3">
@@ -257,20 +203,6 @@
                             </select>
                         </div>
                     </div>
-
-                    <div id="emergency-section">
-                        <h5 class="section-title">In Case of Emergency</h5>
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Contact Person Name <span class="text-danger">*</span></label>
-                                <input type="text" name="emergency_person" class="form-control" value="{{ old('emergency_person') }}">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Emergency Number <span class="text-danger">*</span></label>
-                                <input type="text" name="emergency_contact" class="form-control" value="{{ old('emergency_contact') }}">
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 
                 <div class="d-grid gap-2 mt-5">
@@ -291,8 +223,6 @@
         var status = document.getElementById("classification").value;
         var basicInfo = document.getElementById("basic-info-section");
         var sharedFields = document.getElementById("shared-fields");
-        var activeFields = document.getElementById("active-student-fields");
-        var emergencySection = document.getElementById("emergency-section");
         var tryoutAlert = document.getElementById("tryout-alert");
         var studentIdInput = document.getElementsByName("student_id")[0];
         var idStar = document.getElementById("id_star");
@@ -303,26 +233,16 @@
         if (status === "") {
             basicInfo.style.display = "none";
             sharedFields.style.display = "none";
-            activeFields.style.display = "none";
         } else {
             basicInfo.style.display = "block";
             
-            if (status === "Active") {
-                sharedFields.style.display = "block";
-                activeFields.style.display = "block";
-                if(emergencySection) emergencySection.style.display = "block";
-                idStar.style.display = "inline";
-                setRequired('Active');
-            } else if (status === "Tryout") {
+            if (status === "Tryout") {
                 sharedFields.style.display = "none"; // Hide course/address for tryouts
-                activeFields.style.display = "none"; // Hide age/sex for now
                 tryoutAlert.style.display = "block"; // Show tryout notice
                 idStar.style.display = "none"; // ID not required for recruits
                 setRequired('Tryout');
-            } else { // Alumni
+            } else if (status === "Alumni") { 
                 sharedFields.style.display = "block";
-                activeFields.style.display = "none";
-                if(emergencySection) emergencySection.style.display = "none";
                 idStar.style.display = "inline";
                 setRequired('Alumni');
             }
@@ -330,11 +250,8 @@
     }
 
     function setRequired(mode) {
-        // Essential fields
-        let alwaysRequired = ['email', 'first_name', 'last_name', 'sport_event'];
         let studentId = ['student_id'];
         let sharedRequired = ['contact_number', 'address', 'city_municipality', 'course'];
-        let activeRequired = ['birthdate', 'sex', 'emergency_person', 'emergency_contact'];
 
         function setList(names, isRequired) {
             names.forEach(name => {
@@ -343,18 +260,12 @@
             });
         }
 
-        if (mode === 'Active') {
-            setList(studentId, true);
-            setList(sharedRequired, true);
-            setList(activeRequired, true);
-        } else if (mode === 'Tryout') {
-            setList(studentId, false); // Recruiting applicants don't have IDs yet
+        if (mode === 'Tryout') {
+            setList(studentId, false); 
             setList(sharedRequired, false);
-            setList(activeRequired, false);
-        } else { // Alumni
+        } else if (mode === 'Alumni') { 
             setList(studentId, true);
             setList(sharedRequired, true);
-            setList(activeRequired, false);
         }
     }
 </script>

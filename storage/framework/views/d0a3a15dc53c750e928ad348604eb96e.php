@@ -61,7 +61,7 @@
     <ul class="nav nav-tabs mb-4" id="approvalTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active fw-bold text-success border-bottom-0" id="regular-tab" data-bs-toggle="tab" data-bs-target="#regular" type="button" role="tab">
-                <i class="fas fa-file-signature me-1"></i> Active & Alumni Requests
+                <i class="fas fa-file-signature me-1"></i> Alumni Requests
             </button>
         </li>
         <li class="nav-item" role="presentation">

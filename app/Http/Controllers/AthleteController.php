@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
-
 class AthleteController extends Controller
 {
     public function index()
@@ -307,10 +306,6 @@ class AthleteController extends Controller
             ? $payload['generalInfo']
             : $payload;
             
-        // ... (Keep your existing update logic mostly the same, ensuring validation)
-        // For brevity, assuming the rest of your update function was working fine.
-        // I will re-paste the standard update logic here for safety.
-        
         $data = [];
         $fields = [
             'student_id', 'first_name', 'last_name', 'course', 'year_level', 'sport',
@@ -370,8 +365,8 @@ class AthleteController extends Controller
     {
         // 1. DEFINE VALIDATION RULES
         $rules = [
-            // ✨ THE FIX: Added 'Tryout' to the allowed list!
-            'classification' => 'required|in:Active,Alumni,Tryout',
+            // Removed 'Active' from the allowed list
+            'classification' => 'required|in:Alumni,Tryout',
             
             // MAGIC: Student ID is required UNLESS they are a Tryout applicant
             'student_id'     => 'required_unless:classification,Tryout|nullable|string',
@@ -381,23 +376,12 @@ class AthleteController extends Controller
             'email'          => 'required|email|max:255',
             'sport_event'    => 'required|string',
             'course'         => 'nullable|string|max:255', 
-            // (Removed profile_picture validation here since we deleted it from the form)
         ];
-
-        // 2. ADD STRICT RULES ONLY IF ACTIVE
-        if ($request->classification === 'Active') {
-            $rules['birthdate'] = 'required|date';
-            $rules['sex'] = 'required|string';
-            $rules['contact_number'] = 'required|string';
-            $rules['address'] = 'required|string';
-            $rules['emergency_person'] = 'required|string';
-            $rules['emergency_contact'] = 'required|string';
-        }
 
         $validated = $request->validate($rules);
 
-       try {
-            // 3. SAVE TO DATABASE (Notice we added '$athlete =' here)
+        try {
+            // 3. SAVE TO DATABASE 
             $athlete = \App\Models\Athlete::create([
                 // Basic Info
                 'student_id' => $request->input('student_id'), 
@@ -412,11 +396,12 @@ class AthleteController extends Controller
                 'classification' => $validated['classification'],
                 'picture_path' => null, 
 
-                // ... (Leave all your other fields exactly the same) ...
+                // Academic & Emergency Info (passed cleanly from shared/alumni fields)
                 'course' => $request->input('course'),
                 'year_level' => $request->input('year_level'),
-                'emergency_person' => $request->input('emergency_person'),
-                'emergency_contact' => $request->input('emergency_contact'),
+                'contact_number' => $request->input('contact_number'),
+                'address' => $request->input('address'),
+                'city_municipality' => $request->input('city_municipality'),
             ]);
 
             // 4. THE NOTIFICATION TRICK 🪄
@@ -425,23 +410,22 @@ class AthleteController extends Controller
 
                 if ($schedule) {
                     
-                    // 📧 SEND THE AUTOMATED EMAIL HERE!
-                    //Mail::to($athlete->email)->send(new TryoutScheduleMail($athlete, $schedule));
+                    // 📧 TEMPORARILY DISABLED FOR DEMO
+                    // Mail::to($athlete->email)->send(new TryoutScheduleMail($athlete, $schedule));
 
                     // Format the date and time nicely for the screen alert
                     $date = \Carbon\Carbon::parse($schedule->tryout_date)->format('F d, Y');
                     $time = \Carbon\Carbon::parse($schedule->tryout_time)->format('h:i A');
-                    $sportName = str_replace('_', ' ', $schedule->sport_event);
                     
                     $message = "Your tryout is scheduled on <strong>{$date}</strong> at <strong>{$time}</strong>. Venue: <strong>{$schedule->venue}</strong>. Notes: {$schedule->notes}";
                     
-                    return redirect()->back()->with('tryout_success', $message); // Notice I changed this to 'tryout_success'
+                    return redirect()->back()->with('tryout_success', $message);
                 } else {
                     return redirect()->back()->with('success', 'Registration Successful! The SDO has not posted a schedule for your sport yet. Keep an eye out for announcements.');
                 }
             }
 
-            // Standard success message for Active/Alumni
+            // Standard success message for Alumni
             return redirect()->back()->with('success', 'Registration submitted successfully! Please wait for SDO verification.');
 
         } catch (\Exception $e) {
