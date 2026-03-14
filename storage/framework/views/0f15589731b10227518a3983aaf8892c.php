@@ -1,4 +1,4 @@
-<aside class="fixed top-0 left-0 w-64 h-screen bg-[#2e4e1f] text-white flex flex-col p-4 z-50">
+<aside class="fixed top-0 left-0 w-fit h-screen bg-[#2e4e1f] text-white flex flex-col p-4 z-50">
     <a href="#" class="flex items-center mb-6 text-lg font-bold no-underline text-white">
         SPORTS OFFICE
     </a>
@@ -33,6 +33,28 @@
                     <i class="bi bi-person-walking mr-2"></i> Student–Athletes
                 </a>
             </li>
+            <?php
+                $attendanceRoute = auth()->user()->role === 'admin'
+                    ? route('admin.attendance')
+                    : route('coach.attendance.index');
+            ?>
+
+            <li>
+                <a href="<?php echo e($attendanceRoute); ?>" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                    <i class="bi bi-calendar2-week mr-2"></i> Attendance
+                </a>
+            </li>
+            <?php
+                $reportsRoute = auth()->user()->role === 'admin'
+                    ? route('admin.reports')
+                    : route('coach.reports.index');
+            ?>
+
+            <li>
+                <a href="<?php echo e($reportsRoute); ?>" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                    <i class="bi bi-journal-text mr-2"></i> Reports
+                </a>
+            </li>
             <li>
                 <a href="<?php echo e(route('coach')); ?>" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
                     <i class="bi bi-people-fill mr-2"></i> Coaches
@@ -45,11 +67,6 @@
             </li>
 
             <!-- <li>
-                <a href="#" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
-                    <i class="bi bi-journal-text mr-2"></i> Classes
-                </a>
-            </li>
-            <li>
                 <a href="#" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
                     <i class="bi bi-trophy-fill mr-2 text-yellow-400"></i> Achievements
                 </a>
@@ -94,7 +111,7 @@
         </ul>
 
         <div class="mt-auto pt-4">
-            <a href="<?php echo e(route('log.login')); ?>" class="w-full block text-center px-4 py-2 rounded bg-red-600 hover:bg-red-700 transition text-white no-underline font-bold">
+            <a href="<?php echo e(route('login')); ?>" class="w-full block text-center px-4 py-2 rounded bg-red-600 hover:bg-red-700 transition text-white no-underline font-bold">
                 Logout
             </a>
         </div>

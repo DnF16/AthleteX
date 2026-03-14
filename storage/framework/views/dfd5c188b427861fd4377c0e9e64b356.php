@@ -13,21 +13,21 @@
     </div>
 
     <?php if(session('success')): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             <i class="fas fa-check-circle me-2"></i> <?php echo e(session('success')); ?>
 
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
 
-    <ul class="nav nav-tabs mb-4" id="tryoutTabs" role="tablist">
+    <ul class="nav custom-tabs mb-4" id="tryoutTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active fw-bold text-success border-bottom-0" id="schedules-tab" data-bs-toggle="tab" data-bs-target="#schedules" type="button" role="tab">
+            <button class="nav-link active custom-tab-btn" data-bs-target="#schedules" type="button">
                 <i class="fas fa-calendar-alt me-1"></i> Tryout Schedules
             </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold text-secondary border-bottom-0 relative" id="recruits-tab" data-bs-toggle="tab" data-bs-target="#recruits" type="button" role="tab">
+        <li class="nav-item ms-2" role="presentation">
+            <button class="nav-link custom-tab-btn relative" data-bs-target="#recruits" type="button">
                 <i class="fas fa-user-check me-1"></i> Passed Recruits
                 <?php if(isset($recruits) && $recruits->count() > 0): ?>
                     <span class="absolute top-0 right-0 -mt-1 -mr-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"><?php echo e($recruits->count()); ?></span>
@@ -38,7 +38,7 @@
 
     <div class="tab-content" id="tryoutTabsContent">
 
-        <div class="tab-pane fade show active" id="schedules" role="tabpanel">
+        <div class="tab-pane fade show active" id="schedules">
             <div class="row">
                 <div class="col-md-4 mb-4">
                     <div class="card shadow-sm border-0 border-top border-success border-4">
@@ -57,25 +57,13 @@
                                             <option value="Basketball_Women">Basketball (Women)</option>
                                             <option value="Volleyball_Men">Volleyball (Men)</option>
                                             <option value="Volleyball_Women">Volleyball (Women)</option>
-                                            <option value="Football">Football</option>
-                                            <option value="Softball">Softball</option>
-                                            <option value="Baseball">Baseball</option>
                                         </optgroup>
                                         <optgroup label="Racket Sports">
                                             <option value="Badminton_Men">Badminton (Men)</option>
                                             <option value="Badminton_Women">Badminton (Women)</option>
-                                            <option value="Table_Tennis_Men">Table Tennis (Men)</option>
-                                            <option value="Table_Tennis_Women">Table Tennis (Women)</option>
-                                            <option value="Tennis_Men">Tennis (Men)</option>
-                                            <option value="Tennis_Women">Tennis (Women)</option>
                                         </optgroup>
                                         <optgroup label="Combat Sports & Others">
                                             <option value="Taekwondo_Men">Taekwondo (Men)</option>
-                                            <option value="Taekwondo_Women">Taekwondo (Women)</option>
-                                            <option value="Arnis_Men">Arnis (Men)</option>
-                                            <option value="Arnis_Women">Arnis (Women)</option>
-                                            <option value="Boxing">Boxing</option>
-                                            <option value="Sepak_Takraw">Sepak Takraw</option>
                                             <option value="Chess">Chess</option>
                                             <option value="Swimming">Swimming</option>
                                             <option value="Athletics">Athletics</option>
@@ -96,9 +84,9 @@
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label fw-bold text-secondary">Notes (Optional)</label>
-                                    <textarea name="notes" class="form-control" rows="2" placeholder="e.g. Bring own equipment or water"></textarea>
+                                    <textarea name="notes" class="form-control" rows="2" placeholder="e.g. Bring own equipment"></textarea>
                                 </div>
-                                <button type="submit" class="btn btn-success w-100 fw-bold py-2">
+                                <button type="submit" class="btn btn-success w-100 fw-bold py-2 shadow-sm">
                                     <i class="fas fa-save me-1"></i> Save Schedule
                                 </button>
                             </form>
@@ -125,32 +113,19 @@
                                     <tbody>
                                         <?php $__empty_1 = true; $__currentLoopData = $schedules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $schedule): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                             <tr>
-                                                <td class="ps-4 fw-bold text-success">
-                                                    <?php echo e(str_replace('_', ' ', $schedule->sport_event)); ?>
-
-                                                </td>
+                                                <td class="ps-4 fw-bold text-success"><?php echo e(str_replace('_', ' ', $schedule->sport_event)); ?></td>
                                                 <td>
-                                                    <span class="fw-semibold text-dark">
-                                                        <?php echo e(\Carbon\Carbon::parse($schedule->tryout_date)->format('M d, Y')); ?>
-
-                                                    </span><br>
-                                                    <small class="text-muted">
-                                                        <i class="far fa-clock me-1"></i> <?php echo e(\Carbon\Carbon::parse($schedule->tryout_time)->format('h:i A')); ?>
-
-                                                    </small>
+                                                    <span class="fw-semibold text-dark"><?php echo e(\Carbon\Carbon::parse($schedule->tryout_date)->format('M d, Y')); ?></span><br>
+                                                    <small class="text-muted"><i class="far fa-clock me-1"></i> <?php echo e(\Carbon\Carbon::parse($schedule->tryout_time)->format('h:i A')); ?></small>
                                                 </td>
                                                 <td>
                                                     <span class="fw-semibold"><?php echo e($schedule->venue); ?></span><br>
-                                                    <?php if($schedule->notes): ?>
-                                                        <small class="text-muted fst-italic"><?php echo e($schedule->notes); ?></small>
-                                                    <?php else: ?>
-                                                        <small class="text-muted">No notes</small>
-                                                    <?php endif; ?>
+                                                    <small class="text-muted fst-italic"><?php echo e($schedule->notes ?? 'No notes'); ?></small>
                                                 </td>
                                                 <td class="text-center">
                                                     <form action="<?php echo e(route('tryouts.destroy', $schedule->id)); ?>" method="POST">
                                                         <?php echo csrf_field(); ?>
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger px-3" onclick="return confirm('Are you sure you want to remove this schedule?')">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger px-3" onclick="return confirm('Remove schedule?')">
                                                             <i class="fas fa-trash-alt me-1"></i> Delete
                                                         </button>
                                                     </form>
@@ -159,8 +134,7 @@
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                             <tr>
                                                 <td colspan="4" class="text-center py-5">
-                                                    <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 3rem;"></i>
-                                                    <p class="text-muted fs-5 mb-0">No tryout schedules have been posted yet.</p>
+                                                    <p class="text-muted mb-0">No tryout schedules have been posted yet.</p>
                                                 </td>
                                             </tr>
                                         <?php endif; ?>
@@ -173,12 +147,12 @@
             </div> 
         </div> 
 
-        <div class="tab-pane fade" id="recruits" role="tabpanel">
-            <div class="alert alert-info border-info mb-4 flex items-center">
+        <div class="tab-pane fade" id="recruits" style="display: none;">
+            <div class="alert alert-info border-info mb-4 flex items-center shadow-sm">
                 <i class="fas fa-info-circle me-3 fs-4 text-info"></i>
                 <div>
                     <strong>Action Required:</strong> These students passed their tryouts but are still classified as "Recruits." 
-                    Once they submit their paperwork, edit their profile and change their Classification to "Class A, B, or C" to move them to the Master Roster.
+                    Update their profile to move them to the Master Roster.
                 </div>
             </div>
 
@@ -200,15 +174,10 @@
                                     <tr class="hover:bg-yellow-50 border-b">
                                         <td class="px-4 py-3 border-r font-bold text-gray-900"><?php echo e($recruit->last_name); ?>, <?php echo e($recruit->first_name); ?></td>
                                         <td class="px-4 py-3 border-r text-center"><span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-semibold"><?php echo e(str_replace('_', ' ', $recruit->sport_event)); ?></span></td>
-                                        <td class="px-4 py-3 border-r text-center">
-                                            <?php echo e($recruit->contact_number ?? 'No Phone'); ?> <br>
-                                            <span class="text-xs text-gray-500"><?php echo e($recruit->email); ?></span>
-                                        </td>
+                                        <td class="px-4 py-3 border-r text-center"><?php echo e($recruit->contact_number ?? 'No Phone'); ?> <br><span class="text-xs text-gray-500"><?php echo e($recruit->email); ?></span></td>
                                         <td class="px-4 py-3 border-r text-center text-gray-500"><?php echo e($recruit->updated_at->format('M d, Y')); ?></td>
                                         <td class="px-4 py-3 text-center">
-                                            <a href="<?php echo e(route('student.athlete', ['id' => $recruit->id])); ?>" class="bg-blue-600 text-white hover:bg-blue-700 px-3 py-2 rounded text-xs font-bold transition">
-                                                Update to Official Athlete
-                                            </a>
+                                            <a href="<?php echo e(route('student.athlete', ['id' => $recruit->id])); ?>" class="bg-blue-600 text-white hover:bg-blue-700 px-3 py-2 rounded text-xs font-bold transition">Update to Official Athlete</a>
                                         </td>
                                     </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -224,14 +193,65 @@
     </div> 
 </div> 
 
+<style>
+    /* The main bottom border for the entire tab list */
+    .custom-tabs {
+        border-bottom: 2px solid #198754; /* Bootstrap success green */
+        display: flex;
+    }
+
+    /* Unclicked Tab State */
+    .custom-tab-btn {
+        background-color: #ffffff;
+        color: #6c757d;
+        border: 1px solid #dee2e6;
+        border-bottom: none;
+        border-radius: 8px 8px 0 0;
+        padding: 10px 24px;
+        margin-bottom: -2px; /* Pulls the tab down to overlap the bottom line */
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
+    }
+
+    /* Hover effect for unclicked tabs */
+    .custom-tab-btn:hover:not(.active) {
+        background-color: #e9ecef;
+        color: #198754;
+    }
+
+    /* Clicked (Active) Tab State */
+    .custom-tab-btn.active {
+        background-color: #f8f9fa; /* Matches the bg-light of your main container */
+        color: #198754 !important;
+        border: 2px solid #198754;
+        border-bottom: 2px solid #f8f9fa; /* Erases the bottom line inside the tab */
+    }
+</style>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const tabs = document.querySelectorAll('button[data-bs-toggle="tab"]');
-        tabs.forEach(tab => {
-            tab.addEventListener('shown.bs.tab', event => {
-                tabs.forEach(t => { t.classList.remove('text-success'); t.classList.add('text-secondary'); });
-                event.target.classList.remove('text-secondary');
-                event.target.classList.add('text-success');
+        const tabButtons = document.querySelectorAll('.custom-tab-btn');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                // Remove active class from all buttons
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+
+                // Add active class to clicked button
+                this.classList.add('active');
+
+                // Hide all tab panes
+                tabPanes.forEach(pane => {
+                    pane.classList.remove('show', 'active');
+                    pane.style.display = 'none'; 
+                });
+
+                // Show the targeted tab pane
+                const targetId = this.getAttribute('data-bs-target');
+                const targetPane = document.querySelector(targetId);
+                targetPane.classList.add('show', 'active');
+                targetPane.style.display = 'block'; 
             });
         });
     });
