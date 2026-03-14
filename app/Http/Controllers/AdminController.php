@@ -13,6 +13,7 @@ use App\Models\Holiday; // Added for scheduling
 use App\Models\Certificate; // Added for certificates
 use App\Models\GradeScale; 
 use App\Models\ScholarshipCriteria;
+use App\Models\Sport;
 
 class AdminController extends Controller
 {
@@ -26,8 +27,9 @@ class AdminController extends Controller
     }
     
     public function users() { 
-        $users = User::all(); 
-        return view('admin.users', compact('users')); 
+        $users = User::all();
+        $sports = Sport::orderBy('name')->get(); 
+        return view('admin.users', compact('users', 'sports')); 
     }
     
     public function classes() { 
@@ -100,7 +102,15 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'coach_sport' => 'required|string|in:Basketball,Volleyball,Athletics,Swimming,Taekwondo,Chess,Football,Boxing',
+            'coach_sport' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    if (!Sport::where('name', $value)->exists()) {
+                        $fail('The selected sport is invalid.');
+                    }
+                },
+            ],
         ]);
 
         // 2. Create the user account

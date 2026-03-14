@@ -1,0 +1,207 @@
+@import "tailwindcss";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+/* Custom card styles */
+.card {
+    @apply rounded-lg border border-gray-200 bg-white;
+}
+
+.card-header {
+    @apply border-b border-gray-200 px-6 py-4 font-semibold;
+}
+
+.card-body {
+    @apply px-6 py-4;
+}
+
+/* Bootstrap Button Classes for Compatibility */
+.btn {
+    @apply inline-block px-4 py-2 rounded font-semibold text-center cursor-pointer transition-colors;
+}
+
+.btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700;
+}
+
+.btn-secondary {
+    @apply bg-gray-600 text-white hover:bg-gray-700;
+}
+
+.btn-success {
+    @apply bg-green-600 text-white hover:bg-green-700;
+}
+
+.btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700;
+}
+
+.btn-warning {
+    @apply bg-yellow-500 text-white hover:bg-yellow-600;
+}
+
+.btn-info {
+    @apply bg-blue-500 text-white hover:bg-blue-600;
+}
+
+.btn-light {
+    @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
+}
+
+.btn-dark {
+    @apply bg-gray-800 text-white hover:bg-gray-900;
+}
+
+.btn-outline-success {
+    @apply border-2 border-green-600 text-green-600 hover:bg-green-50;
+}
+
+.btn-outline-danger {
+    @apply border-2 border-red-600 text-red-600 hover:bg-red-50;
+}
+
+.btn-outline-warning {
+    @apply border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-50;
+}
+
+.btn-outline-info {
+    @apply border-2 border-blue-500 text-blue-500 hover:bg-blue-50;
+}
+
+.btn-sm {
+    @apply px-2 py-1 text-sm;
+}
+
+.btn-lg {
+    @apply px-6 py-3 text-lg;
+}
+
+/* Form Controls */
+.form-control {
+    @apply border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+.form-control.is-invalid {
+    @apply border-red-500;
+}
+
+.form-label {
+    @apply block mb-2 font-semibold text-gray-700;
+}
+
+.invalid-feedback {
+    @apply text-red-600 text-sm mt-1;
+}
+
+/* Modal Styles */
+.modal.fade {
+    @apply fixed top-0 left-0 w-full h-full bg-black/50 z-50 flex items-center justify-center opacity-0 invisible transition-all;
+}
+
+.modal.fade.show {
+    @apply opacity-100 visible;
+}
+
+.modal-content {
+    @apply bg-white rounded-lg shadow-lg;
+}
+
+.modal-header {
+    @apply border-b border-gray-200 px-6 py-4 flex items-center justify-between;
+}
+
+.modal-body {
+    @apply px-6 py-4;
+}
+
+.modal-footer {
+    @apply border-t border-gray-200 px-6 py-4 flex justify-end gap-2;
+}
+
+.modal-dialog {
+    @apply relative;
+}
+
+.modal-lg {
+    max-width: 800px;
+}
+
+/* Table Styles */
+.table {
+    @apply w-full border-collapse;
+}
+
+.table th,
+.table td {
+    @apply border border-gray-200 px-4 py-2;
+}
+
+.table thead {
+    @apply bg-gray-100;
+}
+
+.table tbody tr:hover {
+    @apply bg-gray-50;
+}
+
+.table-light {
+    @apply bg-gray-100;
+}
+
+.table-bordered {
+    @apply border border-gray-300;
+}
+
+/* Utility Classes */
+.shadow {
+    @apply drop-shadow-md;
+}
+
+.rounded {
+    @apply rounded-lg;
+}
+
+.me-1 {
+    @apply me-1;
+}
+
+.me-2 {
+    @apply me-2;
+}
+
+.mr-2 {
+    @apply mr-2;
+}
+
+.mb-3 {
+    @apply mb-3;
+}
+
+.mb-4 {
+    @apply mb-4;
+}
+
+.mt-4 {
+    @apply mt-4;
+}
+
+.d-flex {
+    @apply flex;
+}
+
+.align-middle {
+    @apply align-middle;
+}
+
+.justify-content-between {
+    @apply justify-between;
+}
+
+.no-underline {
+    @apply no-underline;
+}
+
+@layer base {
+  button {
+    @apply cursor-pointer;
+  }
+}

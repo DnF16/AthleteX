@@ -6,7 +6,7 @@
     <title>ATHLETIX Login</title>
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <!-- offline tailwind css below -->
-     @vite(['resources/css/app.css']) 
+     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css']); ?> 
 </head>
 <body class="flex flex-col items-center min-h-screen bg-gradient-to-br from-green-900 to-green-800">
 
@@ -23,20 +23,21 @@
             
             <!-- Logo -->
             <div class="text-center mb-6">
-                <img src="{{ asset('images/logo.png') }}" alt="UC Logo" class="mx-auto mb-4 w-24 h-24 rounded-full border-2 border-green-700">
+                <img src="<?php echo e(asset('images/logo.png')); ?>" alt="UC Logo" class="mx-auto mb-4 w-24 h-24 rounded-full border-2 border-green-700">
                 <h2 class="text-2xl font-bold text-white">ATHLETIX Login</h2>
             </div>
 
             <!-- Error Message -->
-            @if($errors->any())
+            <?php if($errors->any()): ?>
                 <div class="bg-red-900/50 text-red-200 p-3 rounded-lg mb-6 border border-red-700/50 text-sm">
-                    {{ $errors->first() }}
+                    <?php echo e($errors->first()); ?>
+
                 </div>
-            @endif
+            <?php endif; ?>
 
             <!-- Login Form -->
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
+            <form method="POST" action="<?php echo e(route('login')); ?>">
+                <?php echo csrf_field(); ?>
 
                 <div class="mb-5">
                     <label for="email" class="block text-green-200 font-medium mb-2 text-sm">Email</label>
@@ -71,3 +72,4 @@
 
 </body>
 </html>
+<?php /**PATH C:\xampp\htdocs\AthleteX\resources\views/log/login.blade.php ENDPATH**/ ?>

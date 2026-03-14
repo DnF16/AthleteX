@@ -109,6 +109,12 @@ class Athlete extends Model
     {
         return $this->hasMany(WorkHistory::class);
     }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
     public function coach() {
         return $this->belongsTo(Coach::class);
     }

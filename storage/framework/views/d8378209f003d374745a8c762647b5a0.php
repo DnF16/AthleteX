@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Dashboard'); ?>
 
-@section('title', 'Dashboard')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="flex bg-gray-100 h-full">
 
     <!-- Main Content -->
@@ -21,7 +19,8 @@
                     <div class="bg-white p-5 rounded-xl shadow hover:shadow-lg transition">
                         <p class="text-gray-500">Total Active Athletes</p>
                         <h2 class="text-3xl font-bold text-green-600">
-                            {{ $activeAthletesCount ?? 0 }}
+                            <?php echo e($activeAthletesCount ?? 0); ?>
+
                         </h2>
                     </div>
 
@@ -29,7 +28,8 @@
                     <div class="bg-white p-5 rounded-xl shadow hover:shadow-lg transition">
                         <p class="text-gray-500">Total Alumni</p>
                         <h2 class="text-3xl font-bold text-blue-600">
-                            {{ $alumniCount ?? 0 }}
+                            <?php echo e($alumniCount ?? 0); ?>
+
                         </h2>
                     </div>
                     
@@ -40,7 +40,8 @@
                 <div class="bg-white p-5 rounded-xl shadow hover:shadow-lg transition">
                     <p class="text-gray-500">Total Coaches</p>
                     <h2 class="text-3xl font-bold text-blue-600">
-                        {{ $coachesCount ?? 0 }}
+                        <?php echo e($coachesCount ?? 0); ?>
+
                     </h2>
                 </div>
 
@@ -48,7 +49,8 @@
                 <div class="bg-white p-5 rounded-xl shadow hover:shadow-lg transition">
                     <p class="text-gray-500">Achievements Recorded</p>
                     <h2 class="text-3xl font-bold text-purple-600">
-                        {{ $totalAchievements ?? 0 }}
+                        <?php echo e($totalAchievements ?? 0); ?>
+
                     </h2>
                 </div>
 
@@ -56,7 +58,8 @@
                 <div class="bg-white p-5 rounded-xl shadow hover:shadow-lg transition">
                     <p class="text-gray-500">Total of Inactive Athletes and Coach's</p>
                     <h2 class="text-3xl font-bold text-orange-600">
-                        {{ $inactive ?? 0 }}
+                        <?php echo e($inactive ?? 0); ?>
+
                     </h2>
                 </div>
             </div>
@@ -85,10 +88,10 @@
     </div>
 </div>
 
-{{-- Chart.js --}}
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-{{-- FullCalendar --}}
+
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
 
@@ -98,14 +101,14 @@
     --------------------------------*/
 
     // Achievements monthly (ensure 12 months)
-    let rawAchievements = @json($achievementsMonthly ?? []);
+    let rawAchievements = <?php echo json_encode($achievementsMonthly ?? [], 15, 512) ?>;
 
     // Build array of 12 months, fill missing with 0
     let monthlyAchievements = Array.from({ length: 12 }, (_, i) => rawAchievements[i + 1] ?? 0);
 
     // Expense data (renamed from athleteCategories)
-    let expensesData = @json(array_values($athleteCategories ?? []));
-    let expensesLabels = @json(array_keys($athleteCategories ?? []));
+    let expensesData = <?php echo json_encode(array_values($athleteCategories ?? []), 15, 512) ?>;
+    let expensesLabels = <?php echo json_encode(array_keys($athleteCategories ?? []), 15, 512) ?>;
 
     // If empty, avoid chart errors
     if (expensesLabels.length === 0) {
@@ -146,7 +149,7 @@
     /* -------------------------------
        FullCalendar – Schedule
     --------------------------------*/
-    let scheduleEvents = @json($scheduleEvents ?? []);
+    let scheduleEvents = <?php echo json_encode($scheduleEvents ?? [], 15, 512) ?>;
 
     document.addEventListener('DOMContentLoaded', function() {
         let calendarEl = document.getElementById('scheduleCalendar');
@@ -168,4 +171,6 @@
     });
 </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\AthleteX\resources\views/features/dashboard.blade.php ENDPATH**/ ?>

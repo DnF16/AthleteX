@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Models\Sport;
 
 class AthleteController extends Controller
 {
@@ -144,7 +145,8 @@ class AthleteController extends Controller
 
     public function create()
     {
-        return view('features.student_athlete');
+        $sports = Sport::all();
+        return view('features.student_athlete', compact('sports'));
     }
 
     public function store(Request $request)
@@ -158,7 +160,16 @@ class AthleteController extends Controller
         $rules = [
             'student_id' => 'required|string|max:255',
             'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'last_name'  => 'required|string|max:255',
+            'sport_event' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    if (!Sport::where('name', $value)->exists()) {
+                        $fail('The selected sport event is invalid.');
+                    }
+                },
+            ],
         ];
 
         $validator = Validator::make($general, $rules);
@@ -197,9 +208,11 @@ class AthleteController extends Controller
             $data['province'] = $general['province'];
         }
 
-        // Assign Coach if logged in
-        if (auth()->check() && auth()->user()->role === 'coach' && auth()->user()->coach) {
-            $data['coach_id'] = auth()->user()->coach->id;
+        // Assign the logged-in coach automatically if user has a coach role.
+        // Fallback to the `coach_id` column on `users` when the relationship isn't loaded.
+        if (auth()->check() && auth()->user()->role === 'coach') {
+            $data['coach_id'] = auth()->user()->coach->id ?? auth()->user()->coach_id ?? null;
+            Log::info('Athlete store - assigning coach', ['user_id' => auth()->id(), 'assigned_coach_id' => $data['coach_id']]);
         }
 
         try {
@@ -306,6 +319,46 @@ class AthleteController extends Controller
                 'first_name' => $a->first_name,
                 'last_name' => $a->last_name,
                 'full_name' => $a->full_name,
+                'age' => $a->age,
+                'gender' => $a->gender,
+                'birthdate' => $a->birthdate,
+                'blood_type' => $a->blood_type,
+                'course' => $a->course,
+                'year_level' => $a->year_level,
+                'email' => $a->email,
+                'facebook' => $a->facebook,
+                'marital_status' => $a->marital_status,
+                'contact_number' => $a->contact_number,
+                'address' => $a->address,
+                'city_municipality' => $a->city_municipality,
+                'province_state' => $a->province_state,
+                'zip_code' => $a->zip_code,
+                'emergency_person' => $a->emergency_person,
+                'emergency_contact' => $a->emergency_contact,
+
+                // include the raw coach_id so client-side code can prefill hidden
+                // input if for some reason we ever used the search result directly.
+                'coach_id' => $a->coach_id,
+
+                'coach_name' => $a->coach
+                    ? $a->coach->coach_first_name . ' ' . $a->coach->coach_last_name
+                    : null,
+
+                'date_joined' => $a->date_joined,
+                'term_graduated' => $a->term_graduated,
+                'asst_coach' => $a->asst_coach,
+                'total_unit' => $a->total_unit,
+                'year_graduated' => $a->year_graduated,
+                'tuition_fee' => $a->tuition_fee,
+                'misc_fee' => $a->misc_fee,
+                'other_charges' => $a->other_charges,
+                'total_assessment' => $a->total_assessment,
+                'total_discount' => $a->total_discount,
+                'balance' => $a->balance,
+                'current_work' => $a->current_work,
+                'current_company' => $a->current_company,
+
+                // right-side fields
                 'sport_event' => $a->sport_event,
                 'status' => $a->status,
                 'picture_url' => $a->picture_path ? asset('storage/' . $a->picture_path) : null,
@@ -318,7 +371,8 @@ class AthleteController extends Controller
 
     public function show(\Illuminate\Http\Request $request, $id)
     {
-        $athlete = \App\Models\Athlete::with(['achievements', 'academicEvaluations', 'feesDiscounts', 'workHistories'])->findOrFail($id);
+        // 1. Find the athlete
+        $athlete = \App\Models\Athlete::with(['coach', 'achievements', 'academicEvaluations', 'feesDiscounts', 'workHistories'])->findOrFail($id);
 
         if ($request->wantsJson()) {
             return response()->json($athlete);
