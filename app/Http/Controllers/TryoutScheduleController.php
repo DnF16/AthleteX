@@ -13,8 +13,8 @@ class TryoutScheduleController extends Controller
         // 1. Get the schedules
         $schedules = TryoutSchedule::orderBy('tryout_date', 'asc')->get();
         
-        // 2. Get the students who PASSED the tryout (Status is Active, but Classification is still Tryout)
-        $recruits = \App\Models\Athlete::where('status', 'Active')
+        // 2. Get the students who PASSED the tryout (Status is Tryout or Active, Classification is Tryout)
+        $recruits = \App\Models\Athlete::whereIn('status', ['Active', 'Tryout'])
                                        ->where('classification', 'Tryout')
                                        ->latest()
                                        ->get();

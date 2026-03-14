@@ -17,39 +17,58 @@ use Illuminate\Support\Facades\Mail;
 
 class AthleteController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        if (auth()->user()->role === 'admin') {
-            
-            // 1. Regular Active Athletes
-            $athletes = Athlete::where('status', 'Active')
-                               ->where('classification', '!=', 'Tryout') 
-                               ->get();
+        $query = Athlete::query();
 
-            // 2. Passed Tryouts (Still considered Recruits)
-            $recruits = Athlete::where('status', 'Active')
-                               ->where('classification', 'Tryout') 
-                               ->get();
+        // 1. Role-based security
+        if (auth()->user()->role === 'coach' && auth()->user()->coach) {
+            $query->where('coach_id', auth()->user()->coach->id);
+        }
 
-        } elseif (auth()->user()->role === 'coach' && auth()->user()->coach) {
-            
-            $athletes = Athlete::where('coach_id', auth()->user()->coach->id)
-                ->where('status', 'Active')
-                ->where('classification', '!=', 'Tryout')
-                ->get();
+        // 🚫 HIDE PENDING, DECLINED, AND TRYOUTS (Tryouts belong in Manage Tryouts!)
+        $query->whereNotIn('status', ['Pending', 'Declined', 'Tryout'])
+              ->where('classification', '!=', 'Tryout');
 
-            $recruits = Athlete::where('coach_id', auth()->user()->coach->id)
-                ->where('status', 'Active')
-                ->where('classification', 'Tryout')
-                ->get();
+        // 2. Search Bar Filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('student_id', 'like', "%{$search}%");
+            });
+        }
 
-        } else {
-            $athletes = collect(); 
-            $recruits = collect(); 
+        // 3. Sport Filter
+        if ($request->filled('sport')) {
+            $query->where('sport_event', $request->sport);
         }
         
-        // Pass BOTH lists to the view
-        return view('features.athlete_lists', compact('athletes', 'recruits'));
+        // 4. THE BULLETPROOF STATUS FILTER 🛡️
+        if ($request->filled('status')) {
+            $status = $request->status;
+
+            if ($status === 'Alumni') {
+                // Look for Alumni in BOTH columns to catch your old test data
+                $query->where(function ($q) {
+                    $q->where('status', 'Alumni')
+                      ->orWhere('classification', 'Alumni');
+                });
+            } elseif ($status === 'Active') {
+                // If filtering by Active, make sure we EXCLUDE Alumni
+                $query->where('status', 'Active')
+                      ->where('classification', '!=', 'Alumni');
+            } else {
+                // Standard status check (Injured, Inactive, Transferred)
+                $query->where('status', $status);
+            }
+        }
+
+        // Sort alphabetically by last name and fetch
+        $athletes = $query->orderBy('last_name', 'asc')->get();
+        
+        return view('features.athlete_lists', compact('athletes'));
     }
 
     // ==========================================
@@ -82,17 +101,26 @@ class AthleteController extends Controller
     {
         $athlete = Athlete::findOrFail($id);
         
+        // 🧠 SMART STATUS: Determine their true status based on what they applied for!
+        $newStatus = 'Active'; // Default for regular student-athletes
+        
+        if ($athlete->classification === 'Alumni') {
+            $newStatus = 'Alumni';
+        } elseif ($athlete->classification === 'Tryout') {
+            $newStatus = 'Tryout';
+        }
+
         $athlete->update([
-            'status' => 'Active',
+            'status' => $newStatus,
             'approval_status' => 'approved',
         ]);
 
         // If it's a background request (AJAX), just send a silent success message
         if ($request->wantsJson() || $request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Approved!']);
+            return response()->json(['success' => true, 'message' => "Approved as {$newStatus}!"]);
         }
 
-        return redirect()->back()->with('success', 'Athlete approved successfully.');
+        return redirect()->back()->with('success', "Athlete approved and marked as {$newStatus}.");
     }
 
     public function decline(Request $request, $id)
@@ -365,17 +393,14 @@ class AthleteController extends Controller
     {
         // 1. DEFINE VALIDATION RULES
         $rules = [
-            // Removed 'Active' from the allowed list
             'classification' => 'required|in:Alumni,Tryout',
-            
-            // MAGIC: Student ID is required UNLESS they are a Tryout applicant
             'student_id'     => 'required_unless:classification,Tryout|nullable|string',
-            
             'first_name'     => 'required|string|max:255',
             'last_name'      => 'required|string|max:255',
             'email'          => 'required|email|max:255',
             'sport_event'    => 'required|string',
-            'course'         => 'nullable|string|max:255', 
+            'course'         => 'required|string|max:255', 
+            'year_level'     => 'required_if:classification,Tryout|nullable|string', 
         ];
 
         $validated = $request->validate($rules);
@@ -396,7 +421,7 @@ class AthleteController extends Controller
                 'classification' => $validated['classification'],
                 'picture_path' => null, 
 
-                // Academic & Emergency Info (passed cleanly from shared/alumni fields)
+                // Academic & Emergency Info
                 'course' => $request->input('course'),
                 'year_level' => $request->input('year_level'),
                 'contact_number' => $request->input('contact_number'),
@@ -410,9 +435,6 @@ class AthleteController extends Controller
 
                 if ($schedule) {
                     
-                    // 📧 TEMPORARILY DISABLED FOR DEMO
-                    // Mail::to($athlete->email)->send(new TryoutScheduleMail($athlete, $schedule));
-
                     // Format the date and time nicely for the screen alert
                     $date = \Carbon\Carbon::parse($schedule->tryout_date)->format('F d, Y');
                     $time = \Carbon\Carbon::parse($schedule->tryout_time)->format('h:i A');

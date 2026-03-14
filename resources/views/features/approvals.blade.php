@@ -73,9 +73,9 @@
     <div class="tab-content" id="approvalTabsContent">
         
         @php
-            // Fetch Active & Alumni
+            // Fetch Alumni
             $regularPendings = \App\Models\Athlete::where('approval_status', 'pending')
-                                ->whereIn('classification', ['Active', 'Alumni'])
+                                ->whereIn('classification', ['Alumni'])
                                 ->latest()->get();
             
             // Fetch Tryouts ONLY

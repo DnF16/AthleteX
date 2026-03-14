@@ -15,7 +15,7 @@
         .section-title { color: #2e4e1f; border-bottom: 2px solid #c4d79b; padding-bottom: 10px; margin-bottom: 20px; margin-top: 30px; font-weight: bold; }
         
         /* HIDE SECTIONS BY DEFAULT */
-        #basic-info-section, #shared-fields, #tryout-alert { display: none; }
+        #basic-info-section, #shared-fields, #academic-section, #tryout-alert { display: none; }
     </style>
 </head>
 <body>
@@ -185,21 +185,24 @@
                             <input type="text" name="zip_code" class="form-control" value="{{ old('zip_code') }}">
                         </div>
                     </div>
+                </div>
 
+                <div id="academic-section">
                     <h5 class="section-title">Academic Information</h5>
                     <div class="row g-3 mb-3">
                         <div class="col-md-8">
                             <label class="form-label">Course / Program <span class="text-danger">*</span></label>
                             <input type="text" name="course" class="form-control" placeholder="e.g. BSIT" value="{{ old('course') }}">
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Year Level</label>
+                        <div class="col-md-4" id="year_level_container">
+                            <label class="form-label">Year Level <span class="text-danger">*</span></label>
                             <select name="year_level" class="form-select">
                                 <option value="">-- Select --</option>
                                 <option value="1">1st Year</option>
                                 <option value="2">2nd Year</option>
                                 <option value="3">3rd Year</option>
                                 <option value="4">4th Year</option>
+                                <option value="5">5th Year</option>
                             </select>
                         </div>
                     </div>
@@ -226,24 +229,31 @@
         var tryoutAlert = document.getElementById("tryout-alert");
         var studentIdInput = document.getElementsByName("student_id")[0];
         var idStar = document.getElementById("id_star");
+        
+        var academicSection = document.getElementById("academic-section");
+        var yearLevelContainer = document.getElementById("year_level_container");
 
         // Reset display
         tryoutAlert.style.display = "none";
+        academicSection.style.display = "none";
 
         if (status === "") {
             basicInfo.style.display = "none";
             sharedFields.style.display = "none";
         } else {
             basicInfo.style.display = "block";
+            academicSection.style.display = "block"; // Everyone needs a Course
             
             if (status === "Tryout") {
-                sharedFields.style.display = "none"; // Hide course/address for tryouts
-                tryoutAlert.style.display = "block"; // Show tryout notice
-                idStar.style.display = "none"; // ID not required for recruits
+                sharedFields.style.display = "none"; // Hide contact/address for tryouts
+                tryoutAlert.style.display = "block"; 
+                idStar.style.display = "none"; 
+                yearLevelContainer.style.display = "block"; // SHOW Year Level for Tryouts
                 setRequired('Tryout');
             } else if (status === "Alumni") { 
-                sharedFields.style.display = "block";
+                sharedFields.style.display = "block"; // Show contact/address for Alumni
                 idStar.style.display = "inline";
+                yearLevelContainer.style.display = "none"; // HIDE Year Level for Alumni
                 setRequired('Alumni');
             }
         }
@@ -251,7 +261,9 @@
 
     function setRequired(mode) {
         let studentId = ['student_id'];
-        let sharedRequired = ['contact_number', 'address', 'city_municipality', 'course'];
+        let sharedRequired = ['contact_number', 'address', 'city_municipality'];
+        let courseField = ['course'];
+        let yearLevelField = ['year_level'];
 
         function setList(names, isRequired) {
             names.forEach(name => {
@@ -260,12 +272,16 @@
             });
         }
 
+        setList(courseField, true); // Course is always required now
+
         if (mode === 'Tryout') {
             setList(studentId, false); 
             setList(sharedRequired, false);
+            setList(yearLevelField, true); // Year level required for Tryouts
         } else if (mode === 'Alumni') { 
             setList(studentId, true);
             setList(sharedRequired, true);
+            setList(yearLevelField, false); // Year level NOT required for Alumni
         }
     }
 </script>
