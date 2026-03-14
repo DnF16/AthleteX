@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Sport;
 
 class AthleteController extends Controller
 {
@@ -34,7 +35,8 @@ class AthleteController extends Controller
 
     public function create()
     {
-        return view('features.student_athlete');
+        $sports = Sport::all();
+        return view('features.student_athlete', compact('sports'));
     }
 
     public function store(Request $request)
@@ -51,7 +53,16 @@ class AthleteController extends Controller
         $rules = [
             'student_id' => 'required|string|max:255',
             'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'last_name'  => 'required|string|max:255',
+            'sport_event' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    if (!Sport::where('name', $value)->exists()) {
+                        $fail('The selected sport event is invalid.');
+                    }
+                },
+            ],
         ];
 
         $validator = Validator::make($general, $rules);

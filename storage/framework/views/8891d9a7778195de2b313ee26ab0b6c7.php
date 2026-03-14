@@ -27,7 +27,7 @@
             <select name="sport" onchange="this.form.submit()" class="border rounded px-3 py-2">
                 <option value="">All Sports</option>
                 <?php $__currentLoopData = $sports; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sport): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <option value="<?php echo e($sport->id); ?>" <?php echo e(request('sport') == $sport->id ? 'selected' : ''); ?>>
+                    <option value="<?php echo e($sport->name); ?>" <?php echo e(request('sport') == $sport->name ? 'selected' : ''); ?>>
                         <?php echo e($sport->name); ?>
 
                     </option>

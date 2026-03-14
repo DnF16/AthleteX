@@ -83,7 +83,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/coach', function () { return view('features.coach'); })->name('coach');
     Route::get('/schedule', function () { return view('features.schedule'); })->name('schedule');
     Route::get('/sports', function () { return view('features.sports'); })->name('sports');
-    Route::get('/student-athlete', function () { return view('features.student_athlete'); })->name('student.athlete');
+    Route::get('/student-athlete', [AthleteController::class, 'create'])->name('student.athlete');
 
     // Student Athlete Logic
     Route::get('/student-athletes', [AthleteController::class, 'index'])->name('student.athletes');

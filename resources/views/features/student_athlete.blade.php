@@ -849,7 +849,7 @@
         const getWorkTbody = () => q('#work-history table tbody');
 
         // -----------------------
-        // Globals
+        // Globals & initial state
         // -----------------------
         window.newAthleteData = {
             generalInfo: {},
@@ -858,6 +858,12 @@
             fees: [],
             workHistory: []
         };
+
+        // remember the default coach (if any) provided by the server
+        const coachDisplayEl = byId('coachDisplay');
+        const coachInputEl = byId('coach_id_input');
+        window.initialCoachId = coachInputEl ? coachInputEl.value : '';
+        window.initialCoachName = coachDisplayEl ? coachDisplayEl.textContent.trim() : '';
 
         // Clear all form/UI state when no athlete is selected (or search is emptied)
         function clearAthleteData() {
@@ -882,6 +888,27 @@
             const selectedName = byId('selected_name');
             if (selectedName) {
                 selectedName.textContent = 'No athlete selected';
+            }
+
+            // reset coach display & hidden input (retain default for coach users)
+            const coachDisplayEl = byId('coachDisplay');
+            const coachInputEl = byId('coach_id_input');
+            if (window.initialCoachId) {
+                // logged-in user is a coach: keep their info
+                if (coachDisplayEl) {
+                    coachDisplayEl.textContent = window.initialCoachName || 'No coach assigned';
+                }
+                if (coachInputEl) {
+                    coachInputEl.value = window.initialCoachId;
+                }
+            } else {
+                // admin or no default coach
+                if (coachDisplayEl) {
+                    coachDisplayEl.textContent = 'No coach assigned';
+                }
+                if (coachInputEl) {
+                    coachInputEl.value = '';
+                }
             }
 
             // reset picture preview

@@ -120,14 +120,12 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>" required>
                                     <option value="">-- Select a Sport --</option>
-                                    <option value="Basketball" <?php echo e(old('coach_sport') == 'Basketball' ? 'selected' : ''); ?>>Basketball</option>
-                                    <option value="Volleyball" <?php echo e(old('coach_sport') == 'Volleyball' ? 'selected' : ''); ?>>Volleyball</option>
-                                    <option value="Athletics" <?php echo e(old('coach_sport') == 'Athletics' ? 'selected' : ''); ?>>Athletics</option>
-                                    <option value="Swimming" <?php echo e(old('coach_sport') == 'Swimming' ? 'selected' : ''); ?>>Swimming</option>
-                                    <option value="Taekwondo" <?php echo e(old('coach_sport') == 'Taekwondo' ? 'selected' : ''); ?>>Taekwondo</option>
-                                    <option value="Chess" <?php echo e(old('coach_sport') == 'Chess' ? 'selected' : ''); ?>>Chess</option>
-                                    <option value="Football" <?php echo e(old('coach_sport') == 'Football' ? 'selected' : ''); ?>>Football</option>
-                                    <option value="Boxing" <?php echo e(old('coach_sport') == 'Boxing' ? 'selected' : ''); ?>>Boxing</option>
+                                    <?php $__currentLoopData = $sports; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sport): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($sport->name); ?>" <?php echo e(old('coach_sport') == $sport->name ? 'selected' : ''); ?>>
+                                            <?php echo e($sport->name); ?>
+
+                                        </option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                                 <?php $__errorArgs = ['coach_sport'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');

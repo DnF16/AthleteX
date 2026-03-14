@@ -38,6 +38,20 @@
                 <?php endfor; ?>
             </select>
 
+            <!-- Sports filter (admin only) -->
+            <?php if(auth()->user()->role === 'admin'): ?>
+                <label class="font-bold text-sm">Sport:</label>
+                <select name="sport_id" class="border rounded px-2 py-1">
+                    <option value="">All Sports</option>
+                    <?php $__currentLoopData = $sports; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sport): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($sport->name); ?>" <?php echo e(($sportId ?? '') == $sport->name ? 'selected' : ''); ?>>
+                            <?php echo e($sport->name); ?>
+
+                        </option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </select>
+            <?php endif; ?>
+
             <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
                 View
             </button>

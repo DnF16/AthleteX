@@ -29,7 +29,7 @@
             <select name="sport" onchange="this.form.submit()" class="border rounded px-3 py-2">
                 <option value="">All Sports</option>
                 @foreach($sports as $sport)
-                    <option value="{{ $sport->id }}" {{ request('sport') == $sport->id ? 'selected' : '' }}>
+                    <option value="{{ $sport->name }}" {{ request('sport') == $sport->name ? 'selected' : '' }}>
                         {{ $sport->name }}
                     </option>
                 @endforeach

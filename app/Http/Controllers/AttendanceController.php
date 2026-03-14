@@ -155,15 +155,29 @@ class AttendanceController extends Controller
 
     $daysInMonth = $start->daysInMonth;
 
-    // ================= ADMIN =================
-    if(auth()->user()->role === 'admin') {
+    // Initialize variables
+    $sports = collect();
+    $sportId = null;
 
-        $athletes = \App\Models\Athlete::all();
+    // ================= ADMIN =================
+        if(auth()->user()->role === 'admin') {
+
+        $sportId = $request->query('sport_id'); // get selected sport from request
+
+        $athletes = \App\Models\Athlete::when($sportId, function($q) use ($sportId) {
+            $q->where('sport_event', $sportId);
+        })->get();
 
         $attendances = \App\Models\Attendance::whereBetween('date', [$start, $end])
+            ->when($sportId, function($q) use ($sportId) {
+                $q->whereHas('athlete', function($q2) use ($sportId) {
+                    $q2->where('sport_event', $sportId);
+                });
+            })
             ->get();
 
-    } 
+        $sports = \App\Models\Sport::all(); // pass sports for dropdown
+    }
     // ================= COACH =================
     else {
 
@@ -193,7 +207,9 @@ class AttendanceController extends Controller
         'selectedMonth',
         'selectedYear',
         'months',
-        'backRoute'
+        'backRoute',
+        'sports',
+        'sportId'
     ));
 }
 }

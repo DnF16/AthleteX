@@ -70,14 +70,11 @@
                                 <label for="coach_sport" class="form-label fw-bold">Sport Event <span class="text-danger">*</span></label>
                                 <select id="coach_sport" name="coach_sport" class="form-select @error('coach_sport') is-invalid @enderror" required>
                                     <option value="">-- Select a Sport --</option>
-                                    <option value="Basketball" {{ old('coach_sport') == 'Basketball' ? 'selected' : '' }}>Basketball</option>
-                                    <option value="Volleyball" {{ old('coach_sport') == 'Volleyball' ? 'selected' : '' }}>Volleyball</option>
-                                    <option value="Athletics" {{ old('coach_sport') == 'Athletics' ? 'selected' : '' }}>Athletics</option>
-                                    <option value="Swimming" {{ old('coach_sport') == 'Swimming' ? 'selected' : '' }}>Swimming</option>
-                                    <option value="Taekwondo" {{ old('coach_sport') == 'Taekwondo' ? 'selected' : '' }}>Taekwondo</option>
-                                    <option value="Chess" {{ old('coach_sport') == 'Chess' ? 'selected' : '' }}>Chess</option>
-                                    <option value="Football" {{ old('coach_sport') == 'Football' ? 'selected' : '' }}>Football</option>
-                                    <option value="Boxing" {{ old('coach_sport') == 'Boxing' ? 'selected' : '' }}>Boxing</option>
+                                    @foreach($sports as $sport)
+                                        <option value="{{ $sport->name }}" {{ old('coach_sport') == $sport->name ? 'selected' : '' }}>
+                                            {{ $sport->name }}
+                                        </option>
+                                    @endforeach
                                 </select>
                                 @error('coach_sport')
                                     <div class="invalid-feedback">{{ $message }}</div>

@@ -37,6 +37,19 @@
                 @endfor
             </select>
 
+            <!-- Sports filter (admin only) -->
+            @if(auth()->user()->role === 'admin')
+                <label class="font-bold text-sm">Sport:</label>
+                <select name="sport_id" class="border rounded px-2 py-1">
+                    <option value="">All Sports</option>
+                    @foreach($sports as $sport)
+                        <option value="{{ $sport->name }}" {{ ($sportId ?? '') == $sport->name ? 'selected' : '' }}>
+                            {{ $sport->name }}
+                        </option>
+                    @endforeach
+                </select>
+            @endif
+
             <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
                 View
             </button>
