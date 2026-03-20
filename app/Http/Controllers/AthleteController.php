@@ -445,7 +445,7 @@ class AthleteController extends Controller
     // 2. Save the data as "Pending"
     public function storePublicRegistration(Request $request)
     {
-        // 1. DEFINE VALIDATION RULES
+        // 1. DEFINE VALIDATION RULES (Added the new tryout fields here!)
         $rules = [
             'classification' => 'required|in:Alumni,Tryout',
             'student_id'     => 'required_unless:classification,Tryout|nullable|string',
@@ -455,6 +455,12 @@ class AthleteController extends Controller
             'sport_event'    => 'required|string',
             'course'         => 'required|string|max:255', 
             'year_level'     => 'required_if:classification,Tryout|nullable|string', 
+            
+            // --- NEW TRYOUT VALIDATION ---
+            'specialization'   => 'nullable|string|max:255',
+            'school_graduated' => 'required_if:classification,Tryout|nullable|string|max:255',
+            'purpose'          => 'required_if:classification,Tryout|nullable|string',
+            'achievements'     => 'nullable|array',
         ];
 
         $validated = $request->validate($rules);
@@ -481,6 +487,12 @@ class AthleteController extends Controller
                 'contact_number' => $request->input('contact_number'),
                 'address' => $request->input('address'),
                 'city_municipality' => $request->input('city_municipality'),
+                
+                // --- NEW TRYOUT FIELDS ADDED HERE ---
+                'specialization'   => $request->input('specialization'),
+                'school_graduated' => $request->input('school_graduated'),
+                'achievements'     => $request->input('achievements'), // Model's $casts will turn this into JSON automatically!
+                'purpose'          => $request->input('purpose'),
             ]);
 
             // 4. THE NOTIFICATION TRICK 🪄
@@ -488,7 +500,6 @@ class AthleteController extends Controller
                 $schedule = \App\Models\TryoutSchedule::where('sport_event', $validated['sport_event'])->first();
 
                 if ($schedule) {
-                    
                     // Format the date and time nicely for the screen alert
                     $date = \Carbon\Carbon::parse($schedule->tryout_date)->format('F d, Y');
                     $time = \Carbon\Carbon::parse($schedule->tryout_time)->format('h:i A');

@@ -78,6 +78,11 @@ class Athlete extends Model
 
         'emergency_relationship', // ADDED (Was missing)
 
+        'specialization',
+        'school_graduated',
+        'achievements',
+        'purpose',
+
         // System
         'picture_path',
 
@@ -87,6 +92,7 @@ class Athlete extends Model
         'birthdate' => 'date',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'achievements' => 'array',
     ];
 
     // Relationships

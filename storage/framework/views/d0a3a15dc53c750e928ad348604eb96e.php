@@ -17,7 +17,6 @@
                     <p class="text-muted small mb-0">Copy this link and send it to students, alumni, or tryout applicants.</p>
                 </div>
             </div>
-            
             <div class="d-flex gap-2 align-items-center" style="width: 500px;">
                 <input type="text" class="form-control form-control-sm bg-white border-light text-muted" 
                        value="<?php echo e(route('alumni.register.show')); ?>" id="regLink" readonly>
@@ -26,9 +25,8 @@
                     <i class="fas fa-copy me-2"></i> Copy
                 </button>
                 
-                
                 <a href="<?php echo e(route('alumni.register.show')); ?>" target="_blank" class="btn btn-outline-success btn-sm px-3 fw-bold d-flex align-items-center">
-                    Open <span class="ms-1"></span>
+                    Open <i class="fas fa-external-link-alt ms-2"></i>
                 </a>
             </div>
         </div>
@@ -48,30 +46,42 @@
         </div>
     <?php endif; ?>
 
+    <?php
+        $regularPendings = \App\Models\Athlete::where('status', 'Pending')
+                            ->whereIn('classification', ['Alumni'])
+                            ->latest()->get();
+        
+        $tryoutPendings = \App\Models\Athlete::where('status', 'Pending')
+                            ->where('classification', 'Tryout')
+                            ->latest()->get();
+    ?>
+
     <ul class="nav custom-tabs mb-4" id="approvalTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active custom-tab-btn" data-bs-target="#regular" type="button">
+            <button class="nav-link active custom-tab-btn position-relative" data-bs-target="#regular" type="button">
                 <i class="fas fa-users me-1"></i> Active & Alumni Requests
+                <?php if($regularPendings->count() > 0): ?>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm" style="font-size: 0.65rem;">
+                        <?php echo e($regularPendings->count()); ?>
+
+                    </span>
+                <?php endif; ?>
             </button>
         </li>
-        <li class="nav-item ms-2" role="presentation">
-            <button class="nav-link custom-tab-btn" data-bs-target="#tryout" type="button">
+        <li class="nav-item ms-3" role="presentation">
+            <button class="nav-link custom-tab-btn position-relative" data-bs-target="#tryout" type="button">
                 <i class="fas fa-running me-1"></i> Tryout Applicants
+                <?php if($tryoutPendings->count() > 0): ?>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm" style="font-size: 0.65rem;">
+                        <?php echo e($tryoutPendings->count()); ?>
+
+                    </span>
+                <?php endif; ?>
             </button>
         </li>
     </ul>
 
     <div class="tab-content" id="approvalTabsContent">
-        
-        <?php
-            $regularPendings = \App\Models\Athlete::where('status', 'Pending')
-                                ->whereIn('classification', ['Alumni'])
-                                ->latest()->get();
-            
-            $tryoutPendings = \App\Models\Athlete::where('status', 'Pending')
-                                ->where('classification', 'Tryout')
-                                ->latest()->get();
-        ?>
 
         <div class="tab-pane fade show active" id="regular">
             <div class="card shadow-sm border-0">
@@ -161,16 +171,21 @@
                                         <td class="text-secondary small"><?php echo e($p->created_at->format('M d, Y')); ?></td>
                                         <td class="text-center">
                                             <div class="d-flex justify-content-center gap-2">
+                                                
+                                                <button type="button" class="btn btn-outline-secondary btn-sm px-3 shadow-sm d-flex align-items-center fw-bold" data-bs-toggle="modal" data-bs-target="#viewTryoutModal<?php echo e($p->id); ?>">
+                                                    <i class="fas fa-eye me-1"></i> View
+                                                </button>
+
                                                 <form action="<?php echo e(route('admin.approve.athlete', $p->id)); ?>" method="POST" class="ajax-form">
                                                     <?php echo csrf_field(); ?>
                                                     <button type="submit" class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center fw-bold">
-                                                        <i class="fas fa-trophy me-2"></i> Passed
+                                                        <i class="fas fa-trophy me-1"></i> Passed
                                                     </button>
                                                 </form>
                                                 <form action="<?php echo e(route('admin.reject.athlete', $p->id)); ?>" method="POST" class="ajax-form">
                                                     <?php echo csrf_field(); ?>
                                                     <button type="submit" class="btn btn-outline-danger btn-sm px-3 shadow-sm d-flex align-items-center fw-bold">
-                                                        <i class="fas fa-times me-2"></i> Failed
+                                                        <i class="fas fa-times me-1"></i> Failed
                                                     </button>
                                                 </form>
                                             </div>
@@ -180,7 +195,98 @@
                                 </tbody>
                             </table>
                         </div>
-                    <?php endif; ?>
+                        
+                        <?php $__currentLoopData = $tryoutPendings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <div class="modal fade" id="viewTryoutModal<?php echo e($p->id); ?>" tabindex="-1" data-bs-backdrop="false" style="background-color: rgba(0, 0, 0, 0.6);">
+                                <div class="modal-dialog modal-lg modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-lg">
+                                        <div class="modal-header bg-success text-white">
+                                            <h5 class="modal-title fw-bold"><i class="fas fa-id-card me-2"></i> Tryout Application Details</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            
+                                            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                                                <div>
+                                                    <h4 class="fw-bold text-dark uppercase mb-1"><?php echo e($p->last_name); ?>, <?php echo e($p->first_name); ?></h4>
+                                                    <p class="text-muted small mb-0"><i class="fas fa-graduation-cap me-1"></i> <?php echo e($p->course ?? 'Course N/A'); ?> - Year <?php echo e($p->year_level ?? 'N/A'); ?></p>
+                                                </div>
+                                                <span class="badge bg-warning text-dark fs-6 px-4 py-2 shadow-sm rounded-pill"><?php echo e(str_replace('_', ' ', $p->sport_event)); ?></span>
+                                            </div>
+
+                                            <div class="row mb-4">
+                                                <div class="col-md-6 mb-3 mb-md-0">
+                                                    <label class="text-muted small fw-bold uppercase">Specialization / Role</label>
+                                                    <p class="fw-semibold text-dark fs-5 mb-0"><?php echo e($p->specialization ?? 'None specified'); ?></p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="text-muted small fw-bold uppercase">School Graduated From</label>
+                                                    <p class="fw-semibold text-dark fs-5 mb-0"><?php echo e($p->school_graduated ?? 'Not provided'); ?></p>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label class="text-muted small fw-bold uppercase mb-2">Purpose in Joining</label>
+                                                <div class="bg-light p-3 rounded border text-dark fst-italic">
+                                                    "<?php echo e($p->purpose ?? 'No purpose statement provided.'); ?>"
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-2">
+                                                <label class="text-muted small fw-bold uppercase mb-2">Tournament Achievements</label>
+                                                <div class="table-responsive border rounded">
+                                                    <table class="table table-sm table-hover mb-0">
+                                                        <thead class="bg-light text-secondary">
+                                                            <tr>
+                                                                <th class="ps-3 py-2">Level</th>
+                                                                <th class="py-2">Event</th>
+                                                                <th class="py-2">Year</th>
+                                                                <th class="py-2">Rank</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <?php
+                                                                $achievements = is_string($p->achievements) ? json_decode($p->achievements, true) : $p->achievements;
+                                                                $levels = ['international', 'national', 'regional', 'local'];
+                                                                $hasAchievements = false;
+                                                            ?>
+
+                                                            <?php if($achievements): ?>
+                                                                <?php $__currentLoopData = $levels; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $level): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                    <?php if(!empty($achievements[$level]['event']) || !empty($achievements[$level]['year']) || !empty($achievements[$level]['rank'])): ?>
+                                                                        <?php $hasAchievements = true; ?>
+                                                                        <tr class="border-bottom">
+                                                                            <td class="fw-bold text-secondary text-capitalize ps-3"><?php echo e($level); ?></td>
+                                                                            <td class="text-dark"><?php echo e($achievements[$level]['event'] ?? '-'); ?></td>
+                                                                            <td class="text-dark"><?php echo e($achievements[$level]['year'] ?? '-'); ?></td>
+                                                                            <td class="text-dark fw-bold"><?php echo e($achievements[$level]['rank'] ?? '-'); ?></td>
+                                                                        </tr>
+                                                                    <?php endif; ?>
+                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                            <?php endif; ?>
+
+                                                            <?php if(!$hasAchievements): ?>
+                                                                <tr>
+                                                                    <td colspan="4" class="text-center text-muted fst-italic py-4">
+                                                                        <i class="fas fa-medal text-light fs-3 d-block mb-2"></i>
+                                                                        No achievements listed.
+                                                                    </td>
+                                                                </tr>
+                                                            <?php endif; ?>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="modal-footer bg-light border-top-0">
+                                            <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -189,40 +295,10 @@
 </div> 
 
 <style>
-    /* The main bottom border for the entire tab list */
-    .custom-tabs {
-        border-bottom: 2px solid #198754; 
-        display: flex;
-    }
-
-    /* Unclicked Tab State */
-    .custom-tab-btn {
-        background-color: #ffffff;
-        color: #6c757d;
-        border: 1px solid #dee2e6;
-        border-bottom: none;
-        border-radius: 8px 8px 0 0;
-        padding: 10px 24px;
-        margin-bottom: -2px; 
-        font-weight: 600;
-        transition: all 0.2s ease-in-out;
-    }
-
-    /* Hover effect for unclicked tabs */
-    .custom-tab-btn:hover:not(.active) {
-        background-color: #e9ecef;
-        color: #198754;
-    }
-
-    /* Clicked (Active) Tab State */
-    .custom-tab-btn.active {
-        background-color: #f8f9fa; 
-        color: #198754 !important;
-        border: 2px solid #198754;
-        border-bottom: 2px solid #f8f9fa; 
-    }
-
-    /* Button and Badge Styles */
+    .custom-tabs { border-bottom: 2px solid #198754; display: flex; }
+    .custom-tab-btn { background-color: #ffffff; color: #6c757d; border: 1px solid #dee2e6; border-bottom: none; border-radius: 8px 8px 0 0; padding: 10px 24px; margin-bottom: -2px; font-weight: 600; transition: all 0.2s ease-in-out; }
+    .custom-tab-btn:hover:not(.active) { background-color: #e9ecef; color: #198754; }
+    .custom-tab-btn.active { background-color: #f8f9fa; color: #198754 !important; border: 2px solid #198754; border-bottom: 2px solid #f8f9fa; }
     .badge.bg-warning { background-color: #ffc107 !important; color: #000 !important; }
     .btn-primary { background-color: #0d6efd !important; border: none; }
     .btn-outline-danger { color: #dc3545; border-color: #dc3545; }
@@ -241,11 +317,10 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         
-        // 1. Bulletproof Tab Logic
+        // Cleaned up Javascript! (Removed the broken DOM modal hack)
         const tabButtons = document.querySelectorAll('.custom-tab-btn');
         const tabPanes = document.querySelectorAll('.tab-pane');
 
-        // Check Local Storage for active tab
         const activeTabId = localStorage.getItem('activeApprovalTab');
         if (activeTabId) {
             const btnToClick = document.querySelector(`[data-bs-target="${activeTabId}"]`);
@@ -254,15 +329,12 @@
 
         tabButtons.forEach(button => {
             button.addEventListener('click', function () {
-                // Save to local storage
                 const targetId = this.getAttribute('data-bs-target');
                 localStorage.setItem('activeApprovalTab', targetId);
 
-                // Update Button Classes
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 this.classList.add('active');
 
-                // Update Pane Visibility
                 tabPanes.forEach(pane => {
                     pane.classList.remove('show', 'active');
                     pane.style.display = 'none'; 
@@ -274,14 +346,12 @@
             });
         });
 
-        // 2. AJAX Row fading logic
         const actionForms = document.querySelectorAll('.ajax-form');
         
         actionForms.forEach(form => {
             form.addEventListener('submit', function (e) {
                 e.preventDefault(); 
                 
-                // Get action type to customize confirmation message
                 const isApprove = this.action.includes('approve');
                 const confirmMsg = isApprove ? "Are you sure you want to pass this applicant?" : "Are you sure you want to fail this applicant?";
                 
@@ -306,6 +376,13 @@
                         row.style.transition = "opacity 0.5s ease, transform 0.5s ease";
                         row.style.opacity = 0;
                         row.style.transform = "translateX(20px)";
+                        
+                        const activeModal = document.querySelector('.modal.show');
+                        if(activeModal) {
+                            const modalInstance = bootstrap.Modal.getInstance(activeModal);
+                            if(modalInstance) modalInstance.hide();
+                        }
+
                         setTimeout(() => row.remove(), 500); 
                     }
                 })

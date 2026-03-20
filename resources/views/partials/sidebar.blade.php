@@ -96,6 +96,12 @@
                 </li>
 
                 <li>
+                    <a href="{{ route('equipment.index') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                        <i class="fas fa-boxes me-2"></i> Equipment Form
+                    </a>
+                </li>
+
+                <li>
                     <a href="{{ route('admin.general') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
                         <i class="bi bi-person-gear mr-2"></i> Admin
                     </a>

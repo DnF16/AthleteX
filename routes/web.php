@@ -16,7 +16,8 @@ use App\Http\Controllers\WorkHistoryController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CoachController;
 use App\Http\Controllers\SportsController;
-use App\Http\Controllers\TryoutScheduleController; // <--- ADDED THIS!
+use App\Http\Controllers\TryoutScheduleController;
+use App\Http\Controllers\EquipmentRequestController;
 
 // Coach Sub-Controllers
 use App\Http\Controllers\CoachAchievementController;
@@ -89,6 +90,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports/{report}/download', [ReportController::class, 'download'])->name('reports.download');
     Route::patch('/reports/{report}/mark-received', [ReportController::class, 'markReceived'])->name('reports.mark-received');
     Route::patch('/reports/{report}/mark-rejected', [ReportController::class, 'markRejected'])->name('reports.mark-rejected');
+
+    // Equipment Requests
+    Route::get('/equipment', [EquipmentRequestController::class, 'index'])->name('equipment.index');
+    Route::post('/equipment', [EquipmentRequestController::class, 'store'])->name('equipment.store');
+    Route::post('/equipment/{id}/approve', [EquipmentRequestController::class, 'approve'])->name('equipment.approve');
+    Route::post('/equipment/{id}/reject', [EquipmentRequestController::class, 'reject'])->name('equipment.reject');
 
     // ==============================================================
     // COACH ROUTES
