@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Athlete Registration - SDO</title>
-    @vite(['resources/css/app.css'])
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css']); ?>
 </head>
 <body class="bg-gradient-to-br from-green-900 to-green-800 min-h-screen flex items-center justify-center p-4">
 
@@ -23,47 +23,49 @@
         <div class="p-6 space-y-6">
 
             <!-- Alerts -->
-            @if(session('success'))
+            <?php if(session('success')): ?>
                 <div class="bg-green-100 text-green-900 p-3 rounded-md text-sm border border-green-300">
-                    {{ session('success') }}
+                    <?php echo e(session('success')); ?>
+
                 </div>
-            @endif
-            @if(session('error'))
+            <?php endif; ?>
+            <?php if(session('error')): ?>
                 <div class="bg-red-100 text-red-900 p-3 rounded-md text-sm border border-red-300">
-                    {{ session('error') }}
+                    <?php echo e(session('error')); ?>
+
                 </div>
-            @endif
-            @if ($errors->any())
+            <?php endif; ?>
+            <?php if($errors->any()): ?>
                 <div class="bg-red-100 text-red-900 p-3 rounded-md text-sm border border-red-300">
                     <ul class="list-disc list-inside mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <li><?php echo e($error); ?></li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
                 </div>
-            @endif
-            @if(session('tryout_success'))
+            <?php endif; ?>
+            <?php if(session('tryout_success')): ?>
                 <div class="bg-green-50 border-l-4 border-green-600 p-3 rounded-md text-green-800 text-sm">
                     <strong>🎫 Registration Confirmed!</strong>
-                    <p class="mt-1">{!! session('tryout_success') !!}</p>
+                    <p class="mt-1"><?php echo session('tryout_success'); ?></p>
                 </div>
-            @endif
+            <?php endif; ?>
 
             <div id="tryout-alert" class="hidden bg-blue-50 border-l-4 border-blue-600 p-3 rounded-md text-blue-800 text-sm">
                 <strong>Tryout Applicant:</strong> Please fill out your basic details. Your tryout schedule will be shown after submission.
             </div>
 
             <!-- Form -->
-            <form action="{{ route('alumni.register.submit') }}" method="POST" class="space-y-4">
-                @csrf
+            <form action="<?php echo e(route('alumni.register.submit')); ?>" method="POST" class="space-y-4">
+                <?php echo csrf_field(); ?>
 
                 <!-- Registration Type -->
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Registration Type <span class="text-red-600">*</span></label>
                     <select name="classification" id="classification" class="w-full rounded-md border border-gray-300 p-2 bg-gray-50 focus:ring-2 focus:ring-green-600 focus:border-green-600" required onchange="toggleFields()">
                         <option value="">-- Select Your Status --</option>
-                        <option value="Tryout" {{ old('classification') == 'Tryout' ? 'selected' : '' }}>Tryout Applicant</option>
-                        <option value="Alumni" {{ old('classification') == 'Alumni' ? 'selected' : '' }}>Alumni / Graduate</option>
+                        <option value="Tryout" <?php echo e(old('classification') == 'Tryout' ? 'selected' : ''); ?>>Tryout Applicant</option>
+                        <option value="Alumni" <?php echo e(old('classification') == 'Alumni' ? 'selected' : ''); ?>>Alumni / Graduate</option>
                     </select>
                 </div>
 
@@ -175,7 +177,7 @@
                 <!-- Submit -->
                 <div class="flex flex-col md:flex-row gap-3 mt-4">
                     <button type="submit" class="w-full md:w-auto bg-green-700 hover:bg-green-800 text-white py-2.5 rounded-md font-semibold transition">Submit Registration</button>
-                    <a href="{{ url('/') }}" class="w-full md:w-auto text-green-800 hover:text-green-600 text-center">Cancel</a>
+                    <a href="<?php echo e(url('/')); ?>" class="w-full md:w-auto text-green-800 hover:text-green-600 text-center">Cancel</a>
                 </div>
 
             </form>
@@ -211,4 +213,4 @@ function toggleFields() {
 </script>
 
 </body>
-</html>
+</html><?php /**PATH C:\xampp\htdocs\AthleteX\resources\views/features/alumni_registration.blade.php ENDPATH**/ ?>

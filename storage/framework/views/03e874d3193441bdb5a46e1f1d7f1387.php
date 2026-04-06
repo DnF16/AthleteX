@@ -1,8 +1,8 @@
-@extends('layouts.app') 
+ 
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
-@include('partials.sidebar')
+<?php echo $__env->make('partials.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <div class="bg-light min-vh-100 p-4">
     
@@ -12,12 +12,13 @@
         </h2>
     </div>
 
-    @if(session('success'))
+    <?php if(session('success')): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+            <i class="fas fa-check-circle me-2"></i> <?php echo e(session('success')); ?>
+
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    @endif
+    <?php endif; ?>
 
     <ul class="nav nav-tabs mb-4" id="tryoutTabs" role="tablist">
         <li class="nav-item" role="presentation">
@@ -28,9 +29,9 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-bold text-secondary border-bottom-0 relative" id="recruits-tab" data-bs-toggle="tab" data-bs-target="#recruits" type="button" role="tab">
                 <i class="fas fa-user-check me-1"></i> Passed Recruits
-                @if(isset($recruits) && $recruits->count() > 0)
-                    <span class="absolute top-0 right-0 -mt-1 -mr-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ $recruits->count() }}</span>
-                @endif
+                <?php if(isset($recruits) && $recruits->count() > 0): ?>
+                    <span class="absolute top-0 right-0 -mt-1 -mr-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"><?php echo e($recruits->count()); ?></span>
+                <?php endif; ?>
             </button>
         </li>
     </ul>
@@ -45,8 +46,8 @@
                             <h5 class="mb-0 fw-bold text-secondary">Add New Schedule</h5>
                         </div>
                         <div class="card-body">
-                            <form action="{{ route('admin.tryouts.store') }}" method="POST">
-                                @csrf
+                            <form action="<?php echo e(route('admin.tryouts.store')); ?>" method="POST">
+                                <?php echo csrf_field(); ?>
                                 <div class="mb-3">
                                     <label class="form-label fw-bold text-secondary">Sport Event <span class="text-danger">*</span></label>
                                     <select name="sport_event" class="form-select" required>
@@ -122,45 +123,48 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($schedules as $schedule)
+                                        <?php $__empty_1 = true; $__currentLoopData = $schedules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $schedule): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                             <tr>
                                                 <td class="ps-4 fw-bold text-success">
-                                                    {{ str_replace('_', ' ', $schedule->sport_event) }}
+                                                    <?php echo e(str_replace('_', ' ', $schedule->sport_event)); ?>
+
                                                 </td>
                                                 <td>
                                                     <span class="fw-semibold text-dark">
-                                                        {{ \Carbon\Carbon::parse($schedule->tryout_date)->format('M d, Y') }}
+                                                        <?php echo e(\Carbon\Carbon::parse($schedule->tryout_date)->format('M d, Y')); ?>
+
                                                     </span><br>
                                                     <small class="text-muted">
-                                                        <i class="far fa-clock me-1"></i> {{ \Carbon\Carbon::parse($schedule->tryout_time)->format('h:i A') }}
+                                                        <i class="far fa-clock me-1"></i> <?php echo e(\Carbon\Carbon::parse($schedule->tryout_time)->format('h:i A')); ?>
+
                                                     </small>
                                                 </td>
                                                 <td>
-                                                    <span class="fw-semibold">{{ $schedule->venue }}</span><br>
-                                                    @if($schedule->notes)
-                                                        <small class="text-muted fst-italic">{{ $schedule->notes }}</small>
-                                                    @else
+                                                    <span class="fw-semibold"><?php echo e($schedule->venue); ?></span><br>
+                                                    <?php if($schedule->notes): ?>
+                                                        <small class="text-muted fst-italic"><?php echo e($schedule->notes); ?></small>
+                                                    <?php else: ?>
                                                         <small class="text-muted">No notes</small>
-                                                    @endif
+                                                    <?php endif; ?>
                                                 </td>
                                                 <td class="text-center">
-                                                    <form action="{{ route('admin.tryouts.destroy', $schedule->id) }}" method="POST">
-                                                        @csrf
-                                                        @method('DELETE')
+                                                    <form action="<?php echo e(route('admin.tryouts.destroy', $schedule->id)); ?>" method="POST">
+                                                        <?php echo csrf_field(); ?>
+                                                        <?php echo method_field('DELETE'); ?>
                                                         <button type="submit" class="btn btn-sm btn-outline-danger px-3" onclick="return confirm('Are you sure you want to remove this schedule?')">
                                                             <i class="fas fa-trash-alt me-1"></i> Delete
                                                         </button>
                                                     </form>
                                                 </td>
                                             </tr>
-                                        @empty
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                             <tr>
                                                 <td colspan="4" class="text-center py-5">
                                                     <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 3rem;"></i>
                                                     <p class="text-muted fs-5 mb-0">No tryout schedules have been posted yet.</p>
                                                 </td>
                                             </tr>
-                                        @endforelse
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -192,26 +196,26 @@
                             </tr>
                         </thead>
                         <tbody class="text-gray-700">
-                            @if(isset($recruits) && $recruits->count() > 0)
-                                @foreach ($recruits as $recruit)
+                            <?php if(isset($recruits) && $recruits->count() > 0): ?>
+                                <?php $__currentLoopData = $recruits; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $recruit): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr class="hover:bg-yellow-50 border-b">
-                                        <td class="px-4 py-3 border-r font-bold text-gray-900">{{ $recruit->last_name }}, {{ $recruit->first_name }}</td>
-                                        <td class="px-4 py-3 border-r text-center"><span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-semibold">{{ str_replace('_', ' ', $recruit->sport_event) }}</span></td>
+                                        <td class="px-4 py-3 border-r font-bold text-gray-900"><?php echo e($recruit->last_name); ?>, <?php echo e($recruit->first_name); ?></td>
+                                        <td class="px-4 py-3 border-r text-center"><span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-semibold"><?php echo e(str_replace('_', ' ', $recruit->sport_event)); ?></span></td>
                                         <td class="px-4 py-3 border-r text-center">
-                                            {{ $recruit->contact_number ?? 'No Phone' }} <br>
-                                            <span class="text-xs text-gray-500">{{ $recruit->email }}</span>
+                                            <?php echo e($recruit->contact_number ?? 'No Phone'); ?> <br>
+                                            <span class="text-xs text-gray-500"><?php echo e($recruit->email); ?></span>
                                         </td>
-                                        <td class="px-4 py-3 border-r text-center text-gray-500">{{ $recruit->updated_at->format('M d, Y') }}</td>
+                                        <td class="px-4 py-3 border-r text-center text-gray-500"><?php echo e($recruit->updated_at->format('M d, Y')); ?></td>
                                         <td class="px-4 py-3 text-center">
-                                            <a href="{{ route('student.athlete', ['id' => $recruit->id]) }}" class="bg-blue-600 text-white hover:bg-blue-700 px-3 py-2 rounded text-xs font-bold transition">
+                                            <a href="<?php echo e(route('student.athlete', ['id' => $recruit->id])); ?>" class="bg-blue-600 text-white hover:bg-blue-700 px-3 py-2 rounded text-xs font-bold transition">
                                                 Update to Official Athlete
                                             </a>
                                         </td>
                                     </tr>
-                                @endforeach
-                            @else
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php else: ?>
                                 <tr><td colspan="5" class="text-center py-8 text-gray-500 italic">No recruits waiting for paperwork.</td></tr>
-                            @endif
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -233,4 +237,5 @@
         });
     });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\AthleteX\resources\views/features/tryout_schedules.blade.php ENDPATH**/ ?>

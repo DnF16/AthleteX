@@ -14,6 +14,32 @@
     @apply px-6 py-4;
 }
 
+/* Tabs / Navigation */
+.tab-link,
+.tab-link:link,
+.tab-link:visited,
+.tab-link:hover,
+.tab-link:focus,
+.tab-link:active {
+    text-decoration: none !important;
+}
+
+.tab-link {
+    color: #374151 !important; /* text-gray-700 */
+    display: inline-block;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-bottom: 2px solid transparent;
+    transition: color .2s ease, border-color .2s ease;
+}
+
+.tab-link:hover,
+.tab-link:focus,
+.tab-link.active {
+    color: #16a34a !important; /* text-green-600 */
+    border-color: #16a34a !important; /* border-green-600 */
+}
+
 /* Bootstrap Button Classes for Compatibility */
 .btn {
     @apply inline-block px-4 py-2 rounded font-semibold text-center cursor-pointer transition-colors;

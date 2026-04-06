@@ -87,8 +87,8 @@
                             </td>
                             <td class="px-4 py-3 text-center">
                                 <span class="px-2.5 py-0.5 rounded-full text-xs font-medium
-                                    <?php echo e($athlete->status == 'approved' ? 'bg-blue-100 text-blue-800' : ($athlete->status == 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800')); ?>">
-                                    <?php echo e(ucfirst($athlete->status)); ?>
+                                    <?php echo e($athlete->approval_status == 'approved' ? 'bg-blue-100 text-blue-800' : ($athlete->approval_status == 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800')); ?>">
+                                    <?php echo e(ucfirst($athlete->approval_status)); ?>
 
                                 </span>
                             </td>

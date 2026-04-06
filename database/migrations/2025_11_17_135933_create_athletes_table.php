@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('sport_event')->nullable();
             $table->string('status')->nullable();
             $table->string('classification')->nullable();
+            $table->string('approval_status')->nullable()->default('pending');
             $table->string('gender')->nullable();
             $table->date('birthdate')->nullable();
             $table->integer('age')->nullable();

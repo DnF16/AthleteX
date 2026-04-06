@@ -18,6 +18,9 @@ class User extends Authenticatable
         'role',
         'coach_id',
         'coach_sport',
+        'role',
+        'coach_id',
+        'coach_sport',
         'permissions', // Make sure this is added!
     ];
 
@@ -43,4 +46,6 @@ class User extends Authenticatable
     {
         return $this->hasOne(Athlete::class);
     }
+
+   
 }

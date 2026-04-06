@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    <div class="flex items-end space-x-2">
+    <div class="flex items-end space-x-2 p-4">
         <div class="">
             <label class=" text-gray-700 font-medium mb-1" for="search">Search</label>
             <input type="text" id="search" name="search" placeholder="Enter full name"
