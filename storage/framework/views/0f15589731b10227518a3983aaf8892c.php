@@ -19,10 +19,9 @@
             <?php endif; ?>
         </span>
     </div>
-<?php endif; ?>
+   <?php endif; ?>
 
-
-    <nav class="flex-1">
+    <nav class="flex-1 flex flex-col">
         <ul class="space-y-2">
             <li>
                 <a href="<?php echo e(route('dashboard')); ?>" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
@@ -44,6 +43,7 @@
                     <i class="bi bi-calendar2-week mr-2"></i> Schedule
                 </a>
             </li>
+
             <!-- <li>
                 <a href="#" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
                     <i class="bi bi-journal-text mr-2"></i> Classes
@@ -66,6 +66,7 @@
             </li>
             <li> -->
 
+
             
             <?php if(auth()->check() && auth()->user()->role === 'admin'): ?>
                 <li>
@@ -73,6 +74,13 @@
                         <i class="bi bi-bell-fill mr-2"></i> Athlete Approvals
                     </a>
                 </li>
+                
+                <li>
+                    <a href="<?php echo e(route('tryouts.index')); ?>" class="flex items-center px-3 py-2 rounded <?php echo e(request()->routeIs('tryouts.index') ? 'bg-[#446634]' : 'bg-[#3b5d28]'); ?> font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                        <i class="bi bi-calendar-event mr-2"></i> Manage Tryouts
+                    </a>
+                </li>
+
                 <li>
                     <a href="<?php echo e(route('admin.general')); ?>" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
                         <i class="bi bi-person-gear mr-2"></i> Admin
@@ -80,11 +88,10 @@
                 </li>
                 <li>
                     <a href="<?php echo e(route('sports')); ?>" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
-                        <i class="bi bi-person-gear mr-2"></i> Sports
-                    </a>
+                        <i class="bi bi-trophy mr-2"></i> Sports </a>
                 </li>
             <?php endif; ?>
-
+        </ul>
 
         <div class="mt-auto pt-4">
             <a href="<?php echo e(route('log.login')); ?>" class="w-full block text-center px-4 py-2 rounded bg-red-600 hover:bg-red-700 transition text-white no-underline font-bold">

@@ -49,6 +49,14 @@ class Athlete extends Model
         // Emergency
         'emergency_person',
         'emergency_contact',
+        'emergency_relationship', // ADDED (Was missing)
+
+        // System
+        'picture_path',
+        'approval_status',
+        'approval_notes',
+        'approved_at',
+        'approved_by',
 
         'coach_name',
         'date_joined',

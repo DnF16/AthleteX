@@ -222,7 +222,7 @@ class AdminController extends Controller
         $athlete = \App\Models\Athlete::findOrFail($id);
         
         // Change status to 'approved' so they appear in the main list
-        $athlete->status = 'approved';
+        $athlete->approval_status = 'approved';
         $athlete->save();
 
         return back()->with('success', 'Athlete has been successfully verified and added to the official list.');

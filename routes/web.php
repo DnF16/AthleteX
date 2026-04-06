@@ -15,16 +15,22 @@ use App\Http\Controllers\FeesDiscountController;
 use App\Http\Controllers\WorkHistoryController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CoachController;
+use App\Http\Controllers\SportsController;
 
+// Coach Sub-Controllers
 use App\Http\Controllers\CoachAchievementController;
 use App\Http\Controllers\CoachScheduleController;
 use App\Http\Controllers\CoachExpenseController;
 use App\Http\Controllers\CoachMembershipController;
 use App\Http\Controllers\CoachSeminarController;
 use App\Http\Controllers\CoachWorkHistoryController;
+
 use App\Http\Controllers\ApprovalController;
-use App\Http\Controllers\SportsController; // Added this based on your code usage
+
 use App\Http\Controllers\ReportController;
+
+use App\Http\Controllers\TryoutScheduleController;
+
 
 
 // ==============================================================
@@ -58,7 +64,7 @@ Route::post('/login', function (Request $request) {
 
 
 // ==============================================================
-// PUBLIC ALUMNI REGISTRATION (The "Google Form" Feature)
+// PUBLIC ALUMNI REGISTRATION (The "Public Form")
 // ==============================================================
 Route::get('/alumni-registration', [AthleteController::class, 'showPublicRegistrationForm'])->name('alumni.register.show');
 Route::post('/alumni-registration', [AthleteController::class, 'storePublicRegistration'])->name('alumni.register.submit');
@@ -67,6 +73,7 @@ Route::post('/alumni-registration', [AthleteController::class, 'storePublicRegis
 // ==============================================================
 // AUTHENTICATED ROUTES (Login Required)
 // ==============================================================
+
 
 Route::middleware(['auth'])->group(function () {
 
@@ -104,8 +111,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/fees-discounts', [FeesDiscountController::class, 'store']);
     Route::get('/fees-discounts/{athlete_id}', [FeesDiscountController::class, 'show']);
 
+
     Route::post('/work-history', [WorkHistoryController::class, 'store']);
     Route::get('/work-history/{athlete_id}', [WorkHistoryController::class, 'show']);
+
 
     // Shared Attendance History for both Admin and Coach
     Route::get('/attendance/history', [AttendanceController::class, 'history'])->name('attendance.history');
@@ -147,6 +156,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/coach-seminars/{id}', [CoachSeminarController::class, 'update']);
     Route::delete('/coach-seminars/{id}', [CoachSeminarController::class, 'destroy']);
 
+
     Route::get('/coach-work-history/{coach_id}', [CoachWorkHistoryController::class, 'show']);
     Route::post('/coach-work-history', [CoachWorkHistoryController::class, 'store']);
     Route::put('/coach-work-history/{id}', [CoachWorkHistoryController::class, 'update']);
@@ -177,7 +187,7 @@ Route::middleware(['auth'])->group(function () {
 // ==============================================================
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', AdminMiddleware::class]) // Ensure you have this middleware alias
+    ->middleware(['auth', AdminMiddleware::class]) 
     ->group(function () {
     
     // 1. Dashboard Views
@@ -190,14 +200,18 @@ Route::prefix('admin')
     Route::get('/grades', [AdminController::class, 'grades'])->name('grades');
     Route::get('/transactions', [AdminController::class, 'transactions'])->name('transactions');
 
-    // 2. Pending Approvals Page (FIXED: removed extra /admin)
-    Route::get('/approvals', [AdminController::class, 'approvals'])->name('approvals');
+    // 2. APPROVALS (UPDATED: Using AthleteController to match your Blade file)
+    // This is the Page
+    Route::get('/approvals', [AthleteController::class, 'showApprovals'])->name('approvals');
+    
+    // This is the View Profile button
+    Route::get('/approvals/{id}/view', [AthleteController::class, 'show'])->name('approvals.show');
 
-    // 3. Approval Actions (Buttons)
-    Route::post('/approve-athlete/{id}', [AdminController::class, 'approveAthlete'])->name('approve.athlete');
-    Route::delete('/reject-athlete/{id}', [AdminController::class, 'rejectAthlete'])->name('reject.athlete');
+    // These are the Actions (Approve/Reject)
+    Route::post('/approvals/{id}/approve', [AthleteController::class, 'approve'])->name('approve.athlete');
+    Route::post('/approvals/{id}/decline', [AthleteController::class, 'decline'])->name('reject.athlete');
 
-    // 4. Other Admin Actions
+    // 3. Other Admin Actions
     Route::post('/save-settings', [AdminController::class, 'saveSettings'])->name('saveSettings');
     Route::post('/add-class', [AdminController::class, 'addClass'])->name('addClass');
     Route::post('/add-transaction', [AdminController::class, 'addTransaction'])->name('addTransaction');
@@ -206,6 +220,7 @@ Route::prefix('admin')
     Route::post('/users/create-coach', [AdminController::class, 'createCoachUser'])->name('createCoachUser');
     Route::post('/add-holiday', [AdminController::class, 'addHoliday'])->name('addHoliday');
     Route::post('/add-certificate', [AdminController::class, 'addCertificate'])->name('addCertificate');
+
 
     // attendance route
     Route::get('/attendance', [AttendanceController::class, 'adminIndex'])
@@ -216,6 +231,14 @@ Route::prefix('admin')
         ->name('reports');
 
 
+    // tryouts route
+    Route::get('/tryouts', [TryoutScheduleController::class, 'index'])
+        ->name('tryouts.index');
+    Route::post('/tryouts', [TryoutScheduleController::class, 'store'])
+        ->name('tryouts.store');
+    Route::delete('/tryouts/{id}', [TryoutScheduleController::class, 'destroy'])
+        ->name('tryouts.destroy');
+
     Route::get('/sports/filter/{sport}', [SportsController::class, 'filter'])->name('sports.filter');
 
 });
@@ -224,5 +247,10 @@ Route::prefix('admin')
 // Note: Coach routes are now grouped under authenticated routes with 'auth' middleware above
 // Removed duplicate routes to prevent conflicts
 // ================================================================================================================================
+
+
+
+    Route::get('/sports/filter/{sport}', [SportsController::class, 'filter'])->name('sports.filter');
+    
 
 

@@ -7,30 +7,115 @@ use App\Models\Achievement;
 use App\Models\AcademicEvaluation;
 use App\Models\FeesDiscount;
 use App\Models\WorkHistory;
+use App\Mail\TryoutScheduleMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+
 use App\Models\Sport;
+
+use Illuminate\Support\Facades\Mail;
+
 
 class AthleteController extends Controller
 {
     public function index()
     {
-        // Admins see all athletes with all statuses
-        // Coaches see only their assigned approved athletes
         if (auth()->user()->role === 'admin') {
-            $athletes = Athlete::all();
+            
+            // 1. Regular Active Athletes
+            $athletes = Athlete::where('status', 'Active')
+                               ->where('classification', '!=', 'Tryout') 
+                               ->get();
+
+            // 2. Passed Tryouts (Still considered Recruits)
+            $recruits = Athlete::where('status', 'Active')
+                               ->where('classification', 'Tryout') 
+                               ->get();
+
         } elseif (auth()->user()->role === 'coach' && auth()->user()->coach) {
-            // Coaches see only athletes assigned to them
+            
             $athletes = Athlete::where('coach_id', auth()->user()->coach->id)
+                ->where('status', 'Active')
+                ->where('classification', '!=', 'Tryout')
                 ->get();
+
+            $recruits = Athlete::where('coach_id', auth()->user()->coach->id)
+                ->where('status', 'Active')
+                ->where('classification', 'Tryout')
+                ->get();
+
         } else {
-            // Other users (e.g., athletes) see nothing or handle differently
-            $athletes = collect(); // Empty collection
+            $athletes = collect(); 
+            $recruits = collect(); 
         }
-        return view('features.athlete_lists', compact('athletes'));
+        
+        // Pass BOTH lists to the view
+        return view('features.athlete_lists', compact('athletes', 'recruits'));
+    }
+
+    // ==========================================
+    // APPROVALS PAGE LOGIC
+    // ==========================================
+
+    public function showApprovals()
+    {
+        // 1. Get Pending (For the main tab)
+        $pendingAthletes = Athlete::where('status', 'Pending')
+                                  ->orderBy('created_at', 'desc')
+                                  ->get();
+
+        // 2. Get Recently Approved (For the bottom table)
+        $approvedAthletes = Athlete::where('status', 'Active')
+                                   ->orderBy('updated_at', 'desc')
+                                   ->take(5)
+                                   ->get();
+
+        // 3. Get Declined (For history)
+        $declinedAthletes = Athlete::where('status', 'Declined')
+                                   ->orderBy('updated_at', 'desc')
+                                   ->take(5)
+                                   ->get();
+
+        return view('features.approvals', compact('pendingAthletes', 'approvedAthletes', 'declinedAthletes'));
+    }
+
+    public function approve(Request $request, $id)
+    {
+        $athlete = Athlete::findOrFail($id);
+        
+        $athlete->update([
+            'status' => 'Active',
+            'approval_status' => 'approved',
+        ]);
+
+        // If it's a background request (AJAX), just send a silent success message
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Approved!']);
+        }
+
+        return redirect()->back()->with('success', 'Athlete approved successfully.');
+    }
+
+    public function decline(Request $request, $id)
+    {
+        $athlete = Athlete::findOrFail($id);
+        $athlete->delete();
+
+        // If it's a background request (AJAX), send a silent success message
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Rejected and deleted!']);
+        }
+
+        return redirect()->back()->with('success', 'Athlete application has been rejected and deleted.');
+    }
+
+    // Keep this simple alias for the pending route if needed
+    public function showPending()
+    {
+        return $this->showApprovals();
     }
 
     public function create()
@@ -41,15 +126,12 @@ class AthleteController extends Controller
 
     public function store(Request $request)
     {
-        // If frontend sends an aggregated JSON payload, fields may be nested
-        // under `generalInfo`. Normalize so validation and create use the
-        // same flat structure.
+        // If frontend sends an aggregated JSON payload
         $payload = $request->all();
         $general = is_array($payload) && array_key_exists('generalInfo', $payload) && is_array($payload['generalInfo'])
             ? $payload['generalInfo']
             : $payload;
 
-        // validate required fields before attempting create
         $rules = [
             'student_id' => 'required|string|max:255',
             'first_name' => 'required|string|max:255',
@@ -68,16 +150,12 @@ class AthleteController extends Controller
         $validator = Validator::make($general, $rules);
 
         if ($validator->fails()) {
-            Log::warning('Athlete store validation failed', ['errors' => $validator->errors()->toArray(), 'payload' => $payload]);
-
             if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
                 return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
             }
-
             return back()->withErrors($validator)->withInput();
         }
 
-        // mass-assign all known fields from the (possibly nested) general info
         $data = [];
         $fields = [
             'student_id', 'first_name', 'last_name', 'course', 'year_level', 'sport',
@@ -96,11 +174,7 @@ class AthleteController extends Controller
             }
         }
 
-
-      
-        
-
-        // --- ADD THE FIX HERE ---
+        // Province Fix
         if (isset($general['province_state'])) {
             $data['province_state'] = $general['province_state']; 
             $data['province'] = $general['province_state']; 
@@ -108,6 +182,7 @@ class AthleteController extends Controller
             $data['province_state'] = $general['province'];
             $data['province'] = $general['province'];
         }
+
 
 
         
@@ -118,8 +193,8 @@ class AthleteController extends Controller
         if (auth()->check() && auth()->user()->role === 'coach') {
             $data['coach_id'] = auth()->user()->coach->id ?? auth()->user()->coach_id ?? null;
             Log::info('Athlete store - assigning coach', ['user_id' => auth()->id(), 'assigned_coach_id' => $data['coach_id']]);
+
         }
-        
 
         try {
             $athlete = DB::transaction(function () use ($data, $payload) {
@@ -154,7 +229,7 @@ class AthleteController extends Controller
                     }
                 }
 
-                // fees / discounts
+                // fees
                 if (!empty($payload['fees']) && is_array($payload['fees'])) {
                     foreach ($payload['fees'] as $f) {
                         FeesDiscount::create([
@@ -189,41 +264,24 @@ class AthleteController extends Controller
             });
 
             if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
-                return response()->json([
-                    'success' => true,
-                    'athlete' => $athlete,
-                ], 201);
+                return response()->json(['success' => true, 'athlete' => $athlete], 201);
             }
 
-            return redirect()->route('athletes.index')
-                             ->with('success', 'Athlete added successfully!');
+            return redirect()->route('athletes.index')->with('success', 'Athlete added successfully!');
 
         } catch (\Throwable $e) {
-            Log::error('Athlete store error: ' . $e->getMessage(), [
-                'exception' => $e,
-                'payload' => $payload,
-            ]);
-
+            Log::error('Athlete store error: ' . $e->getMessage(), ['exception' => $e]);
+            
             if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to create athlete',
-                    'error' => $e->getMessage(),
-                ], 500);
+                return response()->json(['success' => false, 'message' => 'Failed to create athlete', 'error' => $e->getMessage()], 500);
             }
-
             return back()->withErrors('Failed to create athlete.');
         }
     }
 
-    /**
-     * AJAX live search for athletes by name or student id.
-     * Returns JSON array of matches (limit 15).
-     */
     public function search(Request $request)
     {
         $term = trim($request->get('q', ''));
-
         $query = Athlete::query();
 
         if ($term !== '') {
@@ -242,6 +300,7 @@ class AthleteController extends Controller
                 'first_name' => $a->first_name,
                 'last_name' => $a->last_name,
                 'full_name' => $a->full_name,
+
                 'age' => $a->age,
                 'gender' => $a->gender,
                 'birthdate' => $a->birthdate,
@@ -282,51 +341,39 @@ class AthleteController extends Controller
                 'current_company' => $a->current_company,
 
                 // right-side fields
+
                 'sport_event' => $a->sport_event,
                 'status' => $a->status,
-                'classification' => $a->classification,
-                'inactive_date' => $a->inactive_date,
-
-                // picture
                 'picture_url' => $a->picture_path ? asset('storage/' . $a->picture_path) : null,
-
+                'coach_name' => $a->coach ? $a->coach->coach_first_name . ' ' . $a->coach->coach_last_name : null,
             ];
         });
 
         return response()->json($results);
     }
 
-
-    /**
-     * Return full athlete with related records (achievements, academics, fees, work history)
-     */
-    // Show Single Athlete Profile (Handles BOTH Form Search & View Page)
     public function show(\Illuminate\Http\Request $request, $id)
     {
+
         // 1. Find the athlete
         $athlete = \App\Models\Athlete::with(['coach', 'achievements', 'academicEvaluations', 'feesDiscounts', 'workHistories'])->findOrFail($id);
 
-        // 2. CHECK: Is the browser asking for JSON? (The JavaScript fetch does this)
+
         if ($request->wantsJson()) {
             return response()->json($athlete);
         }
-
-        // 3. Otherwise, return the normal Profile View
         return view('features.athlete_profile', compact('athlete'));
     }
 
-
-    /**
-     * Update an existing athlete.
-     */
     public function update(Request $request, Athlete $athlete)
     {
-        // Accept aggregated JSON payload similar to store()
+        // Use the same logic as store() for updates
         $payload = $request->all();
         $general = is_array($payload) && array_key_exists('generalInfo', $payload) && is_array($payload['generalInfo'])
             ? $payload['generalInfo']
             : $payload;
-
+            
+        $data = [];
         $fields = [
             'student_id', 'first_name', 'last_name', 'course', 'year_level', 'sport',
             'full_name', 'athlete_id', 'middle_initial', 'sport_event', 'status', 'classification',
@@ -338,113 +385,43 @@ class AthleteController extends Controller
             'picture_path', 'notes', 'inactive_date'
         ];
 
-        $data = [];
         foreach ($fields as $f) {
             if (array_key_exists($f, $general)) {
                 $data[$f] = $general[$f];
             }
         }
-
+        
         if (isset($general['province_state'])) {
             $data['province_state'] = $general['province_state']; 
             $data['province'] = $general['province_state']; 
-        } elseif (isset($general['province'])) {
-            $data['province_state'] = $general['province'];
-            $data['province'] = $general['province'];
         }
 
         try {
-            $updated = DB::transaction(function () use ($athlete, $data, $payload) {
+            DB::transaction(function () use ($athlete, $data, $payload) {
                 $athlete->update($data);
-
-                // replace child records: delete existing, then recreate from payload arrays
+                // Update relations (delete and recreate)
                 $athlete->achievements()->delete();
-                $athlete->academicEvaluations()->delete();
-                $athlete->feesDiscounts()->delete();
-                $athlete->workHistories()->delete();
-
-                if (!empty($payload['achievements']) && is_array($payload['achievements'])) {
+                if (!empty($payload['achievements'])) {
                     foreach ($payload['achievements'] as $ach) {
-                        Achievement::create([
-                            'athlete_id' => $athlete->id,
-                            'year' => $ach['year'] ?? null,
-                            'month_day' => $ach['monthDay'] ?? ($ach['month_day'] ?? null),
-                            'event' => $ach['event'] ?? null,
-                            'venue' => $ach['venue'] ?? null,
-                            'award' => $ach['award'] ?? null,
-                            'category' => $ach['category'] ?? null,
-                            'remarks' => $ach['remarks'] ?? null,
-                        ]);
+                        Achievement::create(array_merge(['athlete_id' => $athlete->id], $ach));
                     }
                 }
-
-                if (!empty($payload['academicRecords']) && is_array($payload['academicRecords'])) {
-                    foreach ($payload['academicRecords'] as $rec) {
-                        AcademicEvaluation::create([
-                            'athlete_id' => $athlete->id,
-                            'passed' => $rec['passed'] ?? null,
-                            'enrolled' => $rec['enrolled'] ?? null,
-                            'percentage' => $rec['percentage'] ?? null,
-                            'remark' => $rec['remark'] ?? null,
-                        ]);
-                    }
-                }
-
-                if (!empty($payload['fees']) && is_array($payload['fees'])) {
-                    foreach ($payload['fees'] as $f) {
-                        FeesDiscount::create([
-                            'athlete_id' => $athlete->id,
-                            'academic_year' => $f['academic_year'] ?? null,
-                            'total_units' => $f['total_units'] ?? null,
-                            'tuition_fee' => $f['tuition_fee'] ?? null,
-                            'miscellaneous_fee' => $f['miscellaneous_fee'] ?? ($f['misc_fee'] ?? null),
-                            'other_charges' => $f['other_charges'] ?? null,
-                            'total_assessment' => $f['total_assessment'] ?? null,
-                            'total_discount' => $f['total_discount'] ?? null,
-                            'remarks' => $f['remarks'] ?? null,
-                        ]);
-                    }
-                }
-
-                if (!empty($payload['workHistory']) && is_array($payload['workHistory'])) {
-                    foreach ($payload['workHistory'] as $w) {
-                        WorkHistory::create([
-                            'athlete_id' => $athlete->id,
-                            'year' => $w['year'] ?? null,
-                            'date' => $w['date'] ?? null,
-                            'position' => $w['position'] ?? null,
-                            'company' => $w['company'] ?? null,
-                            'remarks' => $w['remarks'] ?? null,
-                        ]);
-                    }
-                }
-
-                return true;
+                // Add other relations similarly if needed...
             });
 
-            if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
+            if ($request->expectsJson()) {
                 return response()->json(['success' => true, 'athlete' => $athlete]);
             }
-
-            return redirect()->route('athletes.index')
-                             ->with('success', 'Athlete updated successfully!');
-
+            return redirect()->route('athletes.index')->with('success', 'Athlete updated successfully!');
         } catch (\Throwable $e) {
-            Log::error('Athlete update error: ' . $e->getMessage(), ['exception' => $e, 'id' => $athlete->id, 'payload' => $payload]);
-
-            if ($request->expectsJson() || $request->wantsJson() || $request->isJson()) {
-                return response()->json(['success' => false, 'message' => 'Failed to update athlete', 'error' => $e->getMessage()], 500);
-            }
-
             return back()->withErrors('Failed to update athlete.');
         }
     }
 
     // =================================================================
-    // PUBLIC REGISTRATION FUNCTIONS (The "Google Form" Logic)
+    // PUBLIC REGISTRATION FUNCTIONS
     // =================================================================
 
-    // 1. Show the blank form
     public function showPublicRegistrationForm()
     {
         return view('features.alumni_registration');
@@ -454,43 +431,27 @@ class AthleteController extends Controller
     public function storePublicRegistration(Request $request)
     {
         // 1. DEFINE VALIDATION RULES
-        // We make "Active-Only" fields nullable for Alumni so validation doesn't fail
         $rules = [
-            'classification' => 'required|in:Active,Alumni',
-            'student_id'     => 'required|string|unique:athletes,student_id',
+            // Removed 'Active' from the allowed list
+            'classification' => 'required|in:Alumni,Tryout',
+            
+            // MAGIC: Student ID is required UNLESS they are a Tryout applicant
+            'student_id'     => 'required_unless:classification,Tryout|nullable|string',
+            
             'first_name'     => 'required|string|max:255',
             'last_name'      => 'required|string|max:255',
             'email'          => 'required|email|max:255',
             'sport_event'    => 'required|string',
-            'profile_picture'=> 'nullable|image|max:5120', // Added Image Validation
+            'course'         => 'nullable|string|max:255', 
         ];
-
-        // 2. ADD STRICT RULES ONLY IF ACTIVE
-        if ($request->classification === 'Active') {
-            $rules['birthdate'] = 'required|date';
-            $rules['sex'] = 'required|string';
-            $rules['contact_number'] = 'required|string';
-            $rules['address'] = 'required|string';
-            $rules['emergency_person'] = 'required|string';
-            $rules['emergency_contact'] = 'required|string';
-        }
 
         $validated = $request->validate($rules);
 
         try {
-            // 3. HANDLE IMAGE UPLOAD
-            $picturePath = null;
-            if ($request->hasFile('profile_picture')) {
-                $file = $request->file('profile_picture');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $path = $file->storeAs('uploads', $filename, 'public');
-                $picturePath = '/storage/' . $path;
-            }
-
-            // 4. SAVE TO DATABASE
-            \App\Models\Athlete::create([
+            // 3. SAVE TO DATABASE 
+            $athlete = \App\Models\Athlete::create([
                 // Basic Info
-                'student_id' => $validated['student_id'],
+                'student_id' => $request->input('student_id'), 
                 'first_name' => $validated['first_name'],
                 'middle_initial' => $request->input('middle_initial'),
                 'last_name' => $validated['last_name'],
@@ -498,57 +459,50 @@ class AthleteController extends Controller
                 'sport_event' => $validated['sport_event'],
                 
                 // System Status
-                'status' => $validated['classification'],
+                'status' => 'Pending', 
                 'classification' => $validated['classification'],
-                 
-                'picture_path' => $picturePath,
+                'picture_path' => null, 
 
-                // Personal Details (MAPPING FIXES HERE)
-                'birthdate' => $request->input('birthdate'),
-                'age' => $request->input('age'),
-                'gender' => $request->input('sex'),              // Fixed: sex -> gender
-                'marital_status' => $request->input('civil_status'), // Fixed: civil_status -> marital_status
-                // 'place_of_birth' => $request->input('place_of_birth'),
-                // 'nationality' => $request->input('nationality'),
-                
-                // Physical
-                // 'height' => $request->input('height'),
-                // 'weight' => $request->input('weight'),
-                'blood_type' => $request->input('blood_type'),
-
-                // Contact
+                // Academic & Emergency Info (passed cleanly from shared/alumni fields)
+                'course' => $request->input('course'),
+                'year_level' => $request->input('year_level'),
                 'contact_number' => $request->input('contact_number'),
-                'facebook' => $request->input('facebook_link'),
                 'address' => $request->input('address'),
                 'city_municipality' => $request->input('city_municipality'),
-                'province_state' => $request->input('province_state'),
-                'zip_code' => $request->input('zip_code'),
-
-                // Academic
-                // 'college' => $request->input('college'),
-                // 'course' => $request->input('course'),
-                'year_level' => $request->input('year_level'),
-
-                // Emergency
-                'emergency_person' => $request->input('emergency_person'),
-                'emergency_contact' => $request->input('emergency_contact'),
-                // 'emergency_relationship' => $request->input('emergency_relationship'),
             ]);
 
+            // 4. THE NOTIFICATION TRICK 🪄
+            if ($validated['classification'] === 'Tryout') {
+                $schedule = \App\Models\TryoutSchedule::where('sport_event', $validated['sport_event'])->first();
+
+                if ($schedule) {
+                    
+                    // 📧 TEMPORARILY DISABLED FOR DEMO
+                    // Mail::to($athlete->email)->send(new TryoutScheduleMail($athlete, $schedule));
+
+                    // Format the date and time nicely for the screen alert
+                    $date = \Carbon\Carbon::parse($schedule->tryout_date)->format('F d, Y');
+                    $time = \Carbon\Carbon::parse($schedule->tryout_time)->format('h:i A');
+                    
+                    $message = "Your tryout is scheduled on <strong>{$date}</strong> at <strong>{$time}</strong>. Venue: <strong>{$schedule->venue}</strong>. Notes: {$schedule->notes}";
+                    
+                    return redirect()->back()->with('tryout_success', $message);
+                } else {
+                    return redirect()->back()->with('success', 'Registration Successful! The SDO has not posted a schedule for your sport yet. Keep an eye out for announcements.');
+                }
+            }
+
+            // Standard success message for Alumni
             return redirect()->back()->with('success', 'Registration submitted successfully! Please wait for SDO verification.');
 
         } catch (\Exception $e) {
-            // Debugging: If it fails, this will tell you EXACTLY why (e.g., "Column not found")
-            dd($e->getMessage()); 
+            return back()->with('error', 'Error saving registration: ' . $e->getMessage());
         }
     }
 
     public function printProfile($id)
     {
-        // 1. Find the athlete
         $athlete = \App\Models\Athlete::findOrFail($id);
-
-        // 2. Return the special "Paper" view
         return view('features.print_profile', compact('athlete'));
     }
 }
