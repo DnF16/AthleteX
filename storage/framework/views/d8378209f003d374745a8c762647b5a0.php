@@ -76,7 +76,7 @@
                 </div>
 
                 <!-- Schedule Calendar -->
-                <div class="bg-white p-6 rounded-xl shadow h-96">
+                <div class="bg-white p-6 rounded-xl shadow h-full">
                     <h3 class="font-semibold text-lg mb-4">Schedule</h3>
                     <div id="scheduleCalendar" class="h-[85%]"></div>
                 </div>
@@ -88,87 +88,11 @@
     </div>
 </div>
 
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
-
 <script>
-    /* -------------------------------
-       Convert PHP → JS safely
-    --------------------------------*/
-
-    // Achievements monthly (ensure 12 months)
-    let rawAchievements = <?php echo json_encode($achievementsMonthly ?? [], 15, 512) ?>;
-
-    // Build array of 12 months, fill missing with 0
-    let monthlyAchievements = Array.from({ length: 12 }, (_, i) => rawAchievements[i + 1] ?? 0);
-
-    // Expense data (renamed from athleteCategories)
-    let expensesData = <?php echo json_encode(array_values($athleteCategories ?? []), 15, 512) ?>;
-    let expensesLabels = <?php echo json_encode(array_keys($athleteCategories ?? []), 15, 512) ?>;
-
-    // If empty, avoid chart errors
-    if (expensesLabels.length === 0) {
-        expensesLabels = ["No Data"];
-        expensesData = [1];
-    }
-
-    const monthlyLabels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-
-    /* -------------------------------
-       BAR CHART – Monthly Achievements 
-    --------------------------------*/
-    new Chart(document.getElementById('achievementChart'), {
-        type: 'bar',
-        data: {
-            labels: monthlyLabels,
-            datasets: [{
-                label: 'Achievements',
-                data: monthlyAchievements,
-                backgroundColor: 'rgba(99,102,241,0.6)',
-                borderColor: 'rgba(99,102,241,1)',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1 }
-                }
-            }
-        }
-    });
-
-
-    /* -------------------------------
-       FullCalendar – Schedule
-    --------------------------------*/
-    let scheduleEvents = <?php echo json_encode($scheduleEvents ?? [], 15, 512) ?>;
-
-    document.addEventListener('DOMContentLoaded', function() {
-        let calendarEl = document.getElementById('scheduleCalendar');
-
-        let calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            height: '100%',
-            events: scheduleEvents,
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-            eventColor: '#6366f1',
-            eventTextColor: '#fff'
-        });
-
-        calendar.render();
-    });
+    // Pass data from PHP to JavaScript
+    window.achievementsMonthly = <?php echo json_encode($achievementsMonthly ?? [], 15, 512) ?>;
+    window.athleteCategories = <?php echo json_encode(array_values($athleteCategories ?? []), 15, 512) ?>;
+    window.scheduleEvents = <?php echo json_encode($scheduleEvents ?? [], 15, 512) ?>;
 </script>
 
 <?php $__env->stopSection(); ?>

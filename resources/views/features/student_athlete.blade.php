@@ -300,7 +300,7 @@
                             </div>
                         </div>
 
-                        <hr class="border-t-2 border-gray-400 my-2 w-[100%]">
+                        <!-- <hr class="border-t-2 border-gray-400 my-2 w-[100%]">
 
                         <div class="grid grid-cols-3 gap-4 mb-4">
                             <div class="flex items-center">
@@ -340,7 +340,7 @@
                                 <input type="text" id="balance" name="balance" placeholder="Enter Balance"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
-                        </div>
+                        </div> -->
 
                         <hr class="border-t-2 border-gray-400 my-2 w-[100%]">
 

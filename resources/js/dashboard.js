@@ -1,18 +1,22 @@
-import './bootstrap';
-
-// include bootstrap JS for components (modals, dropdowns, etc.)
-import 'bootstrap/dist/js/bootstrap.bundle.js';
-
-// Import dashboard dependencies
 import Chart from 'chart.js/auto';
 import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import '@fullcalendar/core/index.global.css';
 
-// Initialize dashboard charts
 document.addEventListener('DOMContentLoaded', function() {
-    // Achievements monthly data
+    // Convert PHP → JS safely
     const rawAchievements = window.achievementsMonthly || [];
+    
+    // Build array of 12 months, fill missing with 0
     const monthlyAchievements = Array.from({ length: 12 }, (_, i) => rawAchievements[i + 1] ?? 0);
+    
+    // Expense data
+    const expensesData = Object.values(window.athleteCategories || {});
+    const expensesLabels = Object.keys(window.athleteCategories || {});
+    
+    // If empty, avoid chart errors
+    const finalLabels = expensesLabels.length > 0 ? expensesLabels : ["No Data"];
+    const finalData = expensesData.length > 0 ? expensesData : [1];
     
     const monthlyLabels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     
