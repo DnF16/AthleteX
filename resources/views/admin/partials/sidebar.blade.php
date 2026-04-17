@@ -10,22 +10,20 @@
         $admin_links = [
             'general' => ['name' => 'General Information', 'icon' => 'fas fa-info-circle'],
             
-            // --- NEW TAB: PENDING VERIFICATIONS ---
-            'approvals' => [
-                'name' => 'Pending Verifications', 
-                'icon' => 'fas fa-user-check',
-                'badge' => $pendingCount // Pass the count here
-            ],
+            
             
             'users' => ['name' => 'Users & Security', 'icon' => 'fas fa-user-shield'],
-            'settings' => ['name' => 'Application Settings', 'icon' => 'fas fa-sliders-h'],
+            
+        ];
+    @endphp
+
+            <!-- add this below users above when the defense is done -->
+            <!-- 'settings' => ['name' => 'Application Settings', 'icon' => 'fas fa-sliders-h'],
             'classes' => ['name' => 'Classes & Lessons', 'icon' => 'fas fa-book'],
             'scheduling' => ['name' => 'Scheduling Settings', 'icon' => 'fas fa-clock'],
             'certificates' => ['name' => 'Certificates & Awards', 'icon' => 'fas fa-award'],
             'grades' => ['name' => 'Grades & Scoring', 'icon' => 'fas fa-star'],
-            'transactions' => ['name' => 'Transactions', 'icon' => 'fas fa-money-check'],
-        ];
-    @endphp
+            'transactions' => ['name' => 'Transactions', 'icon' => 'fas fa-money-check'], -->
 
     @foreach($admin_links as $route_name => $link)
     <a href="{{ route('admin.' . $route_name) }}" 

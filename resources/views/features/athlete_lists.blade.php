@@ -6,7 +6,7 @@
 
 <div class="space-y-6">
 
-    <div class="flex items-center justify-between px-4">
+    <div class="flex items-center justify-between p-4">
         <a href="{{ route('student.athlete') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
             <i class="bi bi-arrow-left me-1"></i> Back
         </a>
@@ -14,31 +14,40 @@
     </div>
 
     {{-- Filter Section --}}
-    <div class="bg-white p-4 rounded-lg shadow-sm border space-y-2">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <input type="text" placeholder="Search name, ID…" 
-                class="border border-gray-300 rounded px-3 py-2 text-sm w-full focus:ring-2 focus:ring-green-500 outline-none">
+    <div class="bg-white p-4 rounded-lg shadow-sm border">
+    <div class="flex items-center gap-3">
 
-            <select class="border border-gray-300 rounded px-3 py-2 text-sm w-full">
+        <input type="text" id="searchInput" placeholder="Search name, ID…" 
+            class="border border-gray-300 rounded px-3 py-2 text-sm w-56 focus:ring-2 focus:ring-green-500 outline-none">
+
+        @if(auth()->user()->role === 'admin')
+            <label class="font-bold text-sm">Sport:</label>
+            <select id="sportFilter" name="sport_id" class="border rounded px-2 py-1">
                 <option value="">All Sports</option>
-                {{-- Add dynamic sports list here later --}}
+                @foreach($sports as $sport)
+                    <option value="{{ $sport->name }}" {{ ($sportId ?? '') == $sport->name ? 'selected' : '' }}>
+                        {{ $sport->name }}
+                    </option>
+                @endforeach
             </select>
+        @endif
 
-            <select class="border border-gray-300 rounded px-3 py-2 text-sm w-full">
-                <option value="">Status</option>
-                <option>Active</option>
-                <option>Injured</option>
-                <option>Inactive</option>
-            </select>
+        <select id="statusFilter" class="border border-gray-300 rounded px-3 py-2 text-sm w-36">
+            <option value="">Status</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+            <option value="Transfered">Transfered</option>
+            <option value="Graduated">Graduated</option>
+        </select>
 
-            <select class="border border-gray-300 rounded px-3 py-2 text-sm w-full">
-                <option value="">Classification</option>
-                <option>Varsity</option>
-                <option>Trainee</option>
-                <option>Reserve</option>
-            </select>
-        </div>
+        <select id="genderFilter" class="border border-gray-300 rounded px-3 py-2 text-sm w-44">
+            <option value="">Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+
     </div>
+</div>
 
     <div class="bg-white rounded-xl shadow overflow-hidden border">
         <div class="overflow-x-auto">
@@ -129,5 +138,56 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const sportFilter = document.getElementById('sportFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const genderFilter = document.getElementById('genderFilter');
+    const tableBody = document.querySelector('tbody');
+
+    function filterTable() {
+        const searchValue = searchInput.value.toLowerCase();
+        const sportValue = sportFilter ? sportFilter.value : '';
+        const statusValue = statusFilter.value;
+        const genderValue = genderFilter.value;
+
+        const rows = tableBody.querySelectorAll('tr');
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length < 5) return; // Skip if not enough cells
+
+            const lastName = cells[1].textContent.toLowerCase();
+            const firstName = cells[2].textContent.toLowerCase();
+            const studentId = cells[3].textContent.toLowerCase();
+            const sportEvent = cells[4].textContent.toLowerCase();
+            const status = cells[5].textContent.trim().toLowerCase();
+            const gender = cells[8].textContent.trim().toLowerCase();
+
+            const matchesSearch = searchValue === '' || 
+                lastName.includes(searchValue) || 
+                firstName.includes(searchValue) || 
+                studentId.includes(searchValue);
+
+            const matchesSport = sportValue === '' || sportEvent.includes(sportValue.toLowerCase());
+            const matchesStatus = statusValue === '' || status === statusValue.toLowerCase();
+            const matchesGender = genderValue === '' || gender === genderValue.toLowerCase();
+
+            if (matchesSearch && matchesSport && matchesStatus && matchesGender) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    if (sportFilter) sportFilter.addEventListener('change', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+    genderFilter.addEventListener('change', filterTable);
+});
+</script>
 
 @endsection

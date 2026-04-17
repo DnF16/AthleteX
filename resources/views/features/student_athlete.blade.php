@@ -498,23 +498,23 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label for="year" class="block text-sm font-medium text-white mb-1">Year</label>
-                                    <input type="text" id="year" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
+                                    <input type="text" id="year" class="w-full border rounded px-3 py-2 bg-white focus:ring-2 focus:ring-green-600 outline-none">
                                 </div>
                                 <div>
                                     <label for="Month-Day" class="block text-sm font-medium text-white mb-1">Month-Day</label>
-                                    <input type="text" id="month_day" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
+                                    <input type="text" id="month_day" class="w-full border rounded px-3 py-2 bg-white focus:ring-2 focus:ring-green-600 outline-none">
                                 </div>
                                 <div>
                                     <label for="event" class="block text-sm font-medium text-white mb-1">Sports Event</label>
-                                    <input type="text" id="event" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
+                                    <input type="text" id="event" class="w-full border rounded px-3 py-2 bg-white focus:ring-2 focus:ring-green-600 outline-none">
                                 </div>
                                 <div>
                                     <label for="venue" class="block text-sm font-medium text-white mb-1">Venue</label>
-                                    <input type="text" id="venue" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
+                                    <input type="text" id="venue" class="w-full border rounded px-3 py-2 bg-white focus:ring-2 focus:ring-green-600 outline-none">
                                 </div>
                                 <div>
                                     <label for="award" class="block text-sm font-medium text-white mb-1">Award</label>
-                                    <select id="award" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
+                                    <select id="award" class="w-full border rounded px-3 py-2 bg-white focus:ring-2 focus:ring-green-600 outline-none">
                                         <option value="">Select Award</option>
                                         <option value="Gold">Gold</option>
                                         <option value="Silver">Silver</option>
@@ -524,11 +524,11 @@
 
                                 <div>
                                     <label for="category" class="block text-sm font-medium text-white mb-1">Category</label>
-                                    <input type="text" id="category" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none">
+                                    <input type="text" id="category" class="w-full border rounded px-3 py-2 bg-white focus:ring-2 focus:ring-green-600 outline-none">
                                 </div>
                                 <div class="mt-4">
                                     <label for="remarks" class="block text-sm font-medium text-white mb-1">Remarks</label>
-                                    <textarea id="remarks" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-600 outline-none"></textarea>
+                                    <textarea id="remarks" class="w-full border rounded px-3 py-2 bg-white focus:ring-2 focus:ring-green-600 outline-none"></textarea>
                                 </div>
                             </div>
                             <button type="submit" class="bg-green-600 text-white w-full py-2 rounded-lg hover:bg-green-700">
@@ -587,25 +587,25 @@
 
                         <div>
                             <label class="text-white font-medium">Units Passed</label>
-                            <input type="number" class="w-full border rounded px-3 py-2" 
+                            <input type="number" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="Passed" placeholder="Units Passed">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Units enrolled</label>
-                            <input type="number" class="w-full border rounded px-3 py-2" 
+                            <input type="number" class="w-full border rounded px-3 py-2 bg-white" 
                                 step="0.01" name="enrolled" placeholder="Enter Units Enrolled">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Percentage</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="percentage" placeholder="Enter Percentage">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Remark</label>
-                            <select name="remark" class="w-full border rounded px-3 py-2">
+                            <select name="remark" class="w-full border rounded px-3 py-2 bg-white">
                                 <option value="">Select</option>
                                 <option>Passed</option>
                                 <option>Failed</option>
@@ -673,61 +673,62 @@
 
                     <form id="feeForm" class="grid grid-cols-2 gap-4">
 
-    <div class="col-start-2">
-        <label class="text-white font-medium">Academic Term and Year</label>
-        <input type="text" name="academic_year" placeholder="Ex: 2025-2026"
-            class="w-full border rounded px-3 py-2">
-    </div>
+    
+                    <div class="col-start-2">
+                        <label class="text-white font-medium">Academic Term and Year</label>
+                        <input type="text" name="academic_year" placeholder="Ex: 2025-2026"
+                            class="w-full border rounded px-3 py-2 bg-white">
+                    </div>
 
-    <div class="col-start-1">
-        <label class="text-white font-medium">Total Units Enrolled</label>
-        <input type="number" name="total_units" class="w-full border rounded px-3 py-2">
-    </div>
+                    <div class="col-start-1">
+                        <label class="text-white font-medium">Total Units Enrolled</label>
+                        <input type="number" name="total_units" class="w-full border rounded px-3 py-2 bg-white">
+                    </div>
 
-    <div class="col-start-2">
-        <label class="text-white font-medium">Tuition Fee</label>
-        <input type="number" name="tuition_fee" class="w-full border rounded px-3 py-2">
-    </div>
+                    <div class="col-start-2">
+                        <label class="text-white font-medium">Tuition Fee</label>
+                        <input type="number" name="tuition_fee" class="w-full border rounded px-3 py-2 bg-white">
+                    </div>
 
-    <div class="col-start-1">
-        <label class="text-white font-medium">Miscellaneous Fee</label>
-        <input type="number" name="miscellaneous_fee" class="w-full border rounded px-3 py-2">
-    </div>
+                    <div class="col-start-1">
+                        <label class="text-white font-medium">Miscellaneous Fee</label>
+                        <input type="number" name="miscellaneous_fee" class="w-full border rounded px-3 py-2 bg-white">
+                    </div>
 
-    <div class="col-start-2">
-        <label class="text-white font-medium">Other Charges</label>
-        <input type="number" name="other_charges" class="w-full border rounded px-3 py-2">
-    </div>
+                    <div class="col-start-2">
+                        <label class="text-white font-medium">Other Charges</label>
+                        <input type="number" name="other_charges" class="w-full border rounded px-3 py-2 bg-white">
+                    </div>
 
-    <div class="col-start-1">
-        <label class="text-white font-medium">Total Assessment</label>
-        <input type="number" name="total_assessment" class="w-full border rounded px-3 py-2">
-    </div>
+                    <div class="col-start-1">
+                        <label class="text-white font-medium">Total Assessment</label>
+                        <input type="number" name="total_assessment" class="w-full border rounded px-3 py-2 bg-white">
+                    </div>
 
-    <div class="col-start-2">
-        <label class="text-white font-medium">Total Discount</label>
-        <input type="number" name="total_discount" class="w-full border rounded px-3 py-2">
-    </div>
+                    <div class="col-start-2">
+                        <label class="text-white font-medium">Total Discount</label>
+                        <input type="number" name="total_discount" class="w-full border rounded px-3 py-2 bg-white">
+                    </div>
 
-    <div class="col-start-1">
-        <label class="text-white font-medium">Remarks</label>
-        <select name="remarks" class="w-full border rounded px-3 py-2">
-            <option value="">Select</option>
-            <option>Paid</option>
-            <option>Pending</option>
-            <option>Waived</option>
-        </select>
-    </div>
+                    <div class="col-start-1">
+                        <label class="text-white font-medium">Remarks</label>
+                        <select name="remarks" class="w-full border rounded px-3 py-2 bg-white">
+                            <option value="">Select</option>
+                            <option>Paid</option>
+                            <option>Pending</option>
+                            <option>Waived</option>
+                        </select>
+                    </div>
 
-    <!-- Full width button -->
-    <div class="col-span-2">
-        <button type="submit" 
-            class="bg-green-600 text-white w-full py-2 rounded-lg hover:bg-green-700">
-            Save Record
-        </button>
-    </div>
+                    <!-- Full width button -->
+                    <div class="col-span-2">
+                        <button type="submit" 
+                            class="bg-green-600 text-white w-full py-2 rounded-lg hover:bg-green-700">
+                            Save Record
+                        </button>
+                    </div>
 
-</form>
+                </form>
 
                 </div>
             </div>
@@ -781,33 +782,33 @@
                         <div>
                             <label class="text-white font-medium">Year</label>
                             <input type="text" name="year" placeholder="Ex: 2025"
-                                class="w-full border rounded px-3 py-2">
+                                class="w-full border rounded px-3 py-2 bg-white">
                         </div>
 
                         
                         <div>
                             <label class="text-white font-medium">Date</label>
-                            <input type="date" name="date" class="w-full border rounded px-3 py-2">
+                            <input type="date" name="date" class="w-full border rounded px-3 py-2 bg-white">
                         </div>
 
                         
                         <div>
                             <label class="text-white font-medium">Work Position</label>
                             <input type="text" name="position" placeholder="Ex: Coach"
-                                class="w-full border rounded px-3 py-2">
+                                class="w-full border rounded px-3 py-2 bg-white">
                         </div>
 
                         
                         <div>
                             <label class="text-white font-medium">Name of Company</label>
                             <input type="text" name="company" placeholder="Ex: ABC Sports Academy"
-                                class="w-full border rounded px-3 py-2">
+                                class="w-full border rounded px-3 py-2 bg-white">
                         </div>
 
                         
                         <div>
                             <label class="text-white font-medium">Remarks</label>
-                            <select name="remarks" class="w-full border rounded px-3 py-2">
+                            <select name="remarks" class="w-full border rounded px-3 py-2 bg-white">
                                 <option value="">Select</option>
                                 <option>Active</option>
                                 <option>Resigned</option>
@@ -1315,6 +1316,56 @@
         if (updateBtn) {
             updateBtn.removeEventListener('click', performFinalSave);
             updateBtn.addEventListener('click', performFinalSave);
+        }
+
+        // -----------------------
+        // RESET FORM FUNCTION
+        // -----------------------
+        window.resetForm = function() {
+            clearAthleteData();
+        };
+
+        // -----------------------
+        // PICTURE HANDLING
+        // -----------------------
+        const pictureInput = byId('pictureInput');
+        const picturePreview = byId('picturePreview');
+        const noPictureText = byId('noPictureText');
+        const addPictureBtn = byId('addPictureBtn');
+        const clearPictureBtn = byId('clearPictureBtn');
+
+        if (addPictureBtn) {
+            addPictureBtn.addEventListener('click', () => {
+                if (pictureInput) pictureInput.click();
+            });
+        }
+
+        if (clearPictureBtn) {
+            clearPictureBtn.addEventListener('click', () => {
+                if (pictureInput) pictureInput.value = '';
+                if (picturePreview) {
+                    picturePreview.src = '';
+                    picturePreview.classList.add('hidden');
+                }
+                if (noPictureText) noPictureText.classList.remove('hidden');
+            });
+        }
+
+        if (pictureInput) {
+            pictureInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        if (picturePreview) {
+                            picturePreview.src = e.target.result;
+                            picturePreview.classList.remove('hidden');
+                        }
+                        if (noPictureText) noPictureText.classList.add('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
         }
 
     }); // End DOMContentLoaded

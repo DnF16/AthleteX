@@ -30,7 +30,8 @@ class AthleteController extends Controller
             // Other users (e.g., athletes) see nothing or handle differently
             $athletes = collect(); // Empty collection
         }
-        return view('features.athlete_lists', compact('athletes'));
+        $sports = Sport::all();
+        return view('features.athlete_lists', compact('athletes', 'sports'));
     }
 
     public function create()
