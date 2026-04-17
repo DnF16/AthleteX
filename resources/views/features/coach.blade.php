@@ -640,7 +640,7 @@
             </div>
 
             <!-- Modal -->
-            <div id="coach-AchievementModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div id="coach-AchievementModal" class="hidden fixed inset-0 flex items-center justify-center z-50">
                 <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
                     <button onclick="toggleCoachAchievementModal(false)" 
                             class="absolute top-3 right-3 text-white hover:text-gray-400 text-xl">
@@ -655,23 +655,23 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-white mb-1">Year</label>
-                                <input type="text" name="year" class="w-full border rounded px-3 py-2 text-sm" placeholder="2024">
+                                <input type="text" name="year" class="w-full border rounded px-3 py-2 text-sm bg-white" placeholder="2024">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-white mb-1">Month-Day</label>
-                                <input type="text" name="month_day" class="w-full border rounded px-3 py-2 text-sm" placeholder="Mar-15">
+                                <input type="text" name="month_day" class="w-full border rounded px-3 py-2 text-sm bg-white" placeholder="Mar-15">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-white mb-1">Sports Event</label>
-                                <input type="text" name="sports_event" class="w-full border rounded px-3 py-2 text-sm" placeholder="Basketball Tournament">
+                                <input type="text" name="sports_event" class="w-full border rounded px-3 py-2 text-sm bg-white" placeholder="Basketball Tournament">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-white mb-1">Venue</label>
-                                <input type="text" name="venue" class="w-full border rounded px-3 py-2 text-sm" placeholder="City Gym">
+                                <input type="text" name="venue" class="w-full border rounded px-3 py-2 text-sm bg-white" placeholder="City Gym">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-white mb-1">Award</label>
-                                <select name="award" class="w-full border rounded px-3 py-2 text-sm">
+                                <select name="award" class="w-full border rounded px-3 py-2 text-sm bg-white">
                                     <option value="">Select Award</option>
                                     <option value="Coach of the Year">Coach of the Year</option>
                                     <option value="Best Performance">Best Performance</option>
@@ -682,11 +682,11 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-white mb-1">Category</label>
-                                <input type="text" name="category" class="w-full border rounded px-3 py-2 text-sm" placeholder="Regional">
+                                <input type="text" name="category" class="w-full border rounded px-3 py-2 text-sm bg-white" placeholder="Regional">
                             </div>
                             <div class="sm:col-span-2">
                                 <label class="block text-sm font-medium text-white mb-1">Remarks</label>
-                                <textarea name="remarks" rows="3" class="w-full border rounded px-3 py-2 text-sm" placeholder="Additional notes..."></textarea>
+                                <textarea name="remarks" rows="3" class="w-full border rounded px-3 py-2 text-sm bg-white" placeholder="Additional notes..."></textarea>
                             </div>
                         </div>
                         
@@ -741,7 +741,7 @@
 
             <!-- ADD SUBJECT MODAL -->
             <div id="scheduleModal" 
-                class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                class="hidden fixed inset-0 flex items-center justify-center z-50">
 
                 <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
 
@@ -757,14 +757,14 @@
                         <!-- TERM -->
                         <div>
                             <label class="text-white font-medium">Term</label>
-                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2"
+                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                                 name="term" placeholder="e.g., 1st Term">
                         </div>
 
                         <!-- ACADEMIC YEAR -->
                         <div>
                             <label class="text-white font-medium">Academic Year</label>
-                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2"
+                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                                 name="academic_year" placeholder="e.g., 2024 - 2025">
                         </div>
 
@@ -772,17 +772,17 @@
                         <div class="grid grid-cols-3 gap-4">
                             <div>
                                 <label class="text-white font-medium">Class A</label>
-                                <input type="number" class="w-full border border-gray-300 rounded px-3 py-2"
+                                <input type="number" class="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                                     name="count_a" placeholder="0">
                             </div>
                             <div>
                                 <label class="text-white font-medium">Class B</label>
-                                <input type="number" class="w-full border border-gray-300 rounded px-3 py-2"
+                                <input type="number" class="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                                     name="count_b" placeholder="0">
                             </div>
                             <div>
                                 <label class="text-white font-medium">Class C</label>
-                                <input type="number" class="w-full border border-gray-300 rounded px-3 py-2"
+                                <input type="number" class="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                                     name="count_c" placeholder="0">
                             </div>
                         </div>
@@ -790,7 +790,7 @@
                         <!-- REMARKS -->
                         <div>
                             <label class="text-white font-medium">Remarks</label>
-                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2"
+                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                                 name="remarks" placeholder="Any notes or remark">
                         </div>
 
@@ -846,7 +846,7 @@
 
             <!-- ADD EXPENSES MODAL -->
             <div id="expensesModal" 
-                class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                class="hidden fixed inset-0 flex items-center justify-center z-50">
 
                 <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
 
@@ -861,37 +861,37 @@
 
                         <div>
                             <label class="text-white font-medium">Year</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="year" placeholder="Year">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Date</label>
-                            <input type="date" class="w-full border rounded px-3 py-2" 
+                            <input type="date" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="date" placeholder="Term">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Title of Activity</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="title" placeholder="Title of Activity">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Estimate Budget</label>
-                            <input type="number" class="w-full border rounded px-3 py-2" 
+                            <input type="number" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="estimate" placeholder="Estimate Budget">
                         </div>
                         
                         <div>
                             <label class="text-white font-medium">Actual Budget</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="actual" placeholder="Actual Budget">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Variance</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="variance" placeholder="Variance">
                         </div>
 
@@ -953,7 +953,7 @@
 
             <!-- ADD Membership MODAL -->
             <div id="membershipModal" 
-                class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                class="hidden fixed inset-0 flex items-center justify-center z-50">
 
                 <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
 
@@ -968,43 +968,43 @@
 
                         <div>
                             <label class="text-white font-medium">Year</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="year" placeholder="Year">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Date</label>
-                            <input type="date" class="w-full border rounded px-3 py-2" 
+                            <input type="date" class="w-full border rounded px-3 py-2 bg-white" 
                             name="date" placeholder="Date">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Venue</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="venue" placeholder="Venue">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Name of Organization</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="organization" placeholder="Name of Organization">
                         </div>
                         
                         <div>
                             <label class="text-white font-medium">Level</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="level" placeholder="Level">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Position</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="position" placeholder="Position">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Remarks</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="remark" placeholder="Remarks">
                         </div>
 
@@ -1059,7 +1059,7 @@
 
             <!-- ADD Membership MODAL -->
             <div id="seminarsModal" 
-                class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                class="hidden fixed inset-0 flex items-center justify-center z-50">
 
                 <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
 
@@ -1074,29 +1074,29 @@
 
                         <div>
                             <label class="text-white font-medium">Year</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="year" placeholder="Seminar Year">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Date</label>
-                            <input type="date" class="w-full border rounded px-3 py-2" 
+                            <input type="date" class="w-full border rounded px-3 py-2 bg-white" 
                             name="date" placeholder="Seminar Date">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Venue</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="venue" placeholder="Venue">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Title of Seminar / Workshop</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="seminar" placeholder="Title of Seminar / Workshop">
                         </div>
                             <label class="text-white font-medium">Level</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="level" placeholder="Level">
                         <div>
 
@@ -1158,7 +1158,7 @@
 
             <!-- ADD Work History MODAL -->
             <div id="workModal" 
-                class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                class="hidden fixed inset-0 flex items-center justify-center z-50">
 
                 <div class="bg-[#2e4e1f] rounded-xl shadow-xl w-full max-w-lg p-6 relative">
 
@@ -1173,31 +1173,31 @@
 
                         <div>
                             <label class="text-white font-medium">Year</label>
-                            <input type="date" class="w-full border rounded px-3 py-2" 
+                            <input type="date" class="w-full border rounded px-3 py-2 bg-white focus:ring-2 focus:ring-green-600 outline-none" 
                                 name="year" placeholder="Seminar Year">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Date</label>
-                            <input type="date" class="w-full border rounded px-3 py-2" 
+                            <input type="date" class="w-full border rounded px-3 py-2 bg-white" 
                             name="date" placeholder="Seminar Date">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Work Position</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="work_position" placeholder="Work Position">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Name of Company</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="company" placeholder="Name of Company">
                         </div>
 
                         <div>
                             <label class="text-white font-medium">Remarks</label>
-                            <input type="text" class="w-full border rounded px-3 py-2" 
+                            <input type="text" class="w-full border rounded px-3 py-2 bg-white" 
                                 name="remark" placeholder="Input Remark">
                         </div>
 
@@ -1906,6 +1906,68 @@ if (window.currentUserRole === 'coach' && window.currentCoachId) {
 
     byId('coach_saveBtn')?.addEventListener('click', performFinalSave);
     byId('coach_updateBtn')?.addEventListener('click', performFinalSave);
+
+    // -----------------------
+    // RESET FORM FUNCTION
+    // -----------------------
+    window.resetCoachForm = function() {
+        const form = document.getElementById('coachForm');
+        if (form) form.reset();
+        
+        // Reset picture preview
+        const preview = byId('coach_picturePreview');
+        const noPic = byId('coach_noPictureText');
+        if (preview) {
+            preview.src = '';
+            preview.classList.add('hidden');
+        }
+        if (noPic) {
+            noPic.classList.remove('hidden');
+        }
+    };
+
+    // -----------------------
+    // PICTURE HANDLING
+    // -----------------------
+    const coachPictureInput = byId('coach_pictureInput');
+    const coachPicturePreview = byId('coach_picturePreview');
+    const coachNoPictureText = byId('coach_noPictureText');
+    const addPictureBtnCoach = byId('addPictureBtn');
+    const clearPictureBtnCoach = byId('coach_clearPictureBtn');
+
+    if (addPictureBtnCoach) {
+        addPictureBtnCoach.addEventListener('click', () => {
+            if (coachPictureInput) coachPictureInput.click();
+        });
+    }
+
+    if (clearPictureBtnCoach) {
+        clearPictureBtnCoach.addEventListener('click', () => {
+            if (coachPictureInput) coachPictureInput.value = '';
+            if (coachPicturePreview) {
+                coachPicturePreview.src = '';
+                coachPicturePreview.classList.add('hidden');
+            }
+            if (coachNoPictureText) coachNoPictureText.classList.remove('hidden');
+        });
+    }
+
+    if (coachPictureInput) {
+        coachPictureInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    if (coachPicturePreview) {
+                        coachPicturePreview.src = e.target.result;
+                        coachPicturePreview.classList.remove('hidden');
+                    }
+                    if (coachNoPictureText) coachNoPictureText.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
 });
 </script>
 
