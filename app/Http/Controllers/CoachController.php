@@ -19,10 +19,8 @@ class CoachController extends Controller
         if (auth()->check() && auth()->user()->role === 'coach') {
             $coach = auth()->user()->coach;
             if (!$coach) {
-                // Coach user doesn't have a coach profile yet, show creation form
                 return view('features.coach', compact('coach'));
             }
-            // Load coach with related data - include ALL relationships so all tabs display data
             $coach->load('achievements', 'workHistories', 'memberships', 'schedule', 'expenses', 'seminars');
             return view('features.coach', compact('coach'));
         }
@@ -30,6 +28,23 @@ class CoachController extends Controller
         // Admins see all coaches
         $coaches = Coach::all();
         return view('c_lists.coach_lists', compact('coaches'));
+    }
+
+    public function page(Request $request)
+    {
+        $coach = null;
+
+        if (auth()->check() && auth()->user()->role === 'coach') {
+            $coach = auth()->user()->coach;
+        } elseif ($request->has('coach_id')) {
+            $coach = Coach::find($request->query('coach_id'));
+        }
+
+        if ($coach) {
+            $coach->load('achievements', 'workHistories', 'memberships', 'schedule', 'expenses', 'seminars');
+        }
+
+        return view('features.coach', compact('coach'));
     }
 
     public function create()

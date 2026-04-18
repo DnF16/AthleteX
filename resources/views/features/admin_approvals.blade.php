@@ -30,7 +30,7 @@
                                 </button>
                                 
                                 <a href="{{ route('alumni.register.show') }}" target="_blank" class="btn btn-outline-success">
-                                    <i class="fas fa-external-link-alt"></i>
+                                    <i class="fas fa-external-link-alt">Open</i>
                                 </a>
                             </div>
                         </div>

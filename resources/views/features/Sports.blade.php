@@ -3,7 +3,7 @@
 @section('title', 'Sports')
 
 @section('content')
-<div id="tab-content" class="bg-white p-6 rounded  w-full">
+<div id="tab-content" class="bg-[#c5e0b4] p-6 rounded  w-full">
     <div class="space-y-6 w-full">
 
         <!-- Page Header -->
@@ -12,35 +12,66 @@
         </div>
 
         <!-- Filters Section -->
-        <div class="flex flex-col w-48">
-            <label class="text-gray-700 font-medium mb-1">Select Sport</label>
-            <select id="sportFilter" class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+        <div class="flex flex-col w-64">
+            <label for="sportFilter" class="text-sm font-semibold text-gray-700 mb-2">Filter by Category</label>
+            <select id="sportFilter" name="sport_id" class="border border-gray-300 rounded-lg px-4 py-2 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition duration-200 shadow-sm cursor-pointer">
                 <option value="">All Sports</option>
-                <option value="Basketball">Basketball</option>
-                <option value="Volleyball">Volleyball</option>
-                <option value="Swimming">Swimming</option>
+                @foreach($sports as $sport)
+                    <option value="{{ $sport->name }}" {{ ($sportId ?? '') == $sport->name ? 'selected' : '' }}>
+                        {{ $sport->name }}
+                    </option>
+                @endforeach
             </select>
         </div>
 
-        <!-- Detailed Schedule Table -->
+        <!-- Sports Table -->
         <div class="bg-white rounded shadow p-6 overflow-x-auto">
-            <h2 class="text-xl font-bold mb-4 text-gray-800">Detailed Schedule</h2>
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Sports Table</h2>
             <table class="min-w-full divide-y divide-gray-200" id="scheduleTable">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Sport</th>
                         <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Coach</th>
                         <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Assistant Coach</th>
                         <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Class A</th>
                         <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Class B</th>
                         <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Class C</th>
-                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Remarks</th>
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Total</th>
+
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200">
-                    <tr data-sport="Basketball">
-                        
-                    </tr>
-                    <!-- Add more rows here, each with a data-sport attribute -->
+                <tbody id="scheduleBody" class="divide-y divide-gray-200">
+                    @foreach($sports as $sport)
+                        @php
+                            $sportCoaches = $coaches->get($sport->name, collect());
+                        @endphp
+
+                        @if($sportCoaches->isEmpty())
+                            <tr data-sport="{{ $sport->name }}">
+                                <td class="px-4 py-3">{{ $sport->name }}</td>
+                                <td class="px-4 py-3"></td>
+                                <td class="px-4 py-3">-</td>
+                                <td class="px-4 py-3">-</td>
+                                <td class="px-4 py-3">-</td>
+                                <td class="px-4 py-3">-</td>
+                                <td class="px-4 py-3">-</td>
+
+                            </tr>
+                        @else
+                            @foreach($sportCoaches as $coach)
+                                <tr data-sport="{{ $sport->name }}">
+                                    <td class="px-4 py-3">{{ $sport->name }}</td>
+                                    <td class="px-4 py-3">{{ trim($coach->coach_first_name . ' ' . $coach->coach_last_name) }}</td>
+                                    <td class="px-4 py-3">{{ $coach->position ?? '-' }}</td>
+                                    <td class="px-4 py-3">-</td>
+                                    <td class="px-4 py-3">-</td>
+                                    <td class="px-4 py-3">-</td>
+                                    <td class="px-4 py-3">-</td>
+
+                                </tr>
+                            @endforeach
+                        @endif
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -51,32 +82,20 @@
 <script>
     // Live filter for sports
     const sportSelect = document.getElementById('sportFilter');
-const scheduleBody = document.getElementById('scheduleBody');
+    const scheduleBody = document.getElementById('scheduleBody');
 
-sportSelect.addEventListener('change', function() {
-    const sport = this.value;
+    sportSelect.addEventListener('change', function() {
+        const sport = this.value;
+        const rows = scheduleBody.querySelectorAll('tr');
 
-    fetch(`/sports/filter/${sport}`)
-        .then(res => res.json())
-        .then(coaches => {
-            scheduleBody.innerHTML = '';
-
-            coaches.forEach(coach => {
-                coach.athletes.forEach(athlete => {
-                    scheduleBody.innerHTML += `
-                        <tr>
-                            <td>${coach.name}</td>
-                            <td>${coach.assistant_coach || ''}</td>
-                            <td>${athlete.class_a || ''}</td>
-                            <td>${athlete.class_b || ''}</td>
-                            <td>${athlete.class_c || ''}</td>
-                            <td>${athlete.remarks || ''}</td>
-                        </tr>
-                    `;
-                });
-            });
+        rows.forEach(row => {
+            if (!sport || row.dataset.sport === sport) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
         });
-});
+    });
 </script>
 
 @endsection

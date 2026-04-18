@@ -25,6 +25,7 @@ use App\Http\Controllers\CoachWorkHistoryController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\SportsController; // Added this based on your code usage
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ScheduleController;
 
 
 // ==============================================================
@@ -80,9 +81,13 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/reports/{report}/mark-rejected', [\App\Http\Controllers\ReportController::class, 'markRejected'])
         ->name('reports.mark-rejected');
 
-    Route::get('/coach', function () { return view('features.coach'); })->name('coach');
-    Route::get('/schedule', function () { return view('features.schedule'); })->name('schedule');
-    Route::get('/sports', function () { return view('features.sports'); })->name('sports');
+    Route::get('/coach', [CoachController::class, 'page'])->name('coach');
+    Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule');
+    Route::get('/sports', function () {
+        $sports = App\Models\Sport::orderBy('name')->get();
+        $coaches = App\Models\Coach::all()->groupBy('coach_sport_event');
+        return view('features.sports', compact('sports', 'coaches'));
+    })->name('sports');
     Route::get('/student-athlete', [AthleteController::class, 'create'])->name('student.athlete');
 
     // Student Athlete Logic
@@ -109,6 +114,14 @@ Route::middleware(['auth'])->group(function () {
 
     // Shared Attendance History for both Admin and Coach
     Route::get('/attendance/history', [AttendanceController::class, 'history'])->name('attendance.history');
+
+    // ==============================================================
+    // SCHEDULE ROUTES
+    // ==============================================================
+    Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
+    Route::put('/schedules/{schedule}', [ScheduleController::class, 'update'])->name('schedules.update');
+    Route::delete('/schedules/{schedule}', [ScheduleController::class, 'destroy'])->name('schedules.destroy');
+    Route::get('/api/schedules', [ScheduleController::class, 'getEvents'])->name('schedules.events');
 
     // ==============================================================
     // COACH ROUTES

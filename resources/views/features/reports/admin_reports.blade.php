@@ -3,7 +3,7 @@
 @section('title', 'Coach Reports')
 
 @section('content')
-<div id="tab-content" class="bg-white p-6 rounded w-full">
+<div id="tab-content" class="bg-[#c5e0b4]  p-6 rounded w-full">
     <div class="space-y-6">
 
         <!-- Page Header -->

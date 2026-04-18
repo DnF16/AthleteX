@@ -7,6 +7,7 @@ use App\Models\Athlete;
 use App\Models\Coach;
 use App\Models\Achievement;
 use App\Models\CoachSchedule;
+use App\Models\Schedule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -38,15 +39,20 @@ class DashboardController extends Controller
             $achievementsMonthly[$month] = $count;
         }
 
-        // Get schedule events (if you have CoachSchedule or similar)
+        // Get schedule events (if you have Schedule or similar)
         $scheduleEvents = [];
         try {
-            if (class_exists('App\Models\CoachSchedule')) {
-                $schedules = CoachSchedule::all();
+            if (class_exists('App\Models\Schedule')) {
+                $schedules = Schedule::where('event_date', '>=', Carbon::now())
+                    ->orderBy('event_date')
+                    ->orderBy('event_time')
+                    ->limit(10)
+                    ->get();
                 foreach ($schedules as $schedule) {
                     $scheduleEvents[] = [
-                        'title' => $schedule->title ?? 'Event',
-                        'start' => $schedule->date ?? $schedule->created_at,
+                        'title' => $schedule->event_name,
+                        'start' => $schedule->event_date->format('Y-m-d') . ' ' . $schedule->event_time->format('H:i:s'),
+                        'description' => $schedule->activity . ($schedule->sport ? ' (' . $schedule->sport . ')' : ''),
                     ];
                 }
             }

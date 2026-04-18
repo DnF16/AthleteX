@@ -11,45 +11,28 @@
             <h1 class="text-3xl font-bold text-gray-800 mb-0">Schedule</h1>
         </div>
         <div>
-            <a href="#"
+            <button id="addScheduleBtn"
                 class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-                Add New Schedule
-            </a>
+                <i class="fas fa-plus mr-2"></i>Add New Schedule
+            </button>
         </div>
     </div>
 
     <!-- Filters Section -->
     <div class="bg-white p-6 rounded shadow flex flex-wrap gap-4">
+        <form id="filterForm" class="flex flex-wrap gap-4 w-full">
+            <div class="flex flex-col">
+                <label class="text-gray-700 font-medium mb-1">Month</label>
+                <input type="month" name="month" id="monthFilter" class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+                    value="{{ request('month', date('Y-m')) }}">
+            </div>
 
-        <div class="flex flex-col">
-            <label class="text-gray-700 font-medium mb-1">Select Sport</label>
-            <select class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
-                <option>All Sports</option>
-                <option>Basketball</option>
-                <option>Volleyball</option>
-                <option>Swimming</option>
-            </select>
-        </div>
-
-        <div class="flex flex-col">
-            <label class="text-gray-700 font-medium mb-1">Select Athlete</label>
-            <select class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
-                <option>All Athletes</option>
-                <option>John Doe</option>
-                <option>Jane Smith</option>
-            </select>
-        </div>
-
-        <div class="flex flex-col">
-            <label class="text-gray-700 font-medium mb-1">Week</label>
-            <input type="week" class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
-        </div>
-
-        <div class="flex items-end">
-            <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-                Filter
-            </button>
-        </div>
+            <div class="flex items-end">
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                    <i class="fas fa-filter mr-2"></i>Filter
+                </button>
+            </div>
+        </form>
     </div>
 
         @php
@@ -63,6 +46,16 @@
 
     // Array of weekdays
     $weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    // Group schedules by date
+    $eventsByDate = [];
+    foreach($schedules as $schedule) {
+        $dateKey = $schedule->event_date->format('Y-m-d');
+        if (!isset($eventsByDate[$dateKey])) {
+            $eventsByDate[$dateKey] = [];
+        }
+        $eventsByDate[$dateKey][] = $schedule;
+    }
 @endphp
 
 <div class="space-y-6 w-full">
@@ -86,32 +79,15 @@
             @for($day = 1; $day <= $daysInMonth; $day++)
                 @php
                     $currentDate = date('Y-m-d', strtotime("$year-$month-$day"));
-                    // Example events (replace with real data)
-                    $events = [
-                        '2025-10-03' => [
-                            ['title'=>'Basketball Practice','color'=>'green'],
-                            ['title'=>'Swimming Training','color'=>'blue']
-                        ],
-                        '2025-10-04' => [
-                            ['title'=>'Volleyball Match','color'=>'yellow']
-                        ]
-                    ];
+                    $dayEvents = $eventsByDate[$currentDate] ?? [];
                 @endphp
                 <div class="border border-gray-200 rounded p-2 h-32 flex flex-col justify-start">
                     <span class="text-xs font-medium text-gray-500">{{ $day }}</span>
 
-                    @if(isset($events[$currentDate]))
-                        @foreach($events[$currentDate] as $event)
-                            @php
-                                $bgColor = match($event['color']){
-                                    'green'=>'bg-green-100 text-green-800',
-                                    'blue'=>'bg-blue-100 text-blue-800',
-                                    'yellow'=>'bg-yellow-100 text-yellow-800',
-                                    default=>'bg-gray-100 text-gray-800'
-                                };
-                            @endphp
-                            <div class="mt-1 {{ $bgColor }} text-xs rounded px-1 py-0.5">
-                                {{ $event['title'] }}
+                    @if(count($dayEvents) > 0)
+                        @foreach(array_slice($dayEvents, 0, 3) as $event)
+                            <div class="mt-1 bg-blue-100 text-blue-800 text-xs rounded px-1 py-0.5 truncate">
+                                {{ $event->event_name }}
                             </div>
                         @endforeach
                     @endif
@@ -119,8 +95,6 @@
             @endfor
         </div>
     </div>
-
-</div>
 
     <!-- Detailed Schedule Table -->
     <div class="bg-white rounded shadow p-6 overflow-x-auto">
@@ -130,33 +104,250 @@
                 <tr>
                     <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Date</th>
                     <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Time</th>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Athlete</th>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Sport</th>
+                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Event Name</th>
                     <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Activity</th>
+                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Sport</th>
                     <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Coach</th>
+                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Actions</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200">
+            <tbody class="divide-y divide-gray-200" id="scheduleTableBody">
+                @forelse($schedules as $schedule)
+                <tr data-id="{{ $schedule->id }}">
+                    <td class="px-4 py-2 text-sm text-gray-800">{{ $schedule->event_date->format('M d, Y') }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-800">{{ $schedule->event_time->format('H:i') }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-800">{{ $schedule->event_name }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-800">{{ $schedule->activity }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-800">{{ $schedule->sport ?: '-' }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-800">{{ $schedule->coach ?: '-' }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-800">
+                        <button class="edit-schedule-btn text-blue-600 hover:text-blue-800 mr-2" data-id="{{ $schedule->id }}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-schedule-btn text-red-600 hover:text-red-800" data-id="{{ $schedule->id }}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                @empty
                 <tr>
-                    <td class="px-4 py-2 text-sm text-gray-800">Oct 7, 2025</td>
-                    <td class="px-4 py-2 text-sm text-gray-800">10:00 AM - 12:00 PM</td>
-                    <td class="px-4 py-2 text-sm text-gray-800">John Doe</td>
-                    <td class="px-4 py-2 text-sm text-gray-800">Basketball</td>
-                    <td class="px-4 py-2 text-sm text-gray-800">Practice</td>
-                    <td class="px-4 py-2 text-sm text-gray-800">Coach Smith</td>
+                    <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+                        No schedules found for this month.
+                    </td>
                 </tr>
-                <tr class="bg-gray-50">
-                    <td class="px-4 py-2 text-sm text-gray-800">Oct 9, 2025</td>
-                    <td class="px-4 py-2 text-sm text-gray-800">2:00 PM - 4:00 PM</td>
-                    <td class="px-4 py-2 text-sm text-gray-800">Jane Smith</td>
-                    <td class="px-4 py-2 text-sm text-gray-800">Swimming</td>
-                    <td class="px-4 py-2 text-sm text-gray-800">Training</td>
-                    <td class="px-4 py-2 text-sm text-gray-800">Coach Lee</td>
-                </tr>
-                <!-- More rows -->
+                @endforelse
             </tbody>
         </table>
     </div>
 
 </div>
+
+<!-- Add/Edit Schedule Modal -->
+<div id="scheduleModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900" id="modalTitle">Add New Schedule</h3>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="scheduleForm">
+                @csrf
+                <input type="hidden" id="scheduleId" name="schedule_id">
+
+                <div class="mb-4">
+                    <label for="event_name" class="block text-sm font-medium text-gray-700 mb-1">Event Name *</label>
+                    <input type="text" id="event_name" name="event_name" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="event_date" class="block text-sm font-medium text-gray-700 mb-1">Date *</label>
+                    <input type="date" id="event_date" name="event_date" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="event_time" class="block text-sm font-medium text-gray-700 mb-1">Time *</label>
+                    <input type="time" id="event_time" name="event_time" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="activity" class="block text-sm font-medium text-gray-700 mb-1">Activity *</label>
+                    <input type="text" id="activity" name="activity" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="sport" class="block text-sm font-medium text-gray-700 mb-1">Sport</label>
+                    <select id="sport" name="sport" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                        <option value="">Select Sport</option>
+                        <option value="Basketball">Basketball</option>
+                        <option value="Volleyball">Volleyball</option>
+                        <option value="Athletics">Athletics</option>
+                        <option value="Swimming">Swimming</option>
+                        <option value="Taekwondo">Taekwondo</option>
+                        <option value="Chess">Chess</option>
+                        <option value="Football">Football</option>
+                        <option value="Boxing">Boxing</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="coach" class="block text-sm font-medium text-gray-700 mb-1">Coach</label>
+                    <input type="text" id="coach" name="coach" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="description" name="description" rows="3" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelBtn" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+                        Cancel
+                    </button>
+                    <button type="submit" id="saveBtn" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                        Save Schedule
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('scheduleModal');
+    const form = document.getElementById('scheduleForm');
+    const addBtn = document.getElementById('addScheduleBtn');
+    const closeBtn = document.getElementById('closeModalBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const filterForm = document.getElementById('filterForm');
+
+    // Modal controls
+    addBtn.addEventListener('click', () => openModal());
+    closeBtn.addEventListener('click', () => closeModal());
+    cancelBtn.addEventListener('click', () => closeModal());
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    // Filter form submission
+    filterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const params = new URLSearchParams(formData);
+        window.location.href = '{{ route("schedule") }}?' + params.toString();
+    });
+
+    // Form submission
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const scheduleId = formData.get('schedule_id');
+        const isEdit = scheduleId && scheduleId !== '';
+
+        const url = isEdit
+            ? `{{ url('/schedules') }}/${scheduleId}`
+            : '{{ route("schedules.store") }}';
+
+        const method = isEdit ? 'PUT' : 'POST';
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                closeModal();
+                location.reload(); // Refresh to show updated data
+            } else {
+                alert('Error: ' + JSON.stringify(result.errors));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while saving the schedule.');
+        }
+    });
+
+    // Edit buttons
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('edit-schedule-btn') || e.target.closest('.edit-schedule-btn')) {
+            const btn = e.target.classList.contains('edit-schedule-btn') ? e.target : e.target.closest('.edit-schedule-btn');
+            const scheduleId = btn.getAttribute('data-id');
+            editSchedule(scheduleId);
+        }
+
+        if (e.target.classList.contains('delete-schedule-btn') || e.target.closest('.delete-schedule-btn')) {
+            const btn = e.target.classList.contains('delete-schedule-btn') ? e.target : e.target.closest('.delete-schedule-btn');
+            const scheduleId = btn.getAttribute('data-id');
+            deleteSchedule(scheduleId);
+        }
+    });
+
+    function openModal(schedule = null) {
+        document.getElementById('modalTitle').textContent = schedule ? 'Edit Schedule' : 'Add New Schedule';
+        document.getElementById('scheduleId').value = schedule ? schedule.id : '';
+        document.getElementById('event_name').value = schedule ? schedule.event_name : '';
+        document.getElementById('event_date').value = schedule ? schedule.event_date : '';
+        document.getElementById('event_time').value = schedule ? schedule.event_time : '';
+        document.getElementById('activity').value = schedule ? schedule.activity : '';
+        document.getElementById('sport').value = schedule ? schedule.sport : '';
+        document.getElementById('coach').value = schedule ? schedule.coach : '';
+        document.getElementById('description').value = schedule ? schedule.description : '';
+
+        modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        form.reset();
+    }
+
+    async function editSchedule(id) {
+        try {
+            const response = await fetch(`{{ url('/schedules') }}/${id}`);
+            const schedule = await response.json();
+            openModal(schedule);
+        } catch (error) {
+            console.error('Error loading schedule:', error);
+            alert('Error loading schedule data.');
+        }
+    }
+
+    async function deleteSchedule(id) {
+        if (!confirm('Are you sure you want to delete this schedule?')) return;
+
+        try {
+            const response = await fetch(`{{ url('/schedules') }}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                location.reload(); // Refresh to show updated data
+            } else {
+                alert('Error deleting schedule.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the schedule.');
+        }
+    }
+});
+</script>
+
 @endsection

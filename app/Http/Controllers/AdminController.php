@@ -137,6 +137,11 @@ class AdminController extends Controller
                 'coach_email' => $user->email,
                 'coach_sport_event' => $validated['coach_sport'],
             ]);
+        } elseif (empty($coach->coach_sport_event)) {
+            // If an existing coach profile already exists but its sport field is empty,
+            // sync it with the newly chosen coach sport from the user creation form.
+            $coach->coach_sport_event = $validated['coach_sport'];
+            $coach->save();
         }
 
         // Link the user to the coach profile
