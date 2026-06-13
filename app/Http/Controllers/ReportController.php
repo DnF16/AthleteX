@@ -11,18 +11,32 @@ use Illuminate\Support\Facades\Log;
 class ReportController extends Controller
 {
     // Coach views their own reports
-    public function coachIndex()
+   public function coachIndex()
     {
         if (auth()->user()->role !== 'coach') {
             abort(403);
         }
 
         $coachId = auth()->user()->coach->id ?? null;
-        $reports = Report::where('coach_id', $coachId)
+        
+        // 1. Fetch standard file reports
+        $reports = \App\Models\Report::where('coach_id', $coachId)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('features.reports.coach_reports', compact('reports'));
+        // 2. Fetch the athletes for the new Medical Incident dropdown
+        $athletes = \Illuminate\Support\Facades\DB::table('athletes')->get();
+
+        // 3. NEW: Fetch this coach's medical incidents! (Joining athletes to get their names)
+        $incidentReports = \Illuminate\Support\Facades\DB::table('incident_reports')
+            ->join('athletes', 'incident_reports.athlete_id', '=', 'athletes.id')
+            ->where('incident_reports.coach_id', $coachId)
+            ->select('incident_reports.*', 'athletes.first_name', 'athletes.last_name')
+            ->orderBy('incident_reports.created_at', 'desc')
+            ->get();
+
+        // Pass all three variables to the view
+        return view('features.reports.coach_reports', compact('reports', 'athletes', 'incidentReports'));
     }
 
     // Coach uploads a report
@@ -63,15 +77,18 @@ class ReportController extends Controller
     // Admin views all reports
     public function adminIndex()
     {
-        if (auth()->user()->role !== 'admin') {
-            abort(403);
-        }
+        // 1. Fetch standard file reports (Keep whatever logic you already had here)
+        $reports = \App\Models\Report::orderBy('created_at', 'desc')->get();
 
-        $reports = Report::with('coach')
-            ->orderBy('created_at', 'desc')
+        // 2. NEW: Fetch ALL medical incidents across the entire system for the SDO
+        $incidentReports = \Illuminate\Support\Facades\DB::table('incident_reports')
+            ->join('athletes', 'incident_reports.athlete_id', '=', 'athletes.id')
+            ->select('incident_reports.*', 'athletes.first_name', 'athletes.last_name')
+            ->orderBy('incident_reports.created_at', 'desc')
             ->get();
 
-        return view('features.reports.admin_reports', compact('reports'));
+        // Pass both variables to the admin view
+        return view('features.reports.admin_reports', compact('reports', 'incidentReports'));
     }
 
     // Admin marks report as received

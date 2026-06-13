@@ -16,6 +16,7 @@ use App\Http\Controllers\WorkHistoryController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CoachController;
 use App\Http\Controllers\SportsController;
+use App\Http\Controllers\IncidentController;
 
 // Coach Sub-Controllers
 use App\Http\Controllers\CoachAchievementController;
@@ -92,6 +93,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/sports', function () { return view('features.sports'); })->name('sports');
     Route::get('/student-athlete', [AthleteController::class, 'create'])->name('student.athlete');
 
+
     // Student Athlete Logic
     Route::get('/student-athletes', [AthleteController::class, 'index'])->name('student.athletes');
 
@@ -162,6 +164,10 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/coach-work-history/{id}', [CoachWorkHistoryController::class, 'update']);
     Route::delete('/coach-work-history/{id}', [CoachWorkHistoryController::class, 'destroy']);
 
+        // Incident Router Endpoints
+    Route::post('/incidents/report', [IncidentController::class, 'createReport'])->name('incidents.report');
+    Route::put('/incidents/approve/{report_id}', [IncidentController::class, 'approveTicket'])->name('incidents.approve')   ;
+
     // Coach Attendance Routes
     Route::prefix('coach')
         ->name('coach.')
@@ -180,7 +186,7 @@ Route::middleware(['auth'])->group(function () {
                 ->name('reports.store');
         });
 
-});
+    });
 
 // ==============================================================
 // ADMIN PANEL ROUTES (Protected)
@@ -240,6 +246,7 @@ Route::prefix('admin')
         ->name('tryouts.destroy');
 
     Route::get('/sports/filter/{sport}', [SportsController::class, 'filter'])->name('sports.filter');
+
 
 });
 

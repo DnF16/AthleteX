@@ -1,30 +1,27 @@
 <?php
 
-namespace App\Mail;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
-use Illuminate\Queue\SerializesModels;
-
-class TryoutScheduleMail extends Mailable
+return new class extends Migration
 {
-    use Queueable, SerializesModels;
-
-    public $athlete;
-    public $schedule;
-
-    // We pass the athlete info and schedule info into the email
-    public function __construct($athlete, $schedule)
+    public function up(): void
     {
-        $this->athlete = $athlete;
-        $this->schedule = $schedule;
+        Schema::create('tryout_schedules', function (Blueprint $table) {
+            $table->id();
+            // Assuming it links to your athletes table
+            $table->foreignId('athlete_id')->constrained()->cascadeOnDelete();
+            $table->string('sport_event')->nullable();
+            $table->dateTime('tryout_date')->nullable();
+            $table->string('location')->nullable();
+            $table->string('status')->default('Pending');
+            $table->timestamps();
+        });
     }
 
-    public function build()
+    public function down(): void
     {
-        $sportName = str_replace('_', ' ', $this->schedule->sport_event);
-        
-        return $this->subject('Your Tryout Schedule: ' . $sportName . ' - SDO')
-                    ->view('emails.tryout_schedule'); // This points to the blade file we will make next
+        Schema::dropIfExists('tryout_schedules');
     }
-}
+};

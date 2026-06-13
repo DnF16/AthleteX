@@ -1,32 +1,30 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'My Reports'); ?>
 
-@section('title', 'My Reports')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div id="tab-content" class="bg-white p-6 rounded w-full">
     <div class="space-y-6">
-        @if(session('success'))
+        <?php if(session('success')): ?>
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-sm mb-4" role="alert">
                 <div class="flex items-center">
                     <i class="bi bi-check-circle-fill text-xl me-2"></i>
-                    <span class="font-bold">{{ session('success') }}</span>
+                    <span class="font-bold"><?php echo e(session('success')); ?></span>
                 </div>
             </div>
-        @endif
+        <?php endif; ?>
 
-        @if($errors->any())
+        <?php if($errors->any()): ?>
             <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-sm mb-4" role="alert">
                 <div class="flex items-center mb-2">
                     <i class="bi bi-exclamation-triangle-fill text-xl me-2"></i>
                     <span class="font-bold">Please fix the following errors:</span>
                 </div>
                 <ul class="list-disc ms-8 mb-0">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
+                    <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <li><?php echo e($error); ?></li>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </ul>
             </div>
-        @endif
+        <?php endif; ?>
 
         <div class="flex-1 text-center">
             <h1 class="text-3xl font-bold text-gray-800 mb-0">My Reports</h1>
@@ -47,9 +45,9 @@
             </div>
             <p class="text-sm text-red-600 mb-6">Step <span id="step-counter">1</span> of 3: Please provide the details of the incident below.</p>
 
-            <form action="{{ route('incidents.report') }}" method="POST" id="smartIncidentForm">
-                @csrf
-                <input type="hidden" name="coach_id" value="{{ auth()->user()->coach->id ?? 1 }}">
+            <form action="<?php echo e(route('incidents.report')); ?>" method="POST" id="smartIncidentForm">
+                <?php echo csrf_field(); ?>
+                <input type="hidden" name="coach_id" value="<?php echo e(auth()->user()->coach->id ?? 1); ?>">
 
                 <!-- ================= STEP 1: CONTEXT & LOCATION ================= -->
                 <div id="step1">
@@ -59,13 +57,13 @@
                             <label class="form-label fw-bold text-danger">Select Primary Athlete <span class="text-red-500">*</span></label>
                             <select name="athlete_id" class="form-select border-danger text-gray-700" required>
                                 <option value="" disabled selected>-- Choose an Athlete --</option>
-                                @if(isset($athletes) && count($athletes) > 0)
-                                    @foreach($athletes as $athlete)
-                                        <option value="{{ $athlete->id }}">{{ $athlete->first_name }} {{ $athlete->last_name }}</option>
-                                    @endforeach
-                                @else
+                                <?php if(isset($athletes) && count($athletes) > 0): ?>
+                                    <?php $__currentLoopData = $athletes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $athlete): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($athlete->id); ?>"><?php echo e($athlete->first_name); ?> <?php echo e($athlete->last_name); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php else: ?>
                                     <option value="" disabled>No athletes found. Please add athletes first.</option>
-                                @endif
+                                <?php endif; ?>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -74,7 +72,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold text-danger">Date of Incident <span class="text-red-500">*</span></label>
-                            <input type="date" name="incident_date" class="form-control border-danger" value="{{ date('Y-m-d') }}" required>
+                            <input type="date" name="incident_date" class="form-control border-danger" value="<?php echo e(date('Y-m-d')); ?>" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold text-danger">Time of Incident <span class="text-red-500">*</span></label>
@@ -259,39 +257,42 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($incidentReports ?? [] as $index => $incident)
+                    <?php $__empty_1 = true; $__currentLoopData = $incidentReports ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $incident): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <tr class="hover:bg-red-50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $index + 1 }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo e($index + 1); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-800">
-                                {{ $incident->first_name }} {{ $incident->last_name }}
+                                <?php echo e($incident->first_name); ?> <?php echo e($incident->last_name); ?>
+
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ $incident->incident_details }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700"><?php echo e($incident->incident_details); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if($incident->status === 'Pending')
+                                <?php if($incident->status === 'Pending'): ?>
                                     <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending SDO Approval</span>
-                                @elseif($incident->status === 'SDO_Approved')
+                                <?php elseif($incident->status === 'SDO_Approved'): ?>
                                     <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">SDO Approved</span>
-                                @elseif($incident->status === 'Ticket_Claimed')
+                                <?php elseif($incident->status === 'Ticket_Claimed'): ?>
                                     <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Ticket Claimed</span>
-                                @else
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">{{ $incident->status }}</span>
-                                @endif
+                                <?php else: ?>
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"><?php echo e($incident->status); ?></span>
+                                <?php endif; ?>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap font-mono text-sm font-bold {{ $incident->insurance_ticket_no ? 'text-green-600' : 'text-gray-400' }}">
-                                {{ $incident->insurance_ticket_no ?? 'Awaiting Code...' }}
+                            <td class="px-6 py-4 whitespace-nowrap font-mono text-sm font-bold <?php echo e($incident->insurance_ticket_no ? 'text-green-600' : 'text-gray-400'); ?>">
+                                <?php echo e($incident->insurance_ticket_no ?? 'Awaiting Code...'); ?>
+
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ \Carbon\Carbon::parse($incident->created_at)->format('M d, Y g:i A') }}
+                                <?php echo e(\Carbon\Carbon::parse($incident->created_at)->format('M d, Y g:i A')); ?>
+
                             </td>
                         </tr>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
                             <td colspan="6" class="px-6 py-8 text-center text-gray-500">
                                 <i class="bi bi-shield-check text-3xl mb-2 block text-gray-300"></i>
                                 No medical incidents reported yet. Safe season!
                             </td>
                         </tr>
-                    @endforelse
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -312,39 +313,41 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($reports as $index => $report)
+                    <?php $__empty_1 = true; $__currentLoopData = $reports; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $report): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $index + 1 }}</td>
-                            <td class="px-6 py-4">{{ $report->title }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap"><?php echo e($index + 1); ?></td>
+                            <td class="px-6 py-4"><?php echo e($report->title); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
-                                <a href="{{ route('reports.download', $report->id) }}" class="hover:underline">
-                                    {{ $report->file_name }}
+                                <a href="<?php echo e(route('reports.download', $report->id)); ?>" class="hover:underline">
+                                    <?php echo e($report->file_name); ?>
+
                                 </a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if($report->status === 'pending')
+                                <?php if($report->status === 'pending'): ?>
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                                @elseif($report->status === 'received')
+                                <?php elseif($report->status === 'received'): ?>
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Received</span>
-                                @elseif($report->status === 'rejected')
+                                <?php elseif($report->status === 'rejected'): ?>
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Rejected</span>
-                                @endif
+                                <?php endif; ?>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ $report->created_at->format('M d, Y') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm"><?php echo e($report->created_at->format('M d, Y')); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                {{ $report->received_at ? $report->received_at->format('M d, Y') : '—' }}
+                                <?php echo e($report->received_at ? $report->received_at->format('M d, Y') : '—'); ?>
+
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a href="{{ route('reports.download', $report->id) }}" class="text-blue-600 hover:text-blue-800" title="Download">
+                                <a href="<?php echo e(route('reports.download', $report->id)); ?>" class="text-blue-600 hover:text-blue-800" title="Download">
                                     <i class="bi bi-download"></i>
                                 </a>
                             </td>
                         </tr>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
                             <td colspan="7" class="px-6 py-4 text-center text-gray-500">No standard reports submitted yet.</td>
                         </tr>
-                    @endforelse
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -362,32 +365,74 @@
             </div>
 
             <div class="modal-body">
-                <form method="POST" action="{{ route('coach.reports.store') }}" enctype="multipart/form-data">
-                    @csrf
+                <form method="POST" action="<?php echo e(route('coach.reports.store')); ?>" enctype="multipart/form-data">
+                    <?php echo csrf_field(); ?>
 
                     <div class="mb-3">
                         <label class="form-label">Report Title <span class="text-red-500">*</span></label>
-                        <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" required>
-                        @error('title')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <input type="text" name="title" class="form-control <?php $__errorArgs = ['title'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" required>
+                        <?php $__errorArgs = ['title'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="invalid-feedback"><?php echo e($message); ?></div>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Description</label>
-                        <textarea name="description" class="form-control @error('description') is-invalid @enderror" rows="3"></textarea>
-                        @error('description')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <textarea name="description" class="form-control <?php $__errorArgs = ['description'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" rows="3"></textarea>
+                        <?php $__errorArgs = ['description'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="invalid-feedback"><?php echo e($message); ?></div>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Select File <span class="text-red-500">*</span></label>
-                        <input type="file" name="file" class="form-control @error('file') is-invalid @enderror" required>
+                        <input type="file" name="file" class="form-control <?php $__errorArgs = ['file'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" required>
                         <small class="form-text text-muted">Max file size: 10MB</small>
-                        @error('file')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <?php $__errorArgs = ['file'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="invalid-feedback"><?php echo e($message); ?></div>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <div class="d-flex justify-content-between">
@@ -401,4 +446,5 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp\htdocs\AthleteX\resources\views/features/reports/coach_reports.blade.php ENDPATH**/ ?>
