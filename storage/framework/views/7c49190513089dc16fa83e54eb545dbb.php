@@ -9,7 +9,7 @@
     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
     
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?php echo e(asset('css/bootstrap.min.css')); ?>" rel="stylesheet">
 
 </head>
 <body class="bg-gray-50">
@@ -25,7 +25,7 @@
     </div>
 
     
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo e(asset('js/bootstrap.bundle.min.js')); ?>"></script>
 
 </body>
 </html><?php /**PATH D:\xampp\htdocs\AthleteX\resources\views/layouts/app.blade.php ENDPATH**/ ?>
