@@ -147,21 +147,24 @@
             </table>
         </div>
 
-        <!-- attendance modal -->
-        <div class="modal fade" id="attendanceModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+    </div>
+</div>
 
-                    <!-- Modal Header -->
-                    <div class="modal-header">
-                        <h5 class="modal-title">Mark Attendance</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
+<!-- attendance modal -->
+<div class="modal fade" id="attendanceModal" tabindex="-1" data-bs-backdrop="false" style="background-color: rgba(0,0,0,0.5); z-index: 9999;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
 
-                    <!-- Modal Body -->
-                    <div class="modal-body">
-                        <form method="POST" action="<?php echo e(route('coach.attendance.store')); ?>">
-                            <?php echo csrf_field(); ?>
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">Mark Attendance</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form method="POST" action="<?php echo e(route('coach.attendance.store')); ?>">
+                    <?php echo csrf_field(); ?>
 
                     <!-- Date Picker -->
                     <div class="mb-3">
@@ -175,58 +178,57 @@
                         <strong>📋 How it works:</strong> Mark attendance today using the status buttons below. Tomorrow, new attendance records for that date will automatically become available. Past records remain in the <strong>Attendance History</strong>.
                     </div>
 
-                            <!-- Athlete Attendance Table -->
-                            <div class="table-responsive mb-3">
-                                <table class="table table-bordered align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Athlete</th>
-                                            <th>Sports</th>
-                                            <th>Status</th>
-                                            <th>Remarks (Optional)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php $__currentLoopData = $athletes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $athlete): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <tr>
-                                            <td><?php echo e($index + 1); ?></td>
-                                            <td><?php echo e($athlete->first_name); ?> <?php echo e($athlete->last_name); ?></td>
-                                            <td><?php echo e($athlete->sport_event); ?></td>
-                                            <td>
-                                                <input type="hidden" name="attendance[<?php echo e($athlete->id); ?>][status]" value="present" class="attendance-hidden">
-                                                <button type="button" class="btn btn-sm btn-outline-success attendance-toggle" title="Click to cycle through statuses">
-                                                    Present
-                                                </button>
-                                            </td>
-                                            <td>
-                                                <input type="text" name="attendance[<?php echo e($athlete->id); ?>][remarks]" class="form-control form-control-sm" placeholder="e.g., Injured, Early dismissal">
-                                            </td>
-                                        </tr>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <!-- Buttons -->
-                            <div class="d-flex justify-content-between">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save Attendance</button>
-                            </div>
-
-                        </form>
+                    <!-- Athlete Attendance Table -->
+                    <div class="table-responsive mb-3">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Athlete</th>
+                                    <th>Sports</th>
+                                    <th>Status</th>
+                                    <th>Remarks (Optional)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $__currentLoopData = $athletes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $athlete): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <tr>
+                                    <td><?php echo e($index + 1); ?></td>
+                                    <td><?php echo e($athlete->first_name); ?> <?php echo e($athlete->last_name); ?></td>
+                                    <td><?php echo e($athlete->sport_event); ?></td>
+                                    <td>
+                                        <input type="hidden" name="attendance[<?php echo e($athlete->id); ?>][status]" value="present" class="attendance-hidden">
+                                        <button type="button" class="btn btn-sm btn-outline-success attendance-toggle" title="Click to cycle through statuses">
+                                            Present
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="attendance[<?php echo e($athlete->id); ?>][remarks]" class="form-control form-control-sm" placeholder="e.g., Injured, Early dismissal">
+                                    </td>
+                                </tr>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </tbody>
+                        </table>
                     </div>
 
-                </div>
-            </div>
-        </div>
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Attendance</button>
+                    </div>
 
+                </form>
+            </div>
+
+        </div>
     </div>
-    
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // THIS IS THE FIX: Teleport the modal directly to the body to escape the layout cage!
+    document.body.appendChild(document.getElementById('attendanceModal'));
+
     const statuses = ['present', 'absent', 'late', 'excused'];
     const statusLabels = {
         'present': 'Present',
