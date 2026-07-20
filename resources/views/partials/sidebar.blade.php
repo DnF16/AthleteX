@@ -60,11 +60,11 @@
                     <i class="bi bi-people-fill mr-2"></i> Coaches
                 </a>
             </li>
-            <li>
+            <!-- <li>
                 <a href="{{ route('schedule') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
                     <i class="bi bi-calendar2-week mr-2"></i> Schedule
                 </a>
-            </li>
+            </li> -->
 
             <!-- <li>
                 <a href="#" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
