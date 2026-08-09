@@ -10,12 +10,11 @@ return new class extends Migration
     {
         Schema::create('tryout_schedules', function (Blueprint $table) {
             $table->id();
-            // Assuming it links to your athletes table
-            $table->foreignId('athlete_id')->constrained()->cascadeOnDelete();
             $table->string('sport_event')->nullable();
-            $table->dateTime('tryout_date')->nullable();
-            $table->string('location')->nullable();
-            $table->string('status')->default('Pending');
+            $table->date('tryout_date')->nullable();
+            $table->time('tryout_time')->nullable();
+            $table->string('venue')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

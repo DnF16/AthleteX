@@ -17,6 +17,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CoachController;
 use App\Http\Controllers\SportsController;
 use App\Http\Controllers\IncidentController;
+use App\Http\Controllers\BlockchainController;
 
 // Coach Sub-Controllers
 use App\Http\Controllers\CoachAchievementController;
@@ -92,6 +93,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/schedule', function () { return view('features.schedule'); })->name('schedule');
     Route::get('/sports', function () { return view('features.sports'); })->name('sports');
     Route::get('/student-athlete', [AthleteController::class, 'create'])->name('student.athlete');
+
+    Route::get('/admin/security-ledger', [BlockchainController::class, 'index'])->name('admin.blockchain');
 
 
     // Student Athlete Logic
@@ -212,6 +215,7 @@ Route::prefix('admin')
     
     // This is the View Profile button
     Route::get('/approvals/{id}/view', [AthleteController::class, 'show'])->name('approvals.show');
+    Route::get('/athletes/print/{id}', [App\Http\Controllers\AthleteController::class, 'printProfile'])->name('athletes.print');
 
     // These are the Actions (Approve/Reject)
     Route::post('/approvals/{id}/approve', [AthleteController::class, 'approve'])->name('approve.athlete');

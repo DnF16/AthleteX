@@ -23,11 +23,11 @@
             <div id="searchResults" class="mt-2 w-64 bg-white border border-gray-200 rounded shadow-sm hidden"></div>
         </div>
         <div class="flex justify-center space-x-2 mt-4">
-            <button id="saveBtn" type="submit" class="px-4 py-2 rounded bg-green-600 text-white bg-green-700 hover:bg-green-700 transition cursor-pointer">
+            <button id="saveBtn" type="submit" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition cursor-pointer">
                 Save Athlete
             </button>
 
-            <button id="updateBtn" type="button" class="hidden px-4 py-2 rounded bg-blue-600 text-white bg-green-700 hover:bg-blue-700 transition cursor-pointer">
+            <button id="updateBtn" type="button" class="hidden px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition cursor-pointer">
                 Update Athlete
             </button>
 
@@ -80,7 +80,7 @@
 
     <hr class="border-t-2 border-gray-400 my-2 w-[100%]">
 
-    <div id="tab-content" class="bg-white p-6 rounded shadow w-full">
+    <div id="tab-content" class="bg-white p-6 rounded shadow w-full relative">
 
         <div id="general-info" class="tab-pane">
             <div class="flex items-stretch gap-6">
@@ -96,18 +96,20 @@
                             <div class="flex items-center">
                                 <label for="last_name" class="w-1/3 text-gray-700 font-medium">Last Name</label>
                                 <input type="text" id="last_name" name="last_name" placeholder="Enter last name"
+                                    oninput="this.value = this.value.replace(/[^a-zA-Z\s\-\.]/g, '')"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
 
                             <div class="flex items-center">
                                 <label for="first_name" class="w-1/3 text-gray-700 font-medium">First Name & MI</label>
                                 <input type="text" id="first_name" name="first_name" placeholder="Enter first name"
+                                    oninput="this.value = this.value.replace(/[^a-zA-Z\s\-\.]/g, '')"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
-
                             <div class="flex items-center">
                                 <label for="student_id" class="w-1/3 text-gray-700 font-medium">Student ID</label>
-                                <input type="text" id="student_id" name="student_id" placeholder="Enter student ID"
+                                <input type="text" id="student_id" name="student_id" placeholder="XX-XXXX-XXX"
+                                    oninput="this.value = this.value.replace(/[^0-9-]/g, '')" maxlength="11"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
                         </div>
@@ -134,6 +136,8 @@
                             <div class="flex items-center">
                                 <label class="w-1/3 text-gray-700 font-medium">Age</label>
                                 <input type="number" id="age" name="age" placeholder="Enter Age"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
+                                    min="15" max="35" title="Age must be a realistic number between 15 and 35."
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
                         </div>
@@ -188,7 +192,10 @@
                         <div class="grid grid-cols-3 gap-4 mb-4">
                             <div class="flex items-center">
                                 <label for="contact_number" class="w-1/3 text-gray-700 font-medium">Contact No.</label>
-                                <input type="text" id="contact_number" name="contact_number" placeholder="Enter Contact Number"
+                                <input type="text" id="contact_number" name="contact_number" placeholder="e.g., 09123456789"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
+                                    maxlength="11" minlength="11" pattern="^09[0-9]{9}$" 
+                                    title="Contact number must start with 09 and be exactly 11 digits long."
                                     class="contact-number w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
 
@@ -215,6 +222,9 @@
                             <div class="flex items-center">
                                 <label for="zip_code" class="w-1/3 text-gray-700 font-medium">Zip Code</label>
                                 <input type="text" id="zip_code" name="zip_code" placeholder="Enter Zip Code"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
+                                    maxlength="4" minlength="4" pattern="^[0-9]{4}$" 
+                                    title="Philippine ZIP codes must be exactly 4 digits."
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
                         </div>
@@ -229,6 +239,7 @@
                                 </label>
                                 <input type="text" id="emergency_person" name="emergency_person"
                                     placeholder="Enter Contact Person"
+                                    oninput="this.value = this.value.replace(/[^a-zA-Z\s\-\.]/g, '')"
                                     class="flex-1 border border-gray-300 rounded px-3 py-2 
                                         focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
@@ -238,7 +249,10 @@
                                     Contact No.
                                 </label>
                                 <input type="text" id="emergency_contact" name="emergency_contact"
-                                    placeholder="Enter Contact Number"
+                                    placeholder="e.g., 09123456789"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
+                                    maxlength="11" minlength="11" pattern="^09[0-9]{9}$" 
+                                    title="Emergency contact number must start with 09 and be exactly 11 digits long."
                                     class="contact-number flex-1 border border-gray-300 rounded px-3 py-2 
                                         focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
@@ -253,19 +267,15 @@
                                 <label class="block text-gray-700 font-bold mb-2">Coach</label>
                                 <div id="coachDisplay" class="p-2 border rounded bg-gray-100 text-gray-700">
                                     <?php
-                                        // display either the selected athlete's coach (if available) or
-                                        // fall back to the logged-in user's coach (useful when a coach
-                                        // is creating a new athlete). An admin will not have a coach,
-                                        // so the JS will update this text after an athlete is loaded.
                                         $currentCoach = $selectedAthlete->coach ?? optional(Auth::user())->coach;
                                     ?>
-
                                     <?php echo e($currentCoach ? $currentCoach->coach_first_name . ' ' . $currentCoach->coach_last_name : 'No coach assigned'); ?>
 
                                 </div>
                             </div>
                             
                             <input type="hidden" name="coach_id" id="coach_id_input" value="<?php echo e($currentCoach ? $currentCoach->id : ''); ?>">
+                            
                             <div class="flex items-center">
                                 <label for="date_joined" class="w-1/3 text-gray-700 font-medium">Date Joined (Varsity)</label>
                                 <input type="date" id="date_joined" name="date_joined"
@@ -283,12 +293,14 @@
                             <div class="flex items-center">
                                 <label for="asst_coach" class="w-1/3 text-gray-700 font-medium">Asst. Coach</label>
                                 <input type="text" id="asst_coach" name="asst_coach" placeholder="Enter Asst. Coach’s Name"
+                                    oninput="this.value = this.value.replace(/[^a-zA-Z\s\-\.]/g, '')"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
 
                             <div class="flex items-center">
                                 <label for="total_unit" class="w-1/3 text-gray-700 font-medium">Total Units</label>
                                 <input type="text" id="total_unit" name="total_unit" placeholder="Enter Units Enrolled"
+                                    oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
 
@@ -305,18 +317,21 @@
                             <div class="flex items-center">
                                 <label for="tuition_fee" class="w-1/3 text-gray-700 font-medium">Tuition Fee</label>
                                 <input type="text" id="tuition_fee" name="tuition_fee" placeholder="Enter Tuition Fee"
+                                    oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
 
                             <div class="flex items-center">
                                 <label for="misc_fee" class="w-1/3 text-gray-700 font-medium">Misc. Fee</label>
                                 <input type="text" id="misc_fee" name="misc_fee" placeholder="Enter Miscellaneous Fee"
+                                    oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
 
                             <div class="flex items-center">
                                 <label for="other_charges" class="w-1/3 text-gray-700 font-medium">Other Charges</label>
                                 <input type="text" id="other_charges" name="other_charges" placeholder="Enter Other Charges"
+                                    oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
                         </div>
@@ -325,18 +340,21 @@
                             <div class="flex items-center">
                                 <label for="total_assessment" class="w-1/3 text-gray-700 font-medium">Total Assessment</label>
                                 <input type="text" id="total_assessment" name="total_assessment" placeholder="Enter Total Assessment"
+                                    oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
 
                             <div class="flex items-center">
                                 <label for="total_discount" class="w-1/3 text-gray-700 font-medium">Total Discount</label>
                                 <input type="text" id="total_discount" name="total_discount" placeholder="Enter Total Discount"
+                                    oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
 
                             <div class="flex items-center">
                                 <label for="balance" class="w-1/3 text-gray-700 font-medium">Balance</label>
                                 <input type="text" id="balance" name="balance" placeholder="Enter Balance"
+                                    oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
                         </div>
@@ -368,7 +386,6 @@
                             <div class="flex flex-col items-center border border-dashed border-gray-400 rounded-lg p-3 bg-white mb-4">  
                                 <span id="selected_name" class="mt-2 text-gray-800 font-semibold">
                                     <?php echo e($selectedAthlete->full_name ?? 'No athlete selected'); ?>
-
 
                                 </span>
                             </div>
@@ -433,6 +450,13 @@
                                     <label class="w-1/3 text-sm font-medium text-gray-700">Date Inactive</label>
                                     <input type="date" name="inactive_date" class="w-2/3 border border-gray-300 rounded px-2 py-1" autocomplete="off">
                                 </div>
+
+                                <!-- PRINT BUTTON (Hidden by default, shows when athlete is selected) -->
+                                <button type="button" id="printBtn" onclick="printAthlete()" 
+                                    class="hidden w-full mt-6 bg-green-700 text-white font-bold rounded px-3 py-2 shadow hover:bg-green-800 transition flex justify-center items-center gap-2">
+                                    🖨️ Print Athlete Record
+                                </button>
+                                
                             </div>
 
                         </div>
@@ -833,10 +857,40 @@
             <p>Stuydents ID content goes here...</p>
         </div>
 
-    </div> 
+        <!-- PRINT PREVIEW MODAL (TELEPORTED) -->
+        <div id="printModal" class="hidden items-center justify-center p-4" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.85); z-index: 999999 !important;">
+            <div class="bg-gray-300 rounded-xl shadow-2xl flex flex-col relative overflow-hidden border-4 border-green-700" style="width: 100%; max-width: 1000px; height: 90vh;">
+                
+                <!-- Modal Header -->
+                <div class="bg-green-700 text-white px-6 py-4 flex justify-between items-center z-10 shadow-md">
+                    <h2 class="text-xl font-bold tracking-wide">🖨️ Document Print Preview</h2>
+                    <div class="space-x-3">
+                        <button onclick="triggerIframePrint()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded font-bold shadow transition border border-blue-400">
+                            Print Document
+                        </button>
+                        <button onclick="togglePrintModal(false)" class="bg-gray-600 hover:bg-gray-500 text-white px-5 py-2 rounded font-bold shadow transition border border-gray-400">
+                            Close
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Iframe Container -->
+                <div class="flex-1 w-full bg-gray-500 p-6 flex justify-center relative shadow-inner" style="overflow-y: auto;">
+                    <iframe id="printIframe" class="bg-white shadow-2xl border border-gray-300 rounded-sm" style="width: 100%; max-width: 8.5in; height: 100%; min-height: 11in;" src=""></iframe>
+                </div>
+
+            </div>
+        </div>
     
     <script>
     document.addEventListener('DOMContentLoaded', () => {
+        
+        // TELEPORT MODAL TO THE FRONT OF THE WEBPAGE
+        const printModalEl = document.getElementById('printModal');
+        if (printModalEl) {
+            document.body.appendChild(printModalEl);
+        }
+        
         // -----------------------
         // Helpers
         // -----------------------
@@ -923,6 +977,9 @@
                 noPic.classList.remove('hidden');
             }
 
+            // Hide print button when clear
+            if (document.getElementById('printBtn')) document.getElementById('printBtn').classList.add('hidden');
+
             // clear all dynamic tables
             const achTbody = getAchievementsTbody();
             if (achTbody) achTbody.innerHTML = '';
@@ -1006,6 +1063,9 @@
             if (selectedIdInput) selectedIdInput.value = id;
             if (saveBtn) saveBtn.classList.add('hidden');
             if (updateBtn) updateBtn.classList.remove('hidden');
+
+            // Show print button since athlete is loaded
+            if (document.getElementById('printBtn')) document.getElementById('printBtn').classList.remove('hidden');
 
             // Fetch Data
             fetch(updateBase + '/' + id, { headers: { 'Accept': 'application/json' } })
@@ -1202,8 +1262,6 @@
         // -----------------------
         // ACHIEVEMENTS / ACADEMIC / FEES / WORK MODALS
         // -----------------------
-        // (Keep your existing modal logic mostly the same, but use newAthleteData array)
-        
         // Helper to toggle any modal
         window.toggleModal = (id, show) => {
             const m = byId(id);
@@ -1305,7 +1363,19 @@
             })
             .catch(err => {
                 console.error(err);
-                alert('Error saving: ' + (err.message || JSON.stringify(err)));
+                
+                // NEW LOGIC: Cleanly parse Laravel validation errors
+                if (err.errors) {
+                    let alertMessage = "Please fix the following errors:\n\n";
+                    for (const field in err.errors) {
+                        alertMessage += `❌ ${err.errors[field][0]}\n`;
+                    }
+                    alert(alertMessage);
+                } else if (err.message) {
+                    alert('Error saving: ' + err.message);
+                } else {
+                    alert('An unexpected error occurred. Please try again.');
+                }
             });
         }
 
@@ -1345,6 +1415,9 @@
             // Swap Buttons
             if (saveBtn) saveBtn.classList.add('hidden');
             if (updateBtn) updateBtn.classList.remove('hidden');
+            
+            // Show print button since we have an ID
+            if (document.getElementById('printBtn')) document.getElementById('printBtn').classList.remove('hidden');
         }
 
         // 2. Fetch Data and Fill Inputs
@@ -1387,9 +1460,38 @@
         })
         .catch(error => console.error('Error fetching athlete:', error));
     }
-    </script>
+    
+    // =======================================================
+    // PRINT MODAL LOGIC
+    // =======================================================
+    window.printAthlete = function() {
+        const athleteId = document.getElementById('selected_athlete_id').value;
+        if (athleteId) {
+            document.getElementById('printIframe').src = '/athlete/' + athleteId + '/print';
+            togglePrintModal(true);
+        } else {
+            alert('Please select an athlete to print first!');
+        }
+    };
 
+    window.togglePrintModal = function(show) {
+        const m = document.getElementById('printModal');
+        if(m) {
+            if(show) {
+                m.classList.remove('hidden');
+                m.classList.add('flex');
+            } else {
+                m.classList.add('hidden');
+                m.classList.remove('flex');
+            }
+        }
+    };
 
-
+    window.triggerIframePrint = function() {
+        const iframe = document.getElementById('printIframe');
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+    };
+</script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp\htdocs\AthleteX\resources\views/features/student_athlete.blade.php ENDPATH**/ ?>

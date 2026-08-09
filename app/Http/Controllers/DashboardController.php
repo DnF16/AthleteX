@@ -12,15 +12,39 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Count active athletes
-        $activeAthletesCount = Athlete::where('status', 'Active')->count();
+        $user = auth()->user();
+        
+        // 1. Start a base query
+        $athleteQuery = Athlete::query();
 
-        // Count alumni
-        $alumniCount = Athlete::where('status', 'Alumni')->count();
+        // 2. 🔒 STRICT RBAC CHECK: Lock the query down to ONLY their sport!
+        if ($user->role === 'coach') {
+            $coachSport = $user->coach->coach_sport_event ?? null;
+            
+            if ($coachSport) {
+                $athleteQuery->where('sport_event', $coachSport);
+            } else {
+                // If testing account has no sport assigned, force 0 results safely
+                $athleteQuery->whereNull('id'); 
+            }
+        }
 
+        // 3. Now do the counts using the (clone) trick. 
+        $activeAthletesCount = (clone $athleteQuery)
+            ->where('status', 'Active')
+            ->where('classification', '!=', 'Tryout') 
+            ->count();
+
+        $alumniCount = (clone $athleteQuery)
+            ->where('status', 'Graduated') 
+            ->count();
+
+        $inactive = (clone $athleteQuery)
+            ->where('status', 'Inactive')
+            ->count();
+
+        // 4. Global Stats (Coaches and total achievements usually stay global)
         $coachesCount = Coach::count();
-
-        // Count achievements
         $totalAchievements = Achievement::count();
 
         $achievementsMonthly = Achievement::select(
@@ -30,7 +54,6 @@ class DashboardController extends Controller
             ->groupBy('month')
             ->pluck('count', 'month');
 
-        // Return the correct Blade file
-        return view('features.dashboard', compact('activeAthletesCount', 'alumniCount', 'coachesCount', 'totalAchievements', 'achievementsMonthly'));
+        return view('features.dashboard', compact('activeAthletesCount', 'alumniCount', 'coachesCount', 'inactive', 'totalAchievements', 'achievementsMonthly'));
     }
 }

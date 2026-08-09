@@ -238,6 +238,9 @@ class AdminController extends Controller
     }
 
     public function approvals() {
-    return view('features.admin_approvals');
-    }
+    // This grabs EVERY athlete whose status is 'Pending' (Regulars, Alumni, and Tryouts!)
+    $pendingAthletes = \App\Models\Athlete::where('status', 'Pending')->get();
+    
+    return view('features.admin_approvals', compact('pendingAthletes'));
+}
 }

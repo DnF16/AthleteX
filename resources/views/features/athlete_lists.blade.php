@@ -13,6 +13,18 @@
         <h1 class="text-2xl font-bold text-gray-800 mx-auto">Student Athletes List</h1>
     </div>
 
+    {{-- 🚀 NEW TAB NAVIGATION --}}
+    <nav class="flex border-b-2 border-gray-200">
+        <button id="tab-active" onclick="switchTab('Active')" 
+            class="px-6 py-3 font-semibold text-green-700 border-b-4 border-green-700 transition">
+            <i class="bi bi-person-check-fill me-2"></i> Active Athletes
+        </button>
+        <button id="tab-inactive" onclick="switchTab('Inactive')" 
+            class="px-6 py-3 font-semibold text-gray-500 border-b-4 border-transparent hover:text-green-700 transition">
+            <i class="bi bi-person-dash-fill me-2"></i> Inactive / Alumni
+        </button>
+    </nav>
+
     {{-- Filter Section --}}
     <div class="bg-white p-4 rounded-lg shadow-sm border space-y-2">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -69,14 +81,16 @@
                         <th class="px-4 py-3 border-b text-left">Zip Code</th>
                         <th class="px-4 py-3 border-b text-left">Emergency Contact</th>
                         <th class="px-4 py-3 border-b text-left">Emergency #</th>
-                        <th class="px-4 py-3 border-b text-left text-center sticky right-0 bg-gray-100 z-10 shadow-l">Actions</th>
+                        <th class="px-4 py-3 border-b text-center sticky right-0 bg-gray-100 z-10 shadow-l">Actions</th>
                     </tr>
                 </thead>
 
                 <tbody class="divide-y divide-gray-200">
                     @foreach ($athletes as $index => $athlete)
-                        <tr class="hover:bg-gray-50 transition">
-                            <td class="px-4 py-3 text-center text-gray-500">{{ $index + 1 }}</td>
+                        <tr class="athlete-row hover:bg-gray-50 transition" data-status="{{ $athlete->status }}">
+                            {{-- 🚀 ADDED 'serial-number' class here so JS can find it --}}
+                            <td class="px-4 py-3 text-center text-gray-500 serial-number"></td>
+                            
                             <td class="px-4 py-3 font-semibold text-gray-900">{{ $athlete->last_name }}</td>
                             <td class="px-4 py-3">{{ $athlete->first_name }} {{ substr($athlete->middle_name, 0, 1) }}</td>
                             <td class="px-4 py-3 text-gray-600">{{ $athlete->student_id }}</td>
@@ -93,10 +107,7 @@
                                 </span>
                             </td>
                             <td class="px-4 py-3">{{ $athlete->classification }}</td>
-                            
-                            {{-- FIX: Using 'gender' instead of 'sex' --}}
                             <td class="px-4 py-3">{{ $athlete->gender }}</td> 
-                            
                             <td class="px-4 py-3">{{ $athlete->birthdate ? $athlete->birthdate->format('M d, Y') : '-' }}</td>
                             <td class="px-4 py-3 text-center">{{ $athlete->age }}</td>
                             <td class="px-4 py-3 text-center">{{ $athlete->blood_type }}</td>
@@ -104,10 +115,7 @@
                             <td class="px-4 py-3 text-center">{{ $athlete->year_level }}</td> 
                             <td class="px-4 py-3">{{ $athlete->email }}</td>
                             <td class="px-4 py-3"><a href="{{ $athlete->facebook }}" target="_blank" class="text-blue-600 hover:underline">Link</a></td> 
-                            
-                            {{-- FIX: Using 'marital_status' instead of 'civil_status' --}}
                             <td class="px-4 py-3">{{ $athlete->marital_status }}</td> 
-                            
                             <td class="px-4 py-3">{{ $athlete->contact_number }}</td>
                             <td class="px-4 py-3 truncate max-w-xs">{{ $athlete->address }}</td>
                             <td class="px-4 py-3">{{ $athlete->city_municipality }}</td> 
@@ -129,5 +137,61 @@
         </div>
     </div>
 </div>
+
+{{-- 🚀 UPDATED JAVASCRIPT FOR TABS & COUNTING --}}
+<script>
+    function switchTab(tabName) {
+        // 1. Update the Tab Styles
+        const activeTabBtn = document.getElementById('tab-active');
+        const inactiveTabBtn = document.getElementById('tab-inactive');
+
+        if (tabName === 'Active') {
+            activeTabBtn.className = "px-6 py-3 font-semibold text-green-700 border-b-4 border-green-700 transition";
+            inactiveTabBtn.className = "px-6 py-3 font-semibold text-gray-500 border-b-4 border-transparent hover:text-green-700 transition";
+        } else {
+            inactiveTabBtn.className = "px-6 py-3 font-semibold text-green-700 border-b-4 border-green-700 transition";
+            activeTabBtn.className = "px-6 py-3 font-semibold text-gray-500 border-b-4 border-transparent hover:text-green-700 transition";
+        }
+
+        // 2. Filter the Table Rows & Recount
+        const rows = document.querySelectorAll('.athlete-row');
+        let counter = 1; // Start counting at 1 for whichever tab is clicked
+        
+        rows.forEach(row => {
+            const status = row.getAttribute('data-status');
+            let isVisible = false;
+            
+            // Determine if the row should be shown based on the tab
+            if (tabName === 'Active') {
+                if (status === 'Active') {
+                    row.style.display = '';
+                    isVisible = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            } else {
+                if (status !== 'Active') {
+                    row.style.display = '';
+                    isVisible = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+
+            // 3. If the row is visible, assign it the current counter number and increase the count!
+            if (isVisible) {
+                const serialCell = row.querySelector('.serial-number');
+                if (serialCell) {
+                    serialCell.textContent = counter++;
+                }
+            }
+        });
+    }
+
+    // Run this automatically when the page loads so it defaults to "Active" and counts them perfectly
+    document.addEventListener("DOMContentLoaded", () => {
+        switchTab('Active');
+    });
+</script>
 
 @endsection

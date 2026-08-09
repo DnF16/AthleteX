@@ -34,101 +34,96 @@
         
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 15px; margin-top: 5px; }
         .info-row { display: flex; border-bottom: 1px dotted #ccc; padding-bottom: 1px; }
-        .label { font-weight: bold; width: 110px; font-size: 9pt; color: #333; }
+        .label { font-weight: bold; width: 120px; font-size: 9pt; color: #333; }
         .value { flex: 1; font-size: 10pt; font-weight: 500; }
 
-        /* ACHIEVEMENTS BOX (Compact) */
-        .achievements-box { border: 1px solid #ccc; padding: 10px; min-height: 40px; font-size: 9pt; }
-
-        /* SIGNATURES (Pulled up to fit) */
-        .signatures { margin-top: 30px; display: flex; justify-content: space-between; page-break-inside: avoid; }
+        /* SIGNATURES */
+        .signatures { margin-top: 40px; display: flex; justify-content: space-between; page-break-inside: avoid; }
         .sig-block { width: 40%; text-align: center; }
         .sig-line { border-top: 1px solid #000; margin-top: 30px; margin-bottom: 5px; font-weight: bold; font-size: 8pt; }
         .sig-name { font-weight: bold; text-transform: uppercase; font-size: 10pt; }
         .sig-role { font-size: 9pt; margin: 0; }
-        
-        /* BUTTONS */
-        .toolbar { position: fixed; top: 10px; right: 10px; background: white; padding: 10px; border: 1px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 5px; z-index: 1000; }
-        .btn { background: #2e4e1f; color: white; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 10pt; }
     </style>
 </head>
 <body>
 
-    <div class="toolbar no-print">
-        <button onclick="window.print()" class="btn">🖨️ Print / Save PDF</button>
-    </div>
-
     <div class="header">
         <p class="school-name">University of the Cordilleras</p>
         <p class="office-name">Sports Development Office</p>
-        <p class="doc-title">ATHLETE PROFILE REPORT</p>
+        <p class="doc-title">GENERAL ATHLETE PROFILE</p>
     </div>
 
     <div class="profile-header">
         <div class="photo-box">
             @if($athlete->picture_path)
-                <img src="{{ asset($athlete->picture_path) }}" alt="Photo">
+                <img src="{{ asset('storage/' . $athlete->picture_path) }}" alt="Photo">
             @else
                 <span>NO PHOTO</span>
             @endif
         </div>
         <div class="main-info">
-            <h1>{{ $athlete->last_name }}, {{ $athlete->first_name }} {{ substr($athlete->middle_name, 0, 1) }}. {{ $athlete->suffix }}</h1>
+            <h1>{{ $athlete->last_name }}, {{ $athlete->first_name }}</h1>
             <div style="margin-top: 5px;"><strong>ID Number:</strong> {{ $athlete->student_id }}</div>
             <div class="sport-badge">{{ str_replace('_', ' ', $athlete->sport_event) }}</div>
-            <div style="margin-top: 3px; font-size: 9pt;"><strong>Status:</strong> {{ $athlete->classification }} ({{ $athlete->status }})</div>
+            <div style="margin-top: 3px; font-size: 9pt;"><strong>Status:</strong> {{ str_replace('_', ' ', $athlete->classification) }} ({{ $athlete->status }})</div>
         </div>
     </div>
 
+    <!-- Personal Information exactly matching the General Info Form -->
     <div class="section-title">Personal Information</div>
     <div class="info-grid">
-        <div class="info-row"><span class="label">Course/Program:</span> <span class="value">{{ $athlete->course }}</span></div>
-        <div class="info-row"><span class="label">Year Level:</span> <span class="value">{{ $athlete->year_level }}</span></div>
-        <div class="info-row"><span class="label">College:</span> <span class="value">{{ $athlete->college }}</span></div>
-        <div class="info-row"><span class="label">Date of Birth:</span> <span class="value">{{ $athlete->birthdate ? $athlete->birthdate->format('F d, Y') : '-' }}</span></div>
-        <div class="info-row"><span class="label">Age:</span> <span class="value">{{ $athlete->age }}</span></div>
-        <div class="info-row"><span class="label">Gender:</span> <span class="value">{{ $athlete->gender }}</span></div>
-        <div class="info-row"><span class="label">Nationality:</span> <span class="value">{{ $athlete->nationality }}</span></div>
-        <div class="info-row"><span class="label">Civil Status:</span> <span class="value">{{ $athlete->marital_status }}</span></div>
-        <div class="info-row"><span class="label">Email:</span> <span class="value">{{ $athlete->email }}</span></div>
-        <div class="info-row"><span class="label">Contact No:</span> <span class="value">{{ $athlete->contact_number }}</span></div>
+        <div class="info-row"><span class="label">Course:</span> <span class="value">{{ $athlete->course ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Year/Level:</span> <span class="value">{{ $athlete->year_level ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Date of Birth:</span> <span class="value">{{ $athlete->birthdate ? \Carbon\Carbon::parse($athlete->birthdate)->format('F d, Y') : 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Age:</span> <span class="value">{{ $athlete->age ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Gender:</span> <span class="value">{{ $athlete->gender ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Blood Type:</span> <span class="value">{{ $athlete->blood_type ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Civil Status:</span> <span class="value">{{ $athlete->marital_status ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Facebook Link:</span> <span class="value">{{ $athlete->facebook ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Email:</span> <span class="value">{{ $athlete->email ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Contact No:</span> <span class="value">{{ $athlete->contact_number ?? 'N/A' }}</span></div>
     </div>
     
     <div class="info-row" style="margin-top: 5px;">
         <span class="label">Home Address:</span> 
-        <span class="value">{{ $athlete->address }}, {{ $athlete->city_municipality }}, {{ $athlete->province_state }}</span>
-    </div>
-
-    <div class="section-title">Physical Attributes</div>
-    <div class="info-grid" style="grid-template-columns: 1fr 1fr 1fr;">
-        <div class="info-row"><span class="label" style="width: 50px;">Height:</span> <span class="value">{{ $athlete->height }} cm</span></div>
-        <div class="info-row"><span class="label" style="width: 50px;">Weight:</span> <span class="value">{{ $athlete->weight }} kg</span></div>
-        <div class="info-row"><span class="label" style="width: 70px;">Blood Type:</span> <span class="value">{{ $athlete->blood_type }}</span></div>
+        <span class="value">
+            {{ trim($athlete->address . ', ' . $athlete->city_municipality . ', ' . $athlete->province_state . ' ' . $athlete->zip_code, ', ') ?: 'N/A' }}
+        </span>
     </div>
 
     <div class="section-title">Emergency Contact</div>
     <div class="info-grid">
-        <div class="info-row"><span class="label">Contact Person:</span> <span class="value">{{ $athlete->emergency_person }}</span></div>
-        <div class="info-row"><span class="label">Relationship:</span> <span class="value">{{ $athlete->emergency_relationship }}</span></div>
-        <div class="info-row" style="grid-column: span 2;"><span class="label">Emergency No:</span> <span class="value">{{ $athlete->emergency_contact }}</span></div>
+        <div class="info-row"><span class="label">Contact Person:</span> <span class="value">{{ $athlete->emergency_person ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Emergency No:</span> <span class="value">{{ $athlete->emergency_contact ?? 'N/A' }}</span></div>
     </div>
 
-    <div class="section-title">Sports Achievements</div>
-    <div class="achievements-box">
-        @if(method_exists($athlete, 'achievements') && $athlete->achievements->count() > 0)
-            <table width="100%" style="border-collapse: collapse;">
-                <tr style="border-bottom: 1px solid #000;">
-                    <th align="left" width="20%">Date</th>
-                    <th align="left">Event / Competition</th>
-                    <th align="left" width="25%">Award</th>
-                </tr>
-                @foreach($athlete->achievements as $ach)
-                    <tr><td>{{ $ach->date }}</td><td>{{ $ach->name }}</td><td>{{ $ach->award }}</td></tr>
-                @endforeach
-            </table>
-        @else
-            <i style="color: #666;">No recorded achievements in the system yet.</i>
-        @endif
+    <!-- Varsity details from the General Info Form -->
+    <div class="section-title">Varsity & Academic Details</div>
+    <div class="info-grid">
+        <div class="info-row"><span class="label">Head Coach:</span> <span class="value">{{ $athlete->coach ? $athlete->coach->coach_first_name . ' ' . $athlete->coach->coach_last_name : 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Asst. Coach:</span> <span class="value">{{ $athlete->asst_coach ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Date Joined:</span> <span class="value">{{ $athlete->date_joined ? \Carbon\Carbon::parse($athlete->date_joined)->format('F d, Y') : 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Total Units:</span> <span class="value">{{ $athlete->total_unit ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Term Graduated:</span> <span class="value">{{ $athlete->term_graduated ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Year Graduated:</span> <span class="value">{{ $athlete->year_graduated ? \Carbon\Carbon::parse($athlete->year_graduated)->format('Y') : 'N/A' }}</span></div>
+    </div>
+
+    <!-- Financial details from the General Info Form -->
+    <div class="section-title">Financial Assessment</div>
+    <div class="info-grid">
+        <div class="info-row"><span class="label">Tuition Fee:</span> <span class="value">{{ $athlete->tuition_fee ? '₱' . number_format($athlete->tuition_fee, 2) : 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Misc. Fee:</span> <span class="value">{{ $athlete->misc_fee ? '₱' . number_format($athlete->misc_fee, 2) : 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Other Charges:</span> <span class="value">{{ $athlete->other_charges ? '₱' . number_format($athlete->other_charges, 2) : 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Total Assessment:</span> <span class="value">{{ $athlete->total_assessment ? '₱' . number_format($athlete->total_assessment, 2) : 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Total Discount:</span> <span class="value">{{ $athlete->total_discount ? '₱' . number_format($athlete->total_discount, 2) : 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Balance:</span> <span class="value">{{ $athlete->balance ? '₱' . number_format($athlete->balance, 2) : 'N/A' }}</span></div>
+    </div>
+
+    <!-- Work details from the General Info Form -->
+    <div class="section-title">Employment Information</div>
+    <div class="info-grid">
+        <div class="info-row"><span class="label">Current Work:</span> <span class="value">{{ $athlete->current_work ?? 'N/A' }}</span></div>
+        <div class="info-row"><span class="label">Company:</span> <span class="value">{{ $athlete->current_company ?? 'N/A' }}</span></div>
     </div>
 
     <div class="signatures">

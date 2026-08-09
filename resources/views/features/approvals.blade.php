@@ -57,30 +57,59 @@
         </div>
     @endif
 
-    <div class="d-flex gap-3 mb-4">
-        <button id="regular-tab-btn" onclick="showSection('regular')" class="btn btn-success fw-bold flex-fill">Alumni Requests</button>
-        <button id="tryout-tab-btn" onclick="showSection('tryout')" class="btn btn-outline-secondary fw-bold flex-fill">Tryout Applicants</button>
-    </div>
-
     @php
-        // Fetch Active & Alumni
-        $regularPendings = \App\Models\Athlete::where('approval_status', 'pending')
-                            ->whereIn('classification', ['Active', 'Alumni'])
+        // Moved the queries ABOVE the buttons so we can count them for the notifications!
+
+        // 1. Fetch Students (Everyone NOT Alumni and NOT Tryout)
+        $studentPendings = \App\Models\Athlete::where('approval_status', 'pending')
+                            ->whereNotIn('classification', ['Alumni', 'Tryout'])
+                            ->latest()->get();
+
+        // 2. Fetch Alumni ONLY
+        $alumniPendings = \App\Models\Athlete::where('approval_status', 'pending')
+                            ->where('classification', 'Alumni')
                             ->latest()->get();
         
-        // Fetch Tryouts ONLY
+        // 3. Fetch Tryouts ONLY
         $tryoutPendings = \App\Models\Athlete::where('approval_status', 'pending')
                             ->where('classification', 'Tryout')
                             ->latest()->get();
     @endphp
 
-    <div id="regular-section">
+    <!-- THREE SEPARATE TABS WITH NOTIFICATION BADGES -->
+    <div class="d-flex gap-3 mb-4">
+        <button id="student-tab-btn" onclick="showSection('student')" class="btn btn-success fw-bold flex-fill">
+            Student Requests
+            @if($studentPendings->count() > 0)
+                <span class="badge bg-danger ms-2 rounded-pill">{{ $studentPendings->count() }}</span>
+            @endif
+        </button>
+        
+        <button id="alumni-tab-btn" onclick="showSection('alumni')" class="btn btn-outline-secondary fw-bold flex-fill">
+            Alumni Requests
+            @if($alumniPendings->count() > 0)
+                <span class="badge bg-danger ms-2 rounded-pill">{{ $alumniPendings->count() }}</span>
+            @endif
+        </button>
+        
+        <button id="tryout-tab-btn" onclick="showSection('tryout')" class="btn btn-outline-secondary fw-bold flex-fill">
+            Tryout Applicants
+            @if($tryoutPendings->count() > 0)
+                <span class="badge bg-danger ms-2 rounded-pill">{{ $tryoutPendings->count() }}</span>
+            @endif
+        </button>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 1. STUDENT SECTION -->
+    <!-- ============================================== -->
+    <div id="student-section">
         <div class="card shadow-sm border-0">
             <div class="card-body p-0">
-                @if($regularPendings->isEmpty())
+                @if($studentPendings->isEmpty())
                     <div class="text-center py-5">
                         <i class="fas fa-clipboard-check text-muted mb-3" style="font-size: 3rem;"></i>
-                        <p class="text-muted fs-5">All caught up! No regular requests pending.</p>
+                        <p class="text-muted fs-5">All caught up! No student requests pending.</p>
                     </div>
                 @else
                     <div class="table-responsive">
@@ -96,13 +125,10 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($regularPendings as $p)
+                                @foreach($studentPendings as $p)
                                 <tr>
                                     <td class="ps-4 fw-bold text-dark">{{ $p->student_id }}</td>
-                                    <td>
-                                        <span class="fw-semibold">{{ $p->first_name }} {{ $p->last_name }}</span><br>
-                                        
-                                    </td>
+                                    <td><span class="fw-semibold">{{ $p->first_name }} {{ $p->last_name }}</span></td>
                                     <td><span class="text-muted small">{{ $p->email }}</span></td>
                                     <td><span class="badge bg-secondary">{{ $p->classification }}</span></td>
                                     <td><span class="badge bg-info text-dark">{{ str_replace('_', ' ', $p->sport_event) }}</span></td>
@@ -132,6 +158,67 @@
         </div>
     </div>
 
+    <!-- ============================================== -->
+    <!-- 2. ALUMNI SECTION -->
+    <!-- ============================================== -->
+    <div id="alumni-section" style="display:none;">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                @if($alumniPendings->isEmpty())
+                    <div class="text-center py-5">
+                        <i class="fas fa-graduation-cap text-muted mb-3" style="font-size: 3rem;"></i>
+                        <p class="text-muted fs-5">No alumni requests pending.</p>
+                    </div>
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 w-100">
+                            <thead class="bg-light text-secondary">
+                                <tr>
+                                    <th class="ps-4">Student ID</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Classification</th>
+                                    <th>Sport Event</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($alumniPendings as $p)
+                                <tr>
+                                    <td class="ps-4 fw-bold text-dark">{{ $p->student_id }}</td>
+                                    <td><span class="fw-semibold">{{ $p->first_name }} {{ $p->last_name }}</span></td>
+                                    <td><span class="text-muted small">{{ $p->email }}</span></td>
+                                    <td><span class="badge bg-secondary">{{ $p->classification }}</span></td>
+                                    <td><span class="badge bg-info text-dark">{{ str_replace('_', ' ', $p->sport_event) }}</span></td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <form action="{{ route('admin.approve.athlete', $p->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success btn-sm px-3" onclick="return confirm('Approve {{ $p->first_name }} as Alumni?')">
+                                                    <i class="fas fa-check me-1"></i> Approve
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('admin.reject.athlete', $p->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-outline-danger btn-sm px-3" onclick="return confirm('Reject this alumni request?')">
+                                                    <i class="fas fa-trash-alt me-1"></i> Reject
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 3. TRYOUT SECTION -->
+    <!-- ============================================== -->
     <div id="tryout-section" style="display:none;">
         <div class="card shadow-sm border-0">
             <div class="card-body p-0">
@@ -190,25 +277,36 @@
 
 <script>
     function showSection(section) {
-        const regularBtn = document.getElementById('regular-tab-btn');
+        // Buttons
+        const studentBtn = document.getElementById('student-tab-btn');
+        const alumniBtn = document.getElementById('alumni-tab-btn');
         const tryoutBtn = document.getElementById('tryout-tab-btn');
 
-        document.getElementById('regular-section').style.display = (section === 'regular') ? 'block' : 'none';
+        // Sections
+        document.getElementById('student-section').style.display = (section === 'student') ? 'block' : 'none';
+        document.getElementById('alumni-section').style.display = (section === 'alumni') ? 'block' : 'none';
         document.getElementById('tryout-section').style.display = (section === 'tryout') ? 'block' : 'none';
 
-        regularBtn.classList.toggle('btn-success', section === 'regular');
-        regularBtn.classList.toggle('btn-outline-secondary', section !== 'regular');
+        // Toggle Button Styles
+        studentBtn.classList.toggle('btn-success', section === 'student');
+        studentBtn.classList.toggle('btn-outline-secondary', section !== 'student');
+        
+        alumniBtn.classList.toggle('btn-success', section === 'alumni');
+        alumniBtn.classList.toggle('btn-outline-secondary', section !== 'alumni');
+
         tryoutBtn.classList.toggle('btn-success', section === 'tryout');
         tryoutBtn.classList.toggle('btn-outline-secondary', section !== 'tryout');
 
+        // Save state so it doesn't reset when they click approve
         localStorage.setItem('activeApprovalTab', section);
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        const activeSection = localStorage.getItem('activeApprovalTab') || 'regular';
+        const activeSection = localStorage.getItem('activeApprovalTab') || 'student';
         showSection(activeSection);
     });
 </script>
-
+    
+</div>
         
 @endsection

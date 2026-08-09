@@ -6,7 +6,7 @@
    @if(auth()->check())
     <div class="flex items-center mb-6 p-2 bg-[#3b5d28] rounded">
         <i class="bi bi-person-circle mr-2 text-2xl"></i>
-        <span class="font-semibold">
+        <span class="font-semibold text-sm">
             @if(auth()->user()->role === 'coach')
                 Coach: {{ auth()->user()->coach ? auth()->user()->coach->coach_first_name . ' ' . auth()->user()->coach->coach_last_name : auth()->user()->name }}
             @elseif(auth()->user()->role === 'admin')
@@ -18,18 +18,19 @@
     </div>
    @endif
 
-
-
-    <nav class="flex-1">
-        <ul class="space-y-2 w-max">
+    <!-- Added flex and flex-col here so mt-auto on Logout works perfectly -->
+    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden pr-2"> 
+        
+        <!-- CHANGED w-max to w-full so it stays inside the sidebar! -->
+        <ul class="space-y-2 w-full"> 
 
             <li>
-                <a href="{{ route('dashboard') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                <a href="{{ route('dashboard') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline w-full">
                     <i class="bi bi-speedometer2 mr-2"></i> Dashboard
                 </a>
             </li>
             <li>
-                <a href="{{ route('student.athlete') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                <a href="{{ route('student.athlete') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline w-full">
                     <i class="bi bi-person-walking mr-2"></i> Student–Athletes
                 </a>
             </li>
@@ -40,7 +41,7 @@
             @endphp
 
             <li>
-                <a href="{{ $attendanceRoute }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                <a href="{{ $attendanceRoute }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline w-full">
                     <i class="bi bi-calendar2-week mr-2"></i> Attendance
                 </a>
             </li>
@@ -51,61 +52,78 @@
             @endphp
 
             <li>
-                <a href="{{ $reportsRoute }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                <a href="{{ $reportsRoute }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline w-full">
                     <i class="bi bi-journal-text mr-2"></i> Reports
                 </a>
             </li>
             <li>
-                <a href="{{ route('coach') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                <a href="{{ route('coach') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline w-full">
                     <i class="bi bi-people-fill mr-2"></i> Coaches
                 </a>
             </li>
+            
+            {{-- Restored Future Features --}}
             <!-- <li>
-                <a href="{{ route('schedule') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                <a href="{{ route('schedule') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline w-full">
                     <i class="bi bi-calendar2-week mr-2"></i> Schedule
                 </a>
             </li> -->
-
             <!-- <li>
-                <a href="#" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                <a href="#" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline w-full">
                     <i class="bi bi-trophy-fill mr-2 text-yellow-400"></i> Achievements
                 </a>
-            </li>
-            <li>
-                <a href="#" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+            </li> -->
+            <!-- <li>
+                <a href="#" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline w-full">
                     <i class="bi bi-clipboard-check mr-2"></i> Exams
                 </a>
             </li>
             <li>
-                <a href="#" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                <a href="#" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline w-full">
                     <i class="bi bi-cash-stack mr-2"></i> Transactions
                 </a>
-            </li>
-            <li> -->
-
+            </li> -->
 
             {{-- Admin-only links --}}
             @if(auth()->check() && auth()->user()->role === 'admin')
                 <li>
-                    <a href="{{ route('admin.approvals') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                    <a href="{{ route('admin.approvals') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline w-full">
                         <i class="bi bi-bell-fill mr-2"></i> Athlete Approvals
+                        
+                        <!-- 🚀 THE NOTIFICATION BADGE -->
+                        @php
+                            $pendingCount = \App\Models\Athlete::where('approval_status', 'pending')->count();
+                        @endphp
+
+                        @if($pendingCount > 0)
+                            <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full ml-auto">
+                                {{ $pendingCount }}
+                            </span>
+                        @endif
                     </a>
                 </li>
                 
                 <li>
-                    <a href="{{ route('admin.tryouts.index') }}" class="flex items-center px-3 py-2 rounded {{ request()->routeIs('admin.tryouts.index') ? 'bg-[#446634]' : 'bg-[#3b5d28]' }} font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                    <a href="{{ route('admin.tryouts.index') }}" class="flex items-center px-3 py-2 rounded {{ request()->routeIs('admin.tryouts.index') ? 'bg-[#446634]' : 'bg-[#3b5d28]' }} font-semibold hover:bg-[#446634] transition-colors text-white no-underline w-full">
                         <i class="bi bi-calendar-event mr-2"></i> Manage Tryouts
                     </a>
                 </li>
 
                 <li>
-                    <a href="{{ route('admin.general') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
+                    <a href="{{ route('admin.blockchain') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline w-full">
+                        <i class="bi bi-shield-lock-fill mr-2 text-green-400"></i> Security Ledger
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('admin.general') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline w-full">
                         <i class="bi bi-person-gear mr-2"></i> Admin
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('sports') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline">
-                        <i class="bi bi-trophy mr-2"></i> Sports </a>
+                    <a href="{{ route('sports') }}" class="flex items-center px-3 py-2 rounded bg-[#3b5d28] font-semibold hover:bg-[#446634] transition-colors text-white no-underline w-full">
+                        <i class="bi bi-trophy mr-2"></i> Sports 
+                    </a>
                 </li>
             @endif
         </ul>

@@ -14,18 +14,31 @@ class AttendanceController extends Controller
             abort(403);
         }
 
-        // determine the coach table id rather than the user id
-        $coachId = auth()->user()->coach->id ?? null;
+        // 1. Get the coach profile and their specific sport
+        $coach = auth()->user()->coach;
+        $coachSport = $coach->coach_sport_event ?? null;
 
-        // Get the attendances for this coach
-        $attendances = Attendance::whereHas('athlete', function ($query) use ($coachId) {
-            $query->where('coach_id', $coachId);
+        // Fallback: If the testing account has no linked profile, show an empty dashboard safely
+        if (!$coach || !$coachSport) {
+            $attendances = collect();
+            $athletes = collect();
+            $athletesWithStatus = collect();
+            $today = now()->toDateString();
+            return view('features.attendance', compact('attendances', 'athletes', 'athletesWithStatus', 'today'));
+        }
+
+        // 2. Strict Sport Filter: Get attendances ONLY for this coach's sport
+        $attendances = Attendance::whereHas('athlete', function ($query) use ($coachSport) {
+            $query->where('sport_event', $coachSport);
         })->get();
 
-        // Get the athletes assigned to this coach with their today's attendance status
-        $athletes = \App\Models\Athlete::where('coach_id', $coachId)->get();
+        // 3. ONLY ACTIVE ATHLETES: Ignore Alumni, Inactive, and Tryouts
+        $athletes = \App\Models\Athlete::where('sport_event', $coachSport)
+            ->where('status', 'Active')
+            ->where('classification', '!=', 'Tryout')
+            ->get();
 
-        // Enrich athletes with today's attendance status
+        // 4. Enrich athletes with today's attendance status
         $today = now()->toDateString();
         $athletesWithStatus = $athletes->map(function ($athlete) use ($today) {
             $todayAttendance = $athlete->attendances()
@@ -36,8 +49,8 @@ class AttendanceController extends Controller
                 'first_name' => $athlete->first_name,
                 'last_name' => $athlete->last_name,
                 'sport_event' => $athlete->sport_event,
-                'status' => $todayAttendance?->status ?? 'unmarked',
-                'remarks' => $todayAttendance?->remarks ?? '',
+                'status' => $todayAttendance?->status ?? 'Not Marked',
+                'remarks' => $todayAttendance?->remarks ?? '—',
                 'attendance_date' => $todayAttendance?->date ?? $today,
                 'isEditable' => true, // Today's records are always editable
             ];
@@ -48,54 +61,72 @@ class AttendanceController extends Controller
     }
 
     public function adminIndex(Request $request)
-{
-    $sportId = $request->query('sport');
-    $month = $request->query('month'); // Month filter (numeric: 01-12)
-    $date = $request->query('date');   // Specific date filter (YYYY-MM-DD)
+    {
+        $sportId = $request->query('sport');
+        $month = $request->query('month'); 
+        $date = $request->query('date');   
 
-    // Fetch all sports for dropdown
-    $sports = Sport::all();
+        // 1. SMART SPORT FILTER: Convert numeric ID back to the Sport Name
+        $sportName = null;
+        if (!empty($sportId)) {
+            if (is_numeric($sportId)) {
+                $sport = Sport::find($sportId);
+                $sportName = $sport ? $sport->name : null;
+            } else {
+                $sportName = $sportId; // Fallback just in case it already sends text
+            }
+        }
 
-    // Fetch attendances with optional filters
-    $attendances = Attendance::when($sportId, function($query, $sportId){
-        $query->whereHas('athlete', function($q) use ($sportId) {
-            $q->where('sport_event', $sportId);
+        // 2. TARGET DATE: Use the requested date, or default to today
+        $targetDate = $date ?: now()->toDateString();
+
+        // Fetch all sports for the dropdown
+        $sports = Sport::all();
+
+        // 3. ONLY ACTIVE ATHLETES: Filter by sport, ignore Alumni/Inactive/Tryouts
+        $athletes = \App\Models\Athlete::where('approval_status', 'approved')
+            ->where('status', 'Active')
+            ->where('classification', '!=', 'Tryout')
+            ->when($sportName, function($q) use ($sportName) {
+                $q->where('sport_event', $sportName);
+            })->get();
+
+        // 4. ENRICH DATA: Map every athlete to their attendance status for the target date
+        $athletesWithStatus = $athletes->map(function ($athlete) use ($targetDate) {
+            $attendance = $athlete->attendances()
+                ->whereDate('date', $targetDate)
+                ->first();
+
+            return [
+                'id' => $athlete->id,
+                'first_name' => $athlete->first_name,
+                'last_name' => $athlete->last_name,
+                'sport_event' => $athlete->sport_event,
+                'status' => $attendance?->status ?? 'Not Marked',
+                'remarks' => $attendance?->remarks ?? '—',
+                'attendance_date' => $attendance?->date ?? $targetDate,
+                'isEditable' => false,
+            ];
         });
-    })
-    ->when($month, function($query, $month){
-        $query->whereMonth('date', $month);
-    })
-    ->when($date, function($query, $date){
-        $query->whereDate('date', $date);
-    })
-    ->get();
 
-    // Fetch athletes with optional sport filter
-    $athletes = \App\Models\Athlete::when($sportId, function($q) use ($sportId) {
-        $q->where('sport_event', $sportId);
-    })->get();
+        // 5. FETCH RAW LOGS
+        $attendances = Attendance::when($sportName, function($query, $sportName){
+            $query->whereHas('athlete', function($q) use ($sportName) {
+                $q->where('sport_event', $sportName);
+            });
+        })
+        ->when($month, function($query, $month){
+            $query->whereMonth('date', $month);
+        })
+        ->when($date, function($query, $date){
+            $query->whereDate('date', $date);
+        })
+        ->get();
 
-    // Add today’s attendance status
-    $today = now()->toDateString();
-    $athletesWithStatus = $athletes->map(function ($athlete) use ($today) {
-        $todayAttendance = $athlete->attendances()
-            ->whereDate('date', $today)
-            ->first();
-
-        return [
-            'id' => $athlete->id,
-            'first_name' => $athlete->first_name,
-            'last_name' => $athlete->last_name,
-            'sport_event' => $athlete->sport_event,
-            'status' => $todayAttendance?->status ?? 'unmarked',
-            'attendance_date' => $todayAttendance?->date ?? $today,
-        ];
-    });
-
-    return view('features.attendance', compact(
-        'attendances', 'sports', 'athletes', 'athletesWithStatus'
-    ));
-}
+        return view('features.attendance', compact(
+            'attendances', 'sports', 'athletes', 'athletesWithStatus', 'targetDate'
+        ));
+    }
 
     public function store(Request $request)
     {
@@ -133,83 +164,91 @@ class AttendanceController extends Controller
     }
 
     public function history(Request $request)
-{
-    $backRoute = auth()->user()->role === 'admin' 
-        ? route('admin.attendance') 
-        : route('coach.attendance.index');
+    {
+        $backRoute = auth()->user()->role === 'admin' 
+            ? route('admin.attendance') 
+            : route('coach.attendance.index');
 
-    // Month & Year selection
-    $selectedMonth = $request->query('month') ?? date('F');
-    $selectedYear  = $request->query('year') ?? date('Y');
+        // Month & Year selection
+        $selectedMonth = $request->query('month') ?? date('F');
+        $selectedYear  = $request->query('year') ?? date('Y');
 
-    $months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
+        $months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
 
-    // Convert month name to month number
-    $monthNumber = date('m', strtotime($selectedMonth));
+        // Convert month name to month number
+        $monthNumber = date('m', strtotime($selectedMonth));
 
-    $start = \Carbon\Carbon::create($selectedYear, $monthNumber, 1)->startOfMonth();
-    $end   = \Carbon\Carbon::create($selectedYear, $monthNumber, 1)->endOfMonth();
+        $start = \Carbon\Carbon::create($selectedYear, $monthNumber, 1)->startOfMonth();
+        $end   = \Carbon\Carbon::create($selectedYear, $monthNumber, 1)->endOfMonth();
 
-    $daysInMonth = $start->daysInMonth;
+        $daysInMonth = $start->daysInMonth;
 
-    // Initialize variables
-    $sports = collect();
-    $sportId = null;
+        // Initialize variables
+        $sports = collect();
+        $sportId = null;
 
-    // ================= ADMIN =================
+        // ================= ADMIN =================
         if(auth()->user()->role === 'admin') {
 
-        $sportId = $request->query('sport_id'); // get selected sport from request
+            $sportId = $request->query('sport_id'); // get selected sport from request
 
-        $athletes = \App\Models\Athlete::when($sportId, function($q) use ($sportId) {
-            $q->where('sport_event', $sportId);
-        })->get();
+            // ONLY ACTIVE ATHLETES
+            $athletes = \App\Models\Athlete::where('status', 'Active')
+                ->where('classification', '!=', 'Tryout')
+                ->when($sportId, function($q) use ($sportId) {
+                    $q->where('sport_event', $sportId);
+                })->get();
 
-        $attendances = \App\Models\Attendance::whereBetween('date', [$start, $end])
-            ->when($sportId, function($q) use ($sportId) {
-                $q->whereHas('athlete', function($q2) use ($sportId) {
-                    $q2->where('sport_event', $sportId);
-                });
-            })
-            ->get();
+            $attendances = \App\Models\Attendance::whereBetween('date', [$start, $end])
+                ->when($sportId, function($q) use ($sportId) {
+                    $q->whereHas('athlete', function($q2) use ($sportId) {
+                        $q2->where('sport_event', $sportId);
+                    });
+                })
+                ->get();
 
-        $sports = \App\Models\Sport::all(); // pass sports for dropdown
+            $sports = \App\Models\Sport::all(); // pass sports for dropdown
+        }
+        // ================= COACH =================
+        else {
+            // Grab the coach's specific sport
+            $coachSport = auth()->user()->coach->coach_sport_event ?? null;
+
+            // ONLY ACTIVE ATHLETES for History
+            $athletes = \App\Models\Athlete::where('sport_event', $coachSport)
+                ->where('status', 'Active')
+                ->where('classification', '!=', 'Tryout')
+                ->get();
+
+            // Strict Sport Filter for History Attendances
+            $attendances = \App\Models\Attendance::whereHas('athlete', function($q) use ($coachSport){
+                    $q->where('sport_event', $coachSport);
+                })
+                ->whereBetween('date', [$start, $end])
+                ->get();
+        }
+
+        // Build attendance map (VERY IMPORTANT)
+        $attendanceMap = [];
+
+        foreach($attendances as $attendance){
+            $key = $attendance->athlete_id . '_' . \Carbon\Carbon::parse($attendance->date)->format('Y-m-d');
+            $attendanceMap[$key] = $attendance;
+        }
+
+        return view('features.attendance_history', compact(
+            'athletes',
+            'attendanceMap',
+            'daysInMonth',
+            'selectedMonth',
+            'selectedYear',
+            'months',
+            'backRoute',
+            'sports',
+            'sportId'
+        ));
     }
-    // ================= COACH =================
-    else {
-
-        $coachId = auth()->user()->coach->id ?? null;
-
-        $athletes = \App\Models\Athlete::where('coach_id', $coachId)->get();
-
-        $attendances = \App\Models\Attendance::whereHas('athlete', function($q) use ($coachId){
-                $q->where('coach_id', $coachId);
-            })
-            ->whereBetween('date', [$start, $end])
-            ->get();
-    }
-
-    // Build attendance map (VERY IMPORTANT)
-    $attendanceMap = [];
-
-    foreach($attendances as $attendance){
-        $key = $attendance->athlete_id . '_' . \Carbon\Carbon::parse($attendance->date)->format('Y-m-d');
-        $attendanceMap[$key] = $attendance;
-    }
-
-    return view('features.attendance_history', compact(
-        'athletes',
-        'attendanceMap',
-        'daysInMonth',
-        'selectedMonth',
-        'selectedYear',
-        'months',
-        'backRoute',
-        'sports',
-        'sportId'
-    ));
-}
 }

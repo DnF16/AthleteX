@@ -23,7 +23,7 @@
             
             <!-- Logo -->
             <div class="text-center mb-6">
-                <img src="<?php echo e(asset('images/logo.png')); ?>" alt="UC Logo" class="mx-auto mb-4 w-24 h-24 rounded-full border-2 border-green-700">
+                <img src="<?php echo e(asset('images/UC.jpg')); ?>" alt="UC Logo" class="mx-auto mb-4 w-24 h-24 rounded-full border-2 border-green-700">
                 <h2 class="text-2xl font-bold text-white">ATHLETIX Login</h2>
             </div>
 

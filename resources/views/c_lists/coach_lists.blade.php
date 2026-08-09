@@ -93,8 +93,9 @@
                         <td class="border px-4 py-2">{{ $coach->coach_sport_event }}</td>
                         <td class="border px-4 py-2">{{ $coach->position }}</td>
                         <td class="border px-4 py-2">
-                            <span class="px-2 py-1 rounded text-white {{ $coach->coach_status === 'Active' ? 'bg-green-600' : 'bg-gray-500' }} text-xs">
-                                {{ $coach->coach_status ?? 'N/A' }}
+                            <!-- 🚀 FIX: Smart fallback! If empty, force it to 'Active' visually -->
+                            <span class="px-2 py-1 rounded text-white {{ empty($coach->coach_status) || $coach->coach_status === 'Active' ? 'bg-green-600' : 'bg-gray-500' }} text-xs font-semibold">
+                                {{ empty($coach->coach_status) ? 'Active' : $coach->coach_status }}
                             </span>
                         </td>
                         <td class="border px-4 py-2">{{ $coach->coach_gender }}</td>

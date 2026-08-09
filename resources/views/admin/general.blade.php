@@ -14,6 +14,13 @@
                 ADMIN > GENERAL INFORMATION
             </div>
 
+            <!-- Optional: Global Error Alert -->
+            @if ($errors->any())
+                <div class="alert alert-danger shadow-sm">
+                    <strong>⚠️ Please fix the errors below before saving.</strong>
+                </div>
+            @endif
+
             <div class="card shadow-sm border-0">
                 <div class="card-body" style="background-color: #EBF1DE;"> 
                     <form action="{{ route('admin.saveSettings') }}" method="POST" enctype="multipart/form-data">
@@ -21,26 +28,51 @@
                         
                         <div class="row">
                             <div class="col-md-9">
+                                
                                 <div class="mb-3 row">
                                     <label class="col-sm-3 col-form-label form-label-sm fw-bold text-end">School / Company</label>
-                                    <div class="col-sm-9"><input type="text" name="school_name" class="form-control" value="{{ \App\Models\Setting::get('school_name') }}" placeholder="Enter School Name"></div>
+                                    <div class="col-sm-9">
+                                        <input type="text" name="school_name" class="form-control @error('school_name') is-invalid @enderror" value="{{ old('school_name', \App\Models\Setting::get('school_name')) }}" placeholder="Enter School Name">
+                                        @error('school_name') <small class="text-danger fw-bold">{{ $message }}</small> @enderror
+                                    </div>
                                 </div>
+                                
                                 <div class="mb-3 row">
                                     <label class="col-sm-3 col-form-label form-label-sm fw-bold text-end">Contact Name</label>
-                                    <div class="col-sm-9"><input type="text" name="contact_name" class="form-control" value="{{ \App\Models\Setting::get('contact_name') }}"></div>
+                                    <div class="col-sm-9">
+                                        <input type="text" name="contact_name" class="form-control @error('contact_name') is-invalid @enderror" value="{{ old('contact_name', \App\Models\Setting::get('contact_name')) }}">
+                                        @error('contact_name') <small class="text-danger fw-bold">{{ $message }}</small> @enderror
+                                    </div>
                                 </div>
+                                
                                 <div class="mb-3 row">
                                     <label class="col-sm-3 col-form-label form-label-sm fw-bold text-end">Email</label>
-                                    <div class="col-sm-4"><input type="email" name="email" class="form-control" value="{{ \App\Models\Setting::get('email') }}"></div>
+                                    <div class="col-sm-4">
+                                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', \App\Models\Setting::get('email')) }}">
+                                        @error('email') <small class="text-danger fw-bold">{{ $message }}</small> @enderror
+                                    </div>
+                                    
                                     <label class="col-sm-2 col-form-label form-label-sm fw-bold text-end">Phone 1</label>
-                                    <div class="col-sm-3"><input type="text" name="phone_1" class="form-control" value="{{ \App\Models\Setting::get('phone_1') }}"></div>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="phone_1" class="form-control @error('phone_1') is-invalid @enderror" value="{{ old('phone_1', \App\Models\Setting::get('phone_1')) }}">
+                                        @error('phone_1') <small class="text-danger fw-bold">{{ $message }}</small> @enderror
+                                    </div>
                                 </div>
+                                
                                 <div class="mb-3 row">
                                     <label class="col-sm-3 col-form-label form-label-sm fw-bold text-end">Address</label>
-                                    <div class="col-sm-4"><input type="text" name="address" class="form-control" value="{{ \App\Models\Setting::get('address') }}"></div>
+                                    <div class="col-sm-4">
+                                        <input type="text" name="address" class="form-control @error('address') is-invalid @enderror" value="{{ old('address', \App\Models\Setting::get('address')) }}">
+                                        @error('address') <small class="text-danger fw-bold">{{ $message }}</small> @enderror
+                                    </div>
+                                    
                                     <label class="col-sm-2 col-form-label form-label-sm fw-bold text-end">Phone 2</label>
-                                    <div class="col-sm-3"><input type="text" name="phone_2" class="form-control" value="{{ \App\Models\Setting::get('phone_2') }}"></div>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="phone_2" class="form-control @error('phone_2') is-invalid @enderror" value="{{ old('phone_2', \App\Models\Setting::get('phone_2')) }}">
+                                        @error('phone_2') <small class="text-danger fw-bold">{{ $message }}</small> @enderror
+                                    </div>
                                 </div>
+                                
                             </div>
 
                             <div class="col-md-3">
@@ -55,8 +87,9 @@
                                                 <i class="fas fa-image fa-3x text-secondary"></i>
                                             </div>
                                         @endif
-                                        <input type="file" name="logo" class="form-control form-control-sm">
+                                        <input type="file" name="logo" class="form-control form-control-sm @error('logo') is-invalid @enderror">
                                         <small class="text-muted d-block mt-1">Rec: 200x200px</small>
+                                        @error('logo') <small class="text-danger fw-bold">{{ $message }}</small> @enderror
                                     </div>
                                 </div>
                             </div>
@@ -64,9 +97,29 @@
 
                         <hr>
                         <div class="row g-2">
-                            <div class="col-md-4"><div class="input-group input-group-sm"><span class="input-group-text fw-bold bg-light">City / Municipality</span><input type="text" name="city" class="form-control" value="{{ \App\Models\Setting::get('city') }}"></div></div>
-                            <div class="col-md-4"><div class="input-group input-group-sm"><span class="input-group-text fw-bold bg-light">Province</span><input type="text" name="province" class="form-control" value="{{ \App\Models\Setting::get('province') }}"></div></div>
-                            <div class="col-md-4"><div class="input-group input-group-sm"><span class="input-group-text fw-bold bg-light">Zip Code</span><input type="text" name="zip" class="form-control" value="{{ \App\Models\Setting::get('zip') }}"></div></div>
+                            <div class="col-md-4">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text fw-bold bg-light">City / Municipality</span>
+                                    <input type="text" name="city" class="form-control @error('city') is-invalid @enderror" value="{{ old('city', \App\Models\Setting::get('city')) }}">
+                                </div>
+                                @error('city') <small class="text-danger fw-bold px-2">{{ $message }}</small> @enderror
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text fw-bold bg-light">Province</span>
+                                    <input type="text" name="province" class="form-control @error('province') is-invalid @enderror" value="{{ old('province', \App\Models\Setting::get('province')) }}">
+                                </div>
+                                @error('province') <small class="text-danger fw-bold px-2">{{ $message }}</small> @enderror
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text fw-bold bg-light">Zip Code</span>
+                                    <input type="text" name="zip" class="form-control @error('zip') is-invalid @enderror" value="{{ old('zip', \App\Models\Setting::get('zip')) }}">
+                                </div>
+                                @error('zip') <small class="text-danger fw-bold px-2">{{ $message }}</small> @enderror
+                            </div>
                         </div>
 
                         <div class="mt-4 text-end">

@@ -3,7 +3,7 @@
 @section('title', 'Attendance')
 
 @section('content')
-<div id="tab-content" class="bg-[#c5e0b4] p-6 rounded w-full  min-h-screen">
+<div id="tab-content" class="bg-[#c5e0b4] p-6 rounded w-full min-h-screen">
     <div class="bg-white border-[12px] border-[#d1e9f0] p-1 shadow-sm">
 
         <!-- Page Header -->
@@ -59,7 +59,7 @@
         </form>
         @endif
 
-        <!-- Coach Attendance Checking -->
+        <!-- Coach Attendance Checking Button -->
         @if(auth()->user()->role === 'coach')
         <div class="flex justify-start mt-4 mb-4">
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#attendanceModal">
@@ -69,7 +69,7 @@
         </div>
         @endif
 
-        <!-- Attendance Table -->
+        <!-- UNIFIED Attendance Table -->
         <div class="bg-[#f8f9fa] rounded shadow p-6 overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-[#d1e9f0]">
@@ -80,69 +80,45 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Remarks</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Record Type</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @if(auth()->user()->role === 'coach' && isset($athletesWithStatus))
-                        @forelse($athletesWithStatus as $index => $athlete)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">{{ $index + 1 }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ $athlete['first_name'] }} {{ $athlete['last_name'] }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ $athlete['sport_event'] }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($athlete['status'] === 'present')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Present</span>
-                                    @elseif($athlete['status'] === 'absent')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Absent</span>
-                                    @elseif($athlete['status'] === 'late')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Late</span>
-                                    @elseif($athlete['status'] === 'excused')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Excused</span>
-                                    @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Not Marked</span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ $athlete['remarks'] ?? '—' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ $athlete['attendance_date'] }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($athlete['isEditable'] && $athlete['attendance_date'] === $today)
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">✏️ Today</span>
-                                    @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">📋 History</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No athletes assigned yet.</td>
-                            </tr>
-                        @endforelse
-                    @else
-                        @forelse($attendances as $index => $attendance)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">{{ $index + 1 }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ $attendance->athlete->first_name }} {{ $attendance->athlete->last_name }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ $attendance->athlete->sport_event }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($attendance->status === 'present')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Present</span>
-                                    @elseif($attendance->status === 'absent')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Absent</span>
-                                    @elseif($attendance->status === 'late')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Late</span>
-                                    @elseif($attendance->status === 'excused')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Excused</span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ $attendance->remarks ?? '—' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ is_string($attendance->date) ? \Carbon\Carbon::parse($attendance->date)->format('Y-m-d') : $attendance->date->format('Y-m-d') }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No attendance records found.</td>
-                            </tr>
-                        @endforelse
-                    @endif
+                    <!-- Now BOTH Admins and Coaches use the enriched array -->
+                    @forelse($athletesWithStatus as $index => $athlete)
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $index + 1 }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $athlete['first_name'] }} {{ $athlete['last_name'] }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $athlete['sport_event'] }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if(strtolower($athlete['status']) === 'present')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Present</span>
+                                @elseif(strtolower($athlete['status']) === 'absent')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Absent</span>
+                                @elseif(strtolower($athlete['status']) === 'late')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Late</span>
+                                @elseif(strtolower($athlete['status']) === 'excused')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Excused</span>
+                                @else
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Not Marked</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ $athlete['remarks'] ?? '—' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $athlete['attendance_date'] }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <!-- Safe check using ?? false so Admins don't trigger errors -->
+                                @if(($athlete['isEditable'] ?? false) && $athlete['attendance_date'] === ($today ?? ''))
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">✏️ Today</span>
+                                @else
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">📋 History</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">No athletes found for this filter.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -150,7 +126,7 @@
     </div>
 </div>
 
-<!-- attendance modal -->
+<!-- Attendance Modal (Visible only to Coaches via trigger button) -->
 <div class="modal fade" id="attendanceModal" tabindex="-1" data-bs-backdrop="false" style="background-color: rgba(0,0,0,0.5); z-index: 9999;">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -191,22 +167,24 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($athletes as $index => $athlete)
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ $athlete->first_name }} {{ $athlete->last_name }}</td>
-                                    <td>{{ $athlete->sport_event }}</td>
-                                    <td>
-                                        <input type="hidden" name="attendance[{{ $athlete->id }}][status]" value="present" class="attendance-hidden">
-                                        <button type="button" class="btn btn-sm btn-outline-success attendance-toggle" title="Click to cycle through statuses">
-                                            Present
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="attendance[{{ $athlete->id }}][remarks]" class="form-control form-control-sm" placeholder="e.g., Injured, Early dismissal">
-                                    </td>
-                                </tr>
-                                @endforeach
+                                @if(isset($athletes))
+                                    @foreach($athletes as $index => $athlete)
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>{{ $athlete->first_name }} {{ $athlete->last_name }}</td>
+                                        <td>{{ $athlete->sport_event }}</td>
+                                        <td>
+                                            <input type="hidden" name="attendance[{{ $athlete->id }}][status]" value="present" class="attendance-hidden">
+                                            <button type="button" class="btn btn-sm btn-outline-success attendance-toggle" title="Click to cycle through statuses">
+                                                Present
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="attendance[{{ $athlete->id }}][remarks]" class="form-control form-control-sm" placeholder="e.g., Injured, Early dismissal">
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                @endif
                             </tbody>
                         </table>
                     </div>

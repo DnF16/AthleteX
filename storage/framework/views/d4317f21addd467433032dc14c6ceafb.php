@@ -1,7 +1,7 @@
 <?php $__env->startSection('title', 'Attendance'); ?>
 
 <?php $__env->startSection('content'); ?>
-<div id="tab-content" class="bg-[#c5e0b4] p-6 rounded w-full  min-h-screen">
+<div id="tab-content" class="bg-[#c5e0b4] p-6 rounded w-full min-h-screen">
     <div class="bg-white border-[12px] border-[#d1e9f0] p-1 shadow-sm">
 
         <!-- Page Header -->
@@ -59,7 +59,7 @@
         </form>
         <?php endif; ?>
 
-        <!-- Coach Attendance Checking -->
+        <!-- Coach Attendance Checking Button -->
         <?php if(auth()->user()->role === 'coach'): ?>
         <div class="flex justify-start mt-4 mb-4">
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#attendanceModal">
@@ -69,7 +69,7 @@
         </div>
         <?php endif; ?>
 
-        <!-- Attendance Table -->
+        <!-- UNIFIED Attendance Table -->
         <div class="bg-[#f8f9fa] rounded shadow p-6 overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-[#d1e9f0]">
@@ -80,68 +80,44 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Remarks</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Record Type</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <?php if(auth()->user()->role === 'coach' && isset($athletesWithStatus)): ?>
-                        <?php $__empty_1 = true; $__currentLoopData = $athletesWithStatus; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $athlete): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap"><?php echo e($index + 1); ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap"><?php echo e($athlete['first_name']); ?> <?php echo e($athlete['last_name']); ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap"><?php echo e($athlete['sport_event']); ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <?php if($athlete['status'] === 'present'): ?>
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Present</span>
-                                    <?php elseif($athlete['status'] === 'absent'): ?>
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Absent</span>
-                                    <?php elseif($athlete['status'] === 'late'): ?>
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Late</span>
-                                    <?php elseif($athlete['status'] === 'excused'): ?>
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Excused</span>
-                                    <?php else: ?>
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Not Marked</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm"><?php echo e($athlete['remarks'] ?? '—'); ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap"><?php echo e($athlete['attendance_date']); ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <?php if($athlete['isEditable'] && $athlete['attendance_date'] === $today): ?>
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">✏️ Today</span>
-                                    <?php else: ?>
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">📋 History</span>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                            <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No athletes assigned yet.</td>
-                            </tr>
-                        <?php endif; ?>
-                    <?php else: ?>
-                        <?php $__empty_1 = true; $__currentLoopData = $attendances; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $attendance): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap"><?php echo e($index + 1); ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap"><?php echo e($attendance->athlete->first_name); ?> <?php echo e($attendance->athlete->last_name); ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap"><?php echo e($attendance->athlete->sport_event); ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <?php if($attendance->status === 'present'): ?>
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Present</span>
-                                    <?php elseif($attendance->status === 'absent'): ?>
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Absent</span>
-                                    <?php elseif($attendance->status === 'late'): ?>
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Late</span>
-                                    <?php elseif($attendance->status === 'excused'): ?>
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Excused</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm"><?php echo e($attendance->remarks ?? '—'); ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap"><?php echo e(is_string($attendance->date) ? \Carbon\Carbon::parse($attendance->date)->format('Y-m-d') : $attendance->date->format('Y-m-d')); ?></td>
-                            </tr>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                            <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No attendance records found.</td>
-                            </tr>
-                        <?php endif; ?>
+                    <!-- Now BOTH Admins and Coaches use the enriched array -->
+                    <?php $__empty_1 = true; $__currentLoopData = $athletesWithStatus; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $athlete): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap"><?php echo e($index + 1); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap"><?php echo e($athlete['first_name']); ?> <?php echo e($athlete['last_name']); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap"><?php echo e($athlete['sport_event']); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <?php if(strtolower($athlete['status']) === 'present'): ?>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Present</span>
+                                <?php elseif(strtolower($athlete['status']) === 'absent'): ?>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Absent</span>
+                                <?php elseif(strtolower($athlete['status']) === 'late'): ?>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Late</span>
+                                <?php elseif(strtolower($athlete['status']) === 'excused'): ?>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Excused</span>
+                                <?php else: ?>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Not Marked</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm"><?php echo e($athlete['remarks'] ?? '—'); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap"><?php echo e($athlete['attendance_date']); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <!-- Safe check using ?? false so Admins don't trigger errors -->
+                                <?php if(($athlete['isEditable'] ?? false) && $athlete['attendance_date'] === ($today ?? '')): ?>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">✏️ Today</span>
+                                <?php else: ?>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">📋 History</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">No athletes found for this filter.</td>
+                        </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -150,7 +126,7 @@
     </div>
 </div>
 
-<!-- attendance modal -->
+<!-- Attendance Modal (Visible only to Coaches via trigger button) -->
 <div class="modal fade" id="attendanceModal" tabindex="-1" data-bs-backdrop="false" style="background-color: rgba(0,0,0,0.5); z-index: 9999;">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -191,22 +167,24 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php $__currentLoopData = $athletes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $athlete): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <tr>
-                                    <td><?php echo e($index + 1); ?></td>
-                                    <td><?php echo e($athlete->first_name); ?> <?php echo e($athlete->last_name); ?></td>
-                                    <td><?php echo e($athlete->sport_event); ?></td>
-                                    <td>
-                                        <input type="hidden" name="attendance[<?php echo e($athlete->id); ?>][status]" value="present" class="attendance-hidden">
-                                        <button type="button" class="btn btn-sm btn-outline-success attendance-toggle" title="Click to cycle through statuses">
-                                            Present
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="attendance[<?php echo e($athlete->id); ?>][remarks]" class="form-control form-control-sm" placeholder="e.g., Injured, Early dismissal">
-                                    </td>
-                                </tr>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php if(isset($athletes)): ?>
+                                    <?php $__currentLoopData = $athletes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $athlete): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <tr>
+                                        <td><?php echo e($index + 1); ?></td>
+                                        <td><?php echo e($athlete->first_name); ?> <?php echo e($athlete->last_name); ?></td>
+                                        <td><?php echo e($athlete->sport_event); ?></td>
+                                        <td>
+                                            <input type="hidden" name="attendance[<?php echo e($athlete->id); ?>][status]" value="present" class="attendance-hidden">
+                                            <button type="button" class="btn btn-sm btn-outline-success attendance-toggle" title="Click to cycle through statuses">
+                                                Present
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="attendance[<?php echo e($athlete->id); ?>][remarks]" class="form-control form-control-sm" placeholder="e.g., Injured, Early dismissal">
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
