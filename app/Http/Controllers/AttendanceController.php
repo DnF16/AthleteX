@@ -66,65 +66,92 @@ class AttendanceController extends Controller
         $month = $request->query('month'); 
         $date = $request->query('date');   
 
-        // 1. SMART SPORT FILTER: Convert numeric ID back to the Sport Name
+        // 1. SMART SPORT FILTER
         $sportName = null;
         if (!empty($sportId)) {
             if (is_numeric($sportId)) {
                 $sport = Sport::find($sportId);
                 $sportName = $sport ? $sport->name : null;
             } else {
-                $sportName = $sportId; // Fallback just in case it already sends text
+                $sportName = $sportId; 
             }
         }
 
-        // 2. TARGET DATE: Use the requested date, or default to today
-        $targetDate = $date ?: now()->toDateString();
-
-        // Fetch all sports for the dropdown
+        $today = now()->toDateString();
+        $targetDate = $date ?: $today;
         $sports = Sport::all();
 
-        // 3. ONLY ACTIVE ATHLETES: Filter by sport, ignore Alumni/Inactive/Tryouts
-        $athletes = \App\Models\Athlete::where('approval_status', 'approved')
-            ->where('status', 'Active')
-            ->where('classification', '!=', 'Tryout')
-            ->when($sportName, function($q) use ($sportName) {
-                $q->where('sport_event', $sportName);
-            })->get();
+        // 2. CHECK WHAT WE ARE VIEWING
+        // If no date is picked (or it's exactly today) AND no month is picked, we are viewing "Today"
+        $isTodayView = (empty($date) || $date === $today) && empty($month);
 
-        // 4. ENRICH DATA: Map every athlete to their attendance status for the target date
-        $athletesWithStatus = $athletes->map(function ($athlete) use ($targetDate) {
-            $attendance = $athlete->attendances()
-                ->whereDate('date', $targetDate)
-                ->first();
+        if ($isTodayView) {
+            // ==========================================
+            // TODAY'S VIEW: Show full roster to see who is "Not Marked"
+            // ==========================================
+            $athletes = \App\Models\Athlete::where('approval_status', 'approved')
+                ->where('status', 'Active')
+                ->where('classification', '!=', 'Tryout')
+                ->when($sportName, function($q) use ($sportName) {
+                    $q->where('sport_event', $sportName);
+                })->get();
 
-            return [
-                'id' => $athlete->id,
-                'first_name' => $athlete->first_name,
-                'last_name' => $athlete->last_name,
-                'sport_event' => $athlete->sport_event,
-                'status' => $attendance?->status ?? 'Not Marked',
-                'remarks' => $attendance?->remarks ?? '—',
-                'attendance_date' => $attendance?->date ?? $targetDate,
-                'isEditable' => false,
-            ];
-        });
+            $athletesWithStatus = $athletes->map(function ($athlete) use ($today) {
+                $attendance = $athlete->attendances()
+                    ->whereDate('date', $today)
+                    ->first();
 
-        // 5. FETCH RAW LOGS
-        $attendances = Attendance::when($sportName, function($query, $sportName){
-            $query->whereHas('athlete', function($q) use ($sportName) {
-                $q->where('sport_event', $sportName);
+                return [
+                    'id' => $athlete->id,
+                    'first_name' => $athlete->first_name,
+                    'last_name' => $athlete->last_name,
+                    'sport_event' => $athlete->sport_event,
+                    'status' => $attendance?->status ?? 'Not Marked',
+                    'remarks' => $attendance?->remarks ?? '—',
+                    'attendance_date' => $attendance?->date ?? $today,
+                ];
             });
-        })
-        ->when($month, function($query, $month){
-            $query->whereMonth('date', $month);
-        })
-        ->when($date, function($query, $date){
-            $query->whereDate('date', $date);
-        })
-        ->get();
+        } else {
+            // ==========================================
+            // PAST/FUTURE or MONTH VIEW: ONLY show actual recorded data
+            // ==========================================
+            $query = \App\Models\Attendance::with('athlete');
+
+            if ($sportName) {
+                $query->whereHas('athlete', function($q) use ($sportName) {
+                    $q->where('sport_event', $sportName);
+                });
+            }
+
+            if (!empty($month)) {
+                $query->whereMonth('date', $month);
+            }
+
+            if (!empty($date)) {
+                $query->whereDate('date', $date);
+            }
+
+            $attendances = $query->orderBy('date', 'desc')->get();
+
+            // Format data exactly how the blade file expects it
+            $athletesWithStatus = $attendances->filter(function($att) {
+                // Safety check in case an athlete was hard-deleted from DB
+                return $att->athlete != null;
+            })->map(function ($att) {
+                return [
+                    'id' => $att->athlete->id,
+                    'first_name' => $att->athlete->first_name,
+                    'last_name' => $att->athlete->last_name,
+                    'sport_event' => $att->athlete->sport_event,
+                    'status' => $att->status,
+                    'remarks' => $att->remarks ?? '—',
+                    'attendance_date' => $att->date,
+                ];
+            })->values();
+        }
 
         return view('features.attendance', compact(
-            'attendances', 'sports', 'athletes', 'athletesWithStatus', 'targetDate'
+            'sports', 'athletesWithStatus', 'targetDate', 'today'
         ));
     }
 
@@ -192,17 +219,11 @@ class AttendanceController extends Controller
 
         // ================= ADMIN =================
         if(auth()->user()->role === 'admin') {
-
             $sportId = $request->query('sport_id'); // get selected sport from request
 
-            // ONLY ACTIVE ATHLETES
-            $athletes = \App\Models\Athlete::where('status', 'Active')
-                ->where('classification', '!=', 'Tryout')
-                ->when($sportId, function($q) use ($sportId) {
-                    $q->where('sport_event', $sportId);
-                })->get();
-
-            $attendances = \App\Models\Attendance::whereBetween('date', [$start, $end])
+            // Get ALL attendance records for this month
+            $attendances = \App\Models\Attendance::with('athlete') // Load athlete data!
+                ->whereBetween('date', [$start, $end])
                 ->when($sportId, function($q) use ($sportId) {
                     $q->whereHas('athlete', function($q2) use ($sportId) {
                         $q2->where('sport_event', $sportId);
@@ -217,19 +238,22 @@ class AttendanceController extends Controller
             // Grab the coach's specific sport
             $coachSport = auth()->user()->coach->coach_sport_event ?? null;
 
-            // ONLY ACTIVE ATHLETES for History
-            $athletes = \App\Models\Athlete::where('sport_event', $coachSport)
-                ->where('status', 'Active')
-                ->where('classification', '!=', 'Tryout')
-                ->get();
-
             // Strict Sport Filter for History Attendances
-            $attendances = \App\Models\Attendance::whereHas('athlete', function($q) use ($coachSport){
+            $attendances = \App\Models\Attendance::with('athlete') // Load athlete data!
+                ->whereHas('athlete', function($q) use ($coachSport){
                     $q->where('sport_event', $coachSport);
                 })
                 ->whereBetween('date', [$start, $end])
                 ->get();
         }
+
+        // ================= THE MAGIC FIX =================
+        // Instead of pulling the active roster, we extract the unique athletes 
+        // directly from the attendance records we just found!
+        $athletes = $attendances->pluck('athlete')
+            ->filter() // Remove any nulls (if an athlete was hard-deleted)
+            ->unique('id') // Make sure each athlete only appears once
+            ->values(); // Reset array keys
 
         // Build attendance map (VERY IMPORTANT)
         $attendanceMap = [];

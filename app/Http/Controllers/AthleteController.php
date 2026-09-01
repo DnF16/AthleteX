@@ -67,24 +67,36 @@ class AthleteController extends Controller
 
     public function showApprovals()
     {
-        // 1. Get Pending (For the main tab)
-        $pendingAthletes = Athlete::where('status', 'Pending')
-                                  ->orderBy('created_at', 'desc')
-                                  ->get();
+        // 1. Public Tryout Applicants (Strictly Tryout classification)
+        $tryoutPendings = Athlete::where('approval_status', 'pending')
+                            ->where('classification', 'Tryout')
+                            ->latest()->get();
 
-        // 2. Get Recently Approved (For the bottom table)
+        // 2. Coach-Submitted Athletes (Catches non-tryouts AND null/empty classifications)
+        $studentRequests = Athlete::where('approval_status', 'pending')
+                            ->where(function($q) {
+                                $q->where('classification', '!=', 'Tryout')
+                                  ->orWhereNull('classification');
+                            })
+                            ->latest()->get();
+
         $approvedAthletes = Athlete::where('status', 'Active')
+                                   ->where('approval_status', 'approved')
                                    ->orderBy('updated_at', 'desc')
                                    ->take(5)
                                    ->get();
 
-        // 3. Get Declined (For history)
         $declinedAthletes = Athlete::where('status', 'Declined')
                                    ->orderBy('updated_at', 'desc')
                                    ->take(5)
                                    ->get();
 
-        return view('features.approvals', compact('pendingAthletes', 'approvedAthletes', 'declinedAthletes'));
+        return view('features.approvals', compact(
+            'tryoutPendings', 
+            'studentRequests',
+            'approvedAthletes', 
+            'declinedAthletes'
+        ));
     }
 
     public function approve(Request $request, $id)
@@ -508,11 +520,12 @@ class AthleteController extends Controller
 
     public function showPublicRegistrationForm()
     {
-        return view('features.alumni_registration');
+        return view('features.tryout_registration');
     }
 
     public function storePublicRegistration(Request $request)
     {
+        // 🔒 STRICT VALIDATION RULES FOR PUBLIC TRYOUT/ALUMNI REGISTRATION
         $rules = [
             'classification' => 'required|in:Alumni,Tryout',
             'student_id' => [
@@ -523,12 +536,18 @@ class AthleteController extends Controller
             ],
             'first_name'     => 'required|string|max:255',
             'last_name'      => 'required|string|max:255',
-            'email'          => 'required|email|max:255',
+            'email'          => ['required', 'string', 'email', 'max:255', 'regex:/^[\w\-\.]+@([\w\-]+\.)+[a-zA-Z]{2,7}$/'], // 👈 Strict email validation preventing 'a@g'
+            'contact_number' => ['required', 'regex:/^09[0-9]{9}$/'], // 👈 Strict 11-digit mobile validation starting with 09
             'sport_event'    => 'required|string',
             'course'         => 'nullable|string|max:255', 
         ];
 
-        $validated = $request->validate($rules);
+        $messages = [
+            'email.regex'          => 'Please provide a valid and complete email address (e.g., name@gmail.com).',
+            'contact_number.regex' => 'Contact Number must start with 09 and be exactly 11 digits.',
+        ];
+
+        $validated = $request->validate($rules, $messages);
 
         try {
             $athlete = \App\Models\Athlete::create([

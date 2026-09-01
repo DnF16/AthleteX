@@ -140,4 +140,28 @@ class ReportController extends Controller
 
         return Storage::disk('public')->download($report->file_path, $report->file_name);
     }
+
+    // ==========================================
+    // NEW: ADMIN APPROVE & GENERATE TICKET
+    // ==========================================
+    public function approveIncident($id)
+    {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Generate a random ticket number (e.g., SDO-IR-58392)
+        $ticketNo = 'SDO-IR-' . strtoupper(substr(uniqid(), -5));
+
+        \Illuminate\Support\Facades\DB::table('incident_reports')
+            ->where('id', $id)
+            ->update([
+                'status' => 'SDO_Approved',
+                'insurance_ticket_no' => $ticketNo,
+                'updated_at' => now()
+            ]);
+
+        return back()->with('success', "Incident Approved! Ticket generated: {$ticketNo}");
+    }
+
 }

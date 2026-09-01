@@ -15,7 +15,6 @@ class SportsController extends Controller
 
     public function filter($sport)
     {
-        // 1. Eager load ONLY the athletes (we don't need the user relationship anymore)
         $coaches = Coach::with(['athletes' => function($query) use ($sport) {
             if ($sport !== 'All') {
                 $query->where('sport_event', $sport); 
@@ -30,15 +29,12 @@ class SportsController extends Controller
         ->get()
         ->map(function($coach) {
             
-            // 2. Grab the name using your EXACT database columns!
             $coachName = trim($coach->coach_first_name . ' ' . $coach->coach_last_name);
             
-            // Quick fallback just in case a coach profile was saved without a name
             if (empty($coachName)) {
                 $coachName = 'Coach ID: ' . $coach->id;
             }
 
-            // 3. Aggregate the counts dynamically
             return [
                 'name' => $coachName, 
                 'assistant_coach' => 'N/A', 

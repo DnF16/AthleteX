@@ -23,6 +23,7 @@
         <!-- Admin Filter -->
         <?php if(auth()->user()->role === 'admin'): ?>
         <form method="GET" class="flex flex-wrap gap-4 mb-4">
+            
             <!-- Sport Filter -->
             <select name="sport" onchange="this.form.submit()" class="border rounded px-3 py-2">
                 <option value="">All Sports</option>
@@ -35,7 +36,8 @@
             </select>
 
             <!-- Month Filter -->
-            <select name="month" onchange="this.form.submit()" class="border rounded px-3 py-2">
+            <!-- Note: Selecting a month automatically clears the date filter! -->
+            <select id="monthFilter" name="month" onchange="document.getElementById('dateFilter').value=''; this.form.submit()" class="border rounded px-3 py-2">
                 <option value="">All Months</option>
                 <?php
                     $months = [
@@ -54,8 +56,16 @@
             </select>
 
             <!-- Date Filter -->
-            <input type="date" name="date" value="<?php echo e(request('date')); ?>" onchange="this.form.submit()"
+            <!-- Note: Picking a date automatically resets the month dropdown! -->
+            <input id="dateFilter" type="date" name="date" value="<?php echo e(request('date')); ?>" onchange="document.getElementById('monthFilter').value=''; this.form.submit()"
                 class="border rounded px-3 py-2" />
+
+            <!-- Clear Button -->
+            <?php if(request('sport') || request('month') || request('date')): ?>
+                <a href="<?php echo e(route('admin.attendance')); ?>" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition flex items-center">
+                    Clear Filters
+                </a>
+            <?php endif; ?>
         </form>
         <?php endif; ?>
 
@@ -80,7 +90,6 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Remarks</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Record Type</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -105,18 +114,10 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm"><?php echo e($athlete['remarks'] ?? '—'); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?php echo e($athlete['attendance_date']); ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <!-- Safe check using ?? false so Admins don't trigger errors -->
-                                <?php if(($athlete['isEditable'] ?? false) && $athlete['attendance_date'] === ($today ?? '')): ?>
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">✏️ Today</span>
-                                <?php else: ?>
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">📋 History</span>
-                                <?php endif; ?>
-                            </td>
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
-                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">No athletes found for this filter.</td>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">No athletes found for this filter.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

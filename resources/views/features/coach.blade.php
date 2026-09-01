@@ -5,10 +5,9 @@
 @section('content')
     <div class="space-y-6 w-full">
 
-        <!-- Page Header -->
-        <div class="bg-white p-6 relative">
-            <!-- Centered Title -->
-            <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-2">
+        <!-- Page Header (Matched with Student Athlete) -->
+        <div class="bg-white p-6 flex items-center justify-between">
+            <div class="flex-1 text-center flex justify-center items-center gap-2">
                 <i class="bi bi-person text-3xl text-gray-800"></i>
                 @if(auth()->check() && auth()->user()->role === 'coach')
                     <h1 class="text-3xl font-bold text-gray-800 mb-0">My Profile</h1>
@@ -19,66 +18,66 @@
 
             <!-- Right Button - Only show for admins -->
             @if(!auth()->check() || auth()->user()->role !== 'coach')
-                <div class="flex justify-end">
+                <div>
                     <a href="{{ route('coaches.index') }}" 
-                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition whitespace-nowrap">
                         List of Coaches
                     </a>
                 </div>
+            @else
+                <!-- Invisible spacer so the title stays perfectly centered for coaches -->
+                <div class="w-[140px]"></div>
             @endif
         </div>
 
-        <!-- Search Section - Only for admins -->
-        @if(!auth()->check() || auth()->user()->role !== 'coach')
-            <div class="flex items-end space-x-2">
-                <!-- Search -->
+        <!-- Search & Action Buttons (Combined to match Student Athlete) -->
+        <div class="flex items-end space-x-2 p-4">
+            
+            <!-- Search Section - Only for admins -->
+            @if(!auth()->check() || auth()->user()->role !== 'coach')
                 <div class="">
-                    <label class=" text-gray-700 font-medium mb-1" for="coach_search">Search</label>
+                    <label class="text-gray-700 font-medium mb-1" for="coach_search">Search</label>
                     <input type="text" id="coach_search" name="coach_search" placeholder="Enter full name"
                         class="w-64 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
                         autocomplete="off" value="">
                     <!-- Live search results -->
                     <div id="coach_searchResults" class="mt-2 w-64 bg-white border border-gray-200 rounded shadow-sm hidden"></div>
                 </div>
-            </div>
-        @endif
+            @endif
 
-        <!-- Action Buttons -->
-        <!-- Action Buttons -->
-        <div class="flex justify-center space-x-2">
+            <!-- Action Buttons -->
+        <div class="flex justify-center space-x-2 mt-4">
             @if(auth()->check() && auth()->user()->role === 'coach')
-                <!-- COACH USERS: Show Save (new) or Edit (existing) -->
+                <!-- COACH USERS -->
                 @if(!isset($coach))
-                    <!-- New profile: Show Save button -->
-                    <button id="coach_saveBtn" type="button" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition">
+                    <button id="coach_saveBtn" type="button" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition cursor-pointer">
                         Save My Profile
                     </button>
-                @else
-                    <!-- Existing profile: Show Edit button -->
-                    <button id="coach_editBtn" type="button" class="px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600 transition">
-                        Edit My Profile
-                    </button>
                 @endif
-                
-                <!-- ALWAYS render Update button (hidden by default) -->
-                <button id="coach_updateBtn" type="button" class="hidden px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition">
-                    Update My Profile
-                </button>
-                
             @else
-                <!-- ADMIN USERS: Original logic -->
-                <button id="coach_saveBtn" type="submit" form="coachForm" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition">
+                <!-- ADMIN USERS -->
+                <button id="coach_addNewBtn" type="button" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition cursor-pointer">
+                    + Add New Coach
+                </button>
+                <button id="coach_saveBtn" type="button" class="hidden px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition cursor-pointer">
                     Save Coach
                 </button>
+            @endif
+            
+            <button id="coach_editBtn" type="button" class="{{ (auth()->check() && auth()->user()->role === 'coach' && isset($coach)) ? '' : 'hidden' }} px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600 transition cursor-pointer">
+                Edit Profile
+            </button>
+            
+            <button id="coach_updateBtn" type="button" class="hidden px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition cursor-pointer">
+                Update Profile
+            </button>
 
-                <button id="coach_updateBtn" type="button" form="coachForm" class="{{ isset($coach) ? '' : 'hidden' }} px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition">
-                    Update Coach
-                </button>
-
-                <button type="button" onclick="resetCoachForm()" class="px-4 py-2 rounded bg-gray-300 text-gray-800 hover:bg-gray-400 transition">
-                    Cancel New
+            @if(!auth()->check() || auth()->user()->role !== 'coach')
+                <button id="coach_cancelBtn" type="button" onclick="clearSelection()" class="hidden px-4 py-2 rounded bg-gray-300 text-gray-800 hover:bg-gray-400 transition cursor-pointer">
+                    Cancel
                 </button>
             @endif
+        </div>
         </div>
 
         <!-- Navigation Tabs -->
@@ -482,17 +481,13 @@
                                         <span class="ml-2 text-sm text-green-600 font-semibold italic">(Assigned: {{ auth()->user()->coach_sport }})</span>
                                     @else
                                         <!-- Admin or coach without sport: show dropdown -->
-                                        <select name="coach_sport_event" id="coach_sport_event" class="w-2/3 bg-blue-100 border border-gray-300 rounded px-2 py-1"
-                                            {{ isset($coach) && $coach->coach_sport_event ? 'disabled' : '' }}>
-                                            <option value="">-- Select Sport Event --</option>
-                                            <option value="Basketball" {{ isset($coach) && $coach->coach_sport_event === 'Basketball' ? 'selected' : '' }}>Basketball</option>
-                                            <option value="Volleyball" {{ isset($coach) && $coach->coach_sport_event === 'Volleyball' ? 'selected' : '' }}>Volleyball</option>
-                                            <option value="Athletics" {{ isset($coach) && $coach->coach_sport_event === 'Athletics' ? 'selected' : '' }}>Athletics</option>
-                                            <option value="Swimming" {{ isset($coach) && $coach->coach_sport_event === 'Swimming' ? 'selected' : '' }}>Swimming</option>
-                                            <option value="Taekwondo" {{ isset($coach) && $coach->coach_sport_event === 'Taekwondo' ? 'selected' : '' }}>Taekwondo</option>
-                                            <option value="Chess" {{ isset($coach) && $coach->coach_sport_event === 'Chess' ? 'selected' : '' }}>Chess</option>
-                                            <option value="Football" {{ isset($coach) && $coach->coach_sport_event === 'Football' ? 'selected' : '' }}>Football</option>
-                                            <option value="Boxing" {{ isset($coach) && $coach->coach_sport_event === 'Boxing' ? 'selected' : '' }}>Boxing</option>
+                                        <select id="coach_sport_event" name="coach_sport_event" class="form-select" required>
+                                            <option value="">Select Sport...</option>
+                                            @foreach(\App\Models\Sport::orderBy('name', 'asc')->get() as $sport)
+                                                <option value="{{ str_replace(' ', '_', $sport->name) }}">
+                                                    {{ $sport->name }}
+                                                </option>
+                                            @endforeach
                                         </select>
                                         @if(isset($coach) && $coach->coach_sport_event)
                                             <input type="hidden" name="coach_sport_event" value="{{ $coach->coach_sport_event }}">
@@ -500,46 +495,6 @@
                                         @endif
                                     @endif
                                 </div>
-
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', () => {
-                                        const isCoachWithProfile = {{ auth()->check() && auth()->user()->role === 'coach' && isset($coach) ? 'true' : 'false' }};
-                                        if (!isCoachWithProfile) return;
-
-                                        // Disable all inputs/selects/textareas initially for coach users who already have profile
-                                        const form = document.getElementById('coachForm');
-                                        if (form) {
-                                            form.querySelectorAll('input,select,textarea,button').forEach(el => {
-                                                // Keep the Edit button enabled
-                                                if (el.id === 'coach_editBtn') return;
-                                                // keep Cancel/New or other admin buttons unchanged
-                                                if (el.id === 'coach_saveBtn') return;
-                                                // disable form controls (but not hidden inputs)
-                                                if (el.type !== 'hidden') el.disabled = true;
-                                            });
-
-                                            const editBtn = document.getElementById('coach_editBtn');
-                                            const updateBtn = document.getElementById('coach_updateBtn');
-
-                                            editBtn?.addEventListener('click', () => {
-                                                // enable inputs for editing
-                                                form.querySelectorAll('input,select,textarea').forEach(el => {
-                                                    if (el.type !== 'hidden') el.disabled = false;
-                                                });
-                                                // swap buttons
-                                                editBtn.classList.add('hidden');
-                                                updateBtn.classList.remove('hidden');
-                                                // mark method as PUT
-                                                document.getElementById('coach_method').value = 'PUT';
-                                            });
-
-                                            updateBtn?.addEventListener('click', (e) => {
-                                                // Gather and send via existing performFinalSave
-                                                performFinalSave(e);
-                                            });
-                                        }
-                                    });
-                                </script>
 
                                 <div class="flex items-center mt-2">
                                     <label class="w-1/3 text-sm font-medium text-gray-700">Positon</label>
@@ -1226,687 +1181,393 @@
         </div>
 
     </div>
-</div>    
+</div>  
 
-    <script>
-        window.currentUserRole = '{{ auth()->check() ? auth()->user()->role : '' }}';
-        window.currentCoachId = '{{ auth()->check() ? auth()->user()->coach_id : '' }}';
-        window.hasCoachProfile = {{ (auth()->check() && auth()->user()->role === 'coach' && isset($coach) && $coach) ? 'true' : 'false' }};
+<script>
+window.currentUserRole = '{{ auth()->check() ? auth()->user()->role : '' }}';
+window.currentCoachId = '{{ auth()->check() ? auth()->user()->coach_id : '' }}';
+window.hasCoachProfile = {{ (auth()->check() && auth()->user()->role === 'coach' && isset($coach) && $coach) ? 'true' : 'false' }};
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Helper functions
+    
+    // -----------------------
+    // 1. TAB SWITCHING (Loaded First)
+    // -----------------------
+    const tabs = document.querySelectorAll('.tab-link');
+    const contents = document.querySelectorAll('.tab-content');
+
+    const defaultTab = document.querySelector('.tab-link[href="#coach-general-info"]');
+    if (defaultTab) {
+        tabs.forEach(t => t.classList.remove('border-b-2', 'border-green-600', 'text-green-600'));
+        contents.forEach(c => c.classList.add('hidden'));
+        defaultTab.classList.add('border-b-2', 'border-green-600', 'text-green-600');
+        document.querySelector('#coach-general-info')?.classList.remove('hidden');
+    }
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', e => {
+            e.preventDefault();
+            tabs.forEach(t => t.classList.remove('border-b-2', 'border-green-600', 'text-green-600'));
+            contents.forEach(c => c.classList.add('hidden'));
+            tab.classList.add('border-b-2', 'border-green-600', 'text-green-600');
+            document.querySelector(tab.getAttribute('href'))?.classList.remove('hidden');
+        });
+    });
+
+    // -----------------------
+    // 2. HELPERS & GLOBALS
+    // -----------------------
     const byId = id => document.getElementById(id);
     const log = (label, data) => console.log(`🔍 ${label}:`, JSON.parse(JSON.stringify(data || {})));
 
-    // Load available sports (filter out already assigned ones)
+    window.newCoachData = {
+        generalInfo: {}, achievements: [], schedule: [], expenses: [], memberships: [], seminars: [], workHistory: []    
+    };
+
+    // -----------------------
+    // 3. LOCK/UNLOCK LOGIC
+    // -----------------------
+    function lockCoachFormInitial() {
+        const form = byId('coachForm');
+        if (form) {
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.type !== 'hidden' && el.id !== 'coach_search') el.disabled = true;
+            });
+        }
+        byId('coach_addNewBtn')?.classList.remove('hidden');
+        byId('coach_saveBtn')?.classList.add('hidden');
+        byId('coach_editBtn')?.classList.add('hidden');
+        byId('coach_updateBtn')?.classList.add('hidden');
+        byId('coach_cancelBtn')?.classList.add('hidden');
+    }
+
+    function unlockCoachFormForNew() {
+        const form = byId('coachForm');
+        if (form) {
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.type !== 'hidden' && el.id !== 'coach_search') el.disabled = false;
+            });
+        }
+        byId('coach_addNewBtn')?.classList.add('hidden');
+        byId('coach_saveBtn')?.classList.remove('hidden');
+        byId('coach_editBtn')?.classList.add('hidden');
+        byId('coach_updateBtn')?.classList.add('hidden');
+        byId('coach_cancelBtn')?.classList.remove('hidden');
+    }
+
+    function lockCoachFormForViewing() {
+        const form = byId('coachForm');
+        if (form) {
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.type !== 'hidden' && el.id !== 'coach_search') el.disabled = true;
+            });
+        }
+        byId('coach_addNewBtn')?.classList.add('hidden');
+        byId('coach_saveBtn')?.classList.add('hidden');
+        byId('coach_updateBtn')?.classList.add('hidden');
+        byId('coach_editBtn')?.classList.remove('hidden');
+        byId('coach_cancelBtn')?.classList.remove('hidden');
+    }
+
+    function unlockCoachFormForEditing() {
+        const form = byId('coachForm');
+        if (form) {
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.type !== 'hidden' && el.id !== 'coach_search') el.disabled = false;
+            });
+        }
+        byId('coach_addNewBtn')?.classList.add('hidden');
+        byId('coach_editBtn')?.classList.add('hidden');
+        byId('coach_updateBtn')?.classList.remove('hidden');
+        byId('coach_cancelBtn')?.classList.remove('hidden');
+        if (byId('coach_method')) byId('coach_method').value = 'PUT';
+    }
+
+    // Trigger initial lock for Admins
+    if (window.currentUserRole !== 'coach') {
+        lockCoachFormInitial();
+    }
+
+    // Connect Action Buttons
+    byId('coach_addNewBtn')?.addEventListener('click', unlockCoachFormForNew);
+    byId('coach_editBtn')?.addEventListener('click', unlockCoachFormForEditing);
+
+    byId('coach_cancelBtn')?.addEventListener('click', () => {
+        const form = byId('coachForm');
+        if (form) {
+            form.querySelectorAll('input[name], select[name], textarea[name]').forEach(el => {
+                if (['_method', '_token', 'selected_coach_id'].includes(el.name)) return;
+                if (el.type === 'file') {
+                    el.value = ''; const preview = byId('coach_picturePreview');
+                    if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+                    byId('coach_noPictureText')?.classList.remove('hidden');
+                } else if (el.tagName === 'SELECT') el.selectedIndex = 0;
+                else el.value = '';
+            });
+        }
+
+        if (byId('coach_search')) byId('coach_search').value = '';
+        if (byId('coach_selected_name')) byId('coach_selected_name').textContent = 'No Coach Selected';
+        
+        if (form) form.setAttribute('action', '{{ route('coaches.store') }}');
+        if (byId('coach_method')) byId('coach_method').value = 'POST';
+        if (byId('selected_coach_id')) byId('selected_coach_id').value = '';
+        
+        ['coach-achievements-tbody', 'scheduleTable', 'expensesTable', 'membershipTable', 'seminarsTable', 'workTable'].forEach(id => {
+            const tb = byId(id); if (tb) tb.innerHTML = `<tr><td colspan="100%" class="text-center py-4 text-gray-500">No data</td></tr>`;
+        });
+        window.newCoachData = { generalInfo: {}, achievements: [], schedule: [], expenses: [], memberships: [], seminars: [], workHistory: [] };
+
+        // Lock it back up!
+        lockCoachFormInitial();
+    });
+
+    // -----------------------
+    // 4. LOAD SPORTS
+    // -----------------------
     async function loadAvailableSports() {
         try {
             const response = await fetch('{{ route('coaches.available-sports') }}');
             const data = await response.json();
             const sportSelect = byId('coach_sport_event');
-            
             if (sportSelect && !sportSelect.disabled) {
-                // Get all existing options except the placeholder
                 const allOptions = Array.from(sportSelect.querySelectorAll('option')).slice(1);
-                const allSports = allOptions.map(opt => opt.value);
-                
-                // Update visibility based on available sports
                 allOptions.forEach(option => {
-                    if (data.available.includes(option.value)) {
-                        option.style.display = '';
-                    } else {
-                        option.style.display = 'none';
-                    }
+                    option.style.display = data.available.includes(option.value) ? '' : 'none';
                 });
             }
-        } catch (error) {
-            console.error('Error loading available sports:', error);
-        }
+        } catch (error) { console.error('Error:', error); }
     }
-
-    // Call on page load
     loadAvailableSports();
 
-    // Global data store
-    window.newCoachData = {
-        generalInfo: {},
-        achievements: [],
-        schedule: [],      
-        expenses: [],
-        memberships: [],
-        seminars: [],
-        workHistory: []    
-    };
-
-    // Auto-load logged-in coach data for coaches
-if (window.currentUserRole === 'coach' && window.currentCoachId) {
-    const generalForm = document.getElementById('coachForm');
+    // -----------------------
+    // 5. DATA POPULATOR
+    // -----------------------
     const updateBase = '{{ url('/coaches') }}';
+    function populateCoachData(full) {
+        const generalForm = byId('coachForm');
+        
+        lockCoachFormForViewing();
 
-    fetch(`${updateBase}/${window.currentCoachId}`, {
-        headers: { 'Accept': 'application/json' }
-    })
-    .then(r => r.json())
-    .then(full => {
-        if (!full) return;
-
-        console.log('Coach data loaded:', full); // DEBUG LOG
-
-        // 1. TEXT/NUMBER INPUTS (explicit mapping)
         const fieldMap = {
-            'coach_last_name': 'coach_last_name',
-            'coach_first_name': 'coach_first_name',
-            'coach_middle_initial': 'coach_middle_initial',
-            'coach_age': 'coach_age',
-            'coach_blood_type': 'coach_blood_type',
-            'coach_place_of_birth': 'coach_place_of_birth',
-            'coach_email': 'coach_email',
-            'coach_facebook': 'coach_facebook',
-            'coach_tba': 'coach_tba',
-            'coach_contact_number': 'coach_contact_number',
-            'coach_address': 'coach_address',
-            'coach_city_municipality': 'coach_city_municipality',
-            'coach_province_state': 'coach_province_state',
-            'coach_zip_code': 'coach_zip_code',
-            'coach_emergency_person': 'coach_emergency_person',
-            'coach_emergency_contact': 'coach_emergency_contact',
-            'post_graduate': 'post_graduate',
-            'course_graduated': 'course_graduated',
-            'name_collage': 'name_collage',
-            'coach_course_graduated': 'coach_course_graduated',
-            'coach_highschool': 'coach_highschool',
-            'strand_graduated': 'strand_graduated',
-            'date_hired': 'date_hired',
-            'honorarium_payment': 'honorarium_payment',
-            'occupation': 'occupation',
-            'coach_current_company': 'coach_current_company',
-            'coach_notes': 'coach_notes'
+            'coach_last_name': 'coach_last_name', 'coach_first_name': 'coach_first_name', 'coach_middle_initial': 'coach_middle_initial',
+            'coach_age': 'coach_age', 'coach_blood_type': 'coach_blood_type', 'coach_place_of_birth': 'coach_place_of_birth',
+            'coach_email': 'coach_email', 'coach_facebook': 'coach_facebook', 'coach_tba': 'coach_tba',
+            'coach_contact_number': 'coach_contact_number', 'coach_address': 'coach_address', 'coach_city_municipality': 'coach_city_municipality',
+            'coach_province_state': 'coach_province_state', 'coach_zip_code': 'coach_zip_code', 'coach_emergency_person': 'coach_emergency_person',
+            'coach_emergency_contact': 'coach_emergency_contact', 'post_graduate': 'post_graduate', 'course_graduated': 'course_graduated',
+            'name_collage': 'name_collage', 'coach_course_graduated': 'coach_course_graduated', 'coach_highschool': 'coach_highschool',
+            'strand_graduated': 'strand_graduated', 'date_hired': 'date_hired', 'honorarium_payment': 'honorarium_payment',
+            'occupation': 'occupation', 'coach_current_company': 'coach_current_company', 'coach_notes': 'coach_notes'
         };
 
         for (const [dbField, formField] of Object.entries(fieldMap)) {
             const el = generalForm?.querySelector(`[name="${formField}"]`);
-            if (el && el.type !== 'file' && el.tagName !== 'SELECT') {
-                el.value = full[dbField] ?? '';
-            }
+            if (el && el.type !== 'file' && el.tagName !== 'SELECT') { el.value = full[dbField] ?? ''; }
         }
 
-        // 2. SELECT DROPDOWNS (gender, marital status, etc.)
-        const selectFields = ['coach_gender', 'coach_marital_status', 'coach_sport_event', 'position', 'coach_status'];
-        selectFields.forEach(field => {
+        ['coach_gender', 'coach_marital_status', 'coach_sport_event', 'position', 'coach_status'].forEach(field => {
             const el = generalForm?.querySelector(`[name="${field}"]`);
-            if (el && full[field]) {
-                el.value = full[field];
-                el.dispatchEvent(new Event('change')); // Trigger any event listeners
-            }
+            if (el && full[field]) { el.value = full[field]; el.dispatchEvent(new Event('change')); }
         });
 
-        // 3. DATE FIELDS (ensure Y-m-d format)
-        const dateFields = ['coach_birthdate', 'coach_year_graduated', 'coach_graduated', 'highschool_graduated', 'date_hired', 'date_resigned', 'coach_inactive_date'];
-        dateFields.forEach(field => {
+        ['coach_birthdate', 'coach_year_graduated', 'coach_graduated', 'highschool_graduated', 'date_hired', 'date_resigned', 'coach_inactive_date'].forEach(field => {
             const el = generalForm?.querySelector(`[name="${field}"]`);
             if (el && full[field]) {
                 const date = new Date(full[field]);
-                if (!isNaN(date.getTime())) {
-                    el.value = date.toISOString().split('T')[0];
-                } else {
-                    el.value = full[field]; // Already formatted
-                }
+                el.value = !isNaN(date.getTime()) ? date.toISOString().split('T')[0] : full[field];
             }
         });
 
-        // 4. PICTURE
         if (full.picture_url) {
             const preview = byId('coach_picturePreview');
             const noPic = byId('coach_noPictureText');
-            if (preview) { 
-                preview.src = full.picture_url; 
-                preview.classList.remove('hidden'); 
-            }
+            if (preview) { preview.src = full.picture_url; preview.classList.remove('hidden'); }
             if (noPic) noPic.classList.add('hidden');
         }
 
-        // 5. SELECTED NAME DISPLAY
         const selectedName = byId('coach_selected_name');
-        const fullName = full.coach_first_name && full.coach_last_name 
-            ? `${full.coach_first_name} ${full.coach_last_name}`.trim() 
-            : 'No Coach Selected';
-        if (selectedName) selectedName.textContent = fullName;
+        if (selectedName) selectedName.textContent = full.full_name?.trim() || `${full.coach_first_name || ''} ${full.coach_last_name || ''}`.trim() || 'No Coach Selected';
 
-        // 6. SHOW UPDATE BUTTON
-        byId('coach_saveBtn')?.classList.add('hidden');
-        byId('coach_updateBtn')?.classList.remove('hidden');
-        byId('coach_method').value = 'PUT';
-        byId('selected_coach_id').value = window.currentCoachId;
+        if (byId('coach_method')) byId('coach_method').value = 'PUT';
+        if (byId('selected_coach_id')) byId('selected_coach_id').value = full.id;
 
-        // 7. POPULATE RELATED TABLES
         window.newCoachData = {
-            generalInfo: {},
-            achievements: full.achievements || [],
-            schedule: full.schedule || [],
-            expenses: full.expenses || [],
-            memberships: full.memberships || [],
-            seminars: full.seminars || [],
-            workHistory: full.workHistories || []
+            generalInfo: {}, achievements: full.achievements || [], schedule: full.schedule || [],
+            expenses: full.expenses || [], memberships: full.memberships || [], seminars: full.seminars || [], workHistory: full.workHistories || []
         };
 
-        // Populate tables
-        populateTable('coach-achievements-tbody', full.achievements, {
-            year: 'Year', month_day: 'Month-Day', sports_event: 'Sports Event', 
-            venue: 'Venue', award: 'Award', category: 'Category', remarks: 'Remarks'
-        });
-
-        populateTable('scheduleTable', full.schedule, {
-            term: 'Term', academic_year: 'Academic Year', count_a: 'A',count_b: 'B',count_c: 'C', coachRemark: 'Remarks'
-        });
-
-        populateTable('expensesTable', full.expenses, {
-            year: 'Year', date: 'Date', title: 'Title of Activity', estimate: 'Estimate Budget',
-            actual: 'Actual Budget', variance: 'Variance', remark: 'Remarks'
-        });
-
-        populateTable('membershipTable', full.memberships, {
-            year: 'Year', date: 'Date', venue: 'Venue',
-            organization: 'Name of Organization', level: 'Level', position: 'Position',
-            remark: 'Remarks'
-        });
-
-        populateTable('seminarsTable', full.seminars, {
-            year: 'Year', date: 'Date', venue: 'venue', seminar: 'Title of Seminar / Workshop', level: 'Level', remark: 'Remarks'
-        });
-
-        populateTable('workTable', full.workHistories, {
-            year: 'Year', date: 'Date', work_position: 'Position', company: 'Company', remark: 'Remarks'
-        });
-    })
-    .catch(err => console.error('❌ Failed to auto-load coach data:', err));
-}
-
-
-    // -----------------------
-    // LIVE SEARCH
-    // -----------------------
-    (function initLiveSearch() {
-        const searchInput = byId('coach_search');
-        const resultsBox = byId('coach_searchResults');
-        if (!searchInput || !resultsBox) return;
-
-        const searchUrl = '{{ route('coaches.search') }}';
-        const updateBase = '{{ url('/coaches') }}';
-        const generalForm = byId('coachForm');
-        const methodInput = byId('coach_method');
-        const selectedCoachIdInput = byId('selected_coach_id');
-        const saveBtn = byId('coach_saveBtn');
-        const updateBtn = byId('coach_updateBtn');
-        const defaultAction = generalForm?.getAttribute('action') || '{{ route('coaches.store') }}';
-
-        let timer = null;
-        let selectedFromSearch = false;
-        let selectedId = null;
-
-        function clearResults() {
-            resultsBox.innerHTML = '';
-            resultsBox.classList.add('hidden');
-        }
-
-        function clearSelection() {
-            if (!generalForm) return;
-
-            // Clear form fields
-            generalForm.querySelectorAll('input[name], select[name], textarea[name]').forEach(el => {
-                if (['_method', '_token', 'selected_coach_id'].includes(el.name)) return;
-                if (el.type === 'file') {
-                    el.value = '';
-                    const preview = byId('coach_picturePreview');
-                    if (preview) { preview.src = ''; preview.classList.add('hidden'); }
-                    byId('coach_noPictureText')?.classList.remove('hidden');
-                } else if (el.tagName === 'SELECT') {
-                    el.selectedIndex = 0;
-                } else {
-                    el.value = '';
-                }
-            });
-
-            byId('coach_selected_name').textContent = 'No Coach Selected';
-            selectedFromSearch = false;
-            selectedId = null;
-            generalForm?.setAttribute('action', defaultAction);
-            if (methodInput) methodInput.value = 'POST';
-            if (selectedCoachIdInput) selectedCoachIdInput.value = '';
-            saveBtn?.classList.remove('hidden');
-            updateBtn?.classList.add('hidden');
-
-            // Clear all tables
-            const tableIds = ['coach-achievements-tbody', 'scheduleTable', 'expensesTable', 'membershipTable', 'seminarsTable', 'workTable'];
-            tableIds.forEach(id => {
-                const tbody = byId(id);
-                if (tbody) tbody.innerHTML = `<tr><td colspan="100%" class="text-center py-4 text-gray-500">No data</td></tr>`;
-            });
-
-            // Reset global data
-            window.newCoachData = {
-                generalInfo: {},
-                achievements: [],
-                schedule: [],
-                expenses: [],
-                memberships: [],
-                seminars: [],
-                workHistory: []
-            };
-        }
-
-        function renderResults(items) {
-            if (!items?.length) {
-                clearResults();
-                return;
-            }
-            resultsBox.innerHTML = '';
-            items.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm';
-                const name = item.full_name?.trim() || `${item.coach_first_name || ''} ${item.coach_last_name || ''}`.trim();
-                div.textContent = name + (item.id ? ` — ID: ${item.id}` : '');
-                
-                div.addEventListener('click', () => {
-                    selectedFromSearch = true;
-                    selectedId = item.id || null;
-                    if (selectedCoachIdInput) selectedCoachIdInput.value = selectedId;
-
-                    if (generalForm && selectedId) {
-                        generalForm.setAttribute('action', `${updateBase}/${selectedId}`);
-                        if (methodInput) methodInput.value = 'PUT';
-                    }
-
-                    // Fetch full details
-                    fetch(`${updateBase}/${selectedId}`, { 
-                        headers: { 'Accept': 'application/json' } 
-                    })
-                    .then(r => {
-                        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-                        return r.json();
-                    })
-                    .then(full => {
-                        log('✅ Coach data loaded', full); // Debug log
-
-                        // Populate general info
-                        for (const key in full) {
-                            if (['achievements', 'schedule', 'expenses', 'memberships', 'seminars', 'workHistories'].includes(key)) continue;
-                            
-                            const el = generalForm?.querySelector(`[name="${key}"]`);
-                            if (el && el.tagName !== 'SELECT' && el.type !== 'file') {
-                                el.value = full[key] ?? '';
-                            }
-                        }
-
-                        // Handle picture
-                        if (full.picture_url) {
-                            const preview = byId('coach_picturePreview');
-                            const noPic = byId('coach_noPictureText');
-                            if (preview) { 
-                                preview.src = full.picture_url; 
-                                preview.classList.remove('hidden'); 
-                            }
-                            if (noPic) noPic.classList.add('hidden');
-                        }
-
-                        // Update selected name
-                        const selectedName = byId('coach_selected_name');
-                        const fullName = full.full_name?.trim() || `${full.coach_first_name || ''} ${full.coach_last_name || ''}`.trim();
-                        if (selectedName) selectedName.textContent = fullName || 'No Coach Selected';
-
-                        // Clear tables first
-                        const tableIds = ['coach-achievements-tbody', 'scheduleTable', 'expensesTable', 'membershipTable', 'seminarsTable', 'workTable'];
-                        tableIds.forEach(id => {
-                            const tbody = byId(id);
-                            if (tbody) tbody.innerHTML = '';
-                        });
-
-                        // CRITICAL FIX: Map relationship names correctly
-                        window.newCoachData = {
-                            generalInfo: {},
-                            achievements: full.achievements || [],
-                            schedule: full.schedule || [],      // 'schedule' from model
-                            expenses: full.expenses || [],
-                            memberships: full.memberships || [],
-                            seminars: full.seminars || [],
-                            workHistory: full.workHistories || [] // Map plural to singular
-                        };
-
-                        log('📊 Global data ready', window.newCoachData);
-
-                        // Populate tables with field mapping
-                        populateTable('coach-achievements-tbody', full.achievements, {
-                            year: 'Year', month_day: 'Month-Day', sports_event: 'Sports Event', 
-                            venue: 'Venue', award: 'Award', category: 'Category', remarks: 'Remarks'
-                        });
-
-                        populateTable('scheduleTable', full.schedule, {  // Use 'schedule' not 'schedules'
-                            term: 'Term', academic_year: 'Academic Year', count_a: 'A',count_b: 'B',count_c: 'C', coachRemark: 'Remarks'
-                        });
-
-                        populateTable('expensesTable', full.expenses, {
-                            year: 'Year', date: 'Date', title: 'Title of Activity', estimate: 'Estimate Budget',
-                            actual: 'Actual Budget', variance: 'Variance', remark: 'Remarks'
-                        });
-
-                        populateTable('membershipTable', full.memberships, {
-                            year: 'Year', date: 'Date', venue: 'Venue',
-                            organization: 'Name of Organization', level: 'Level', position: 'Position',
-                            remark: 'Remarks'
-                        });
-
-                        populateTable('seminarsTable', full.seminars, {
-                            year: 'Year', date: 'Date', venue: 'venue', seminar: 'Title of Seminar / Workshop', level: 'Level', remark: 'Remarks'
-                        });
-
-                        populateTable('workTable', full.workHistories, {  // Use 'workHistories' from model
-                            year: 'Year', date: 'Date', work_position: 'Position', company: 'Company', remark: 'Remarks'
-                        });
-
-                        saveBtn?.classList.add('hidden');
-                        updateBtn?.classList.remove('hidden');
-                    })
-                    .catch(err => {
-                        console.error('❌ Failed to load coach:', err);
-                        alert(`Error loading coach: ${err.message}`);
-                    });
-
-                clearResults();
-            });
-            resultsBox.appendChild(div);
-        });
-        resultsBox.classList.remove('hidden');
+        populateTable('coach-achievements-tbody', full.achievements, { year: 'Year', month_day: 'Month-Day', sports_event: 'Sports Event', venue: 'Venue', award: 'Award', category: 'Category', remarks: 'Remarks' });
+        populateTable('scheduleTable', full.schedule, { term: 'Term', academic_year: 'Academic Year', count_a: 'A',count_b: 'B',count_c: 'C', coachRemark: 'Remarks' });
+        populateTable('expensesTable', full.expenses, { year: 'Year', date: 'Date', title: 'Title of Activity', estimate: 'Estimate Budget', actual: 'Actual Budget', variance: 'Variance', remark: 'Remarks' });
+        populateTable('membershipTable', full.memberships, { year: 'Year', date: 'Date', venue: 'Venue', organization: 'Name of Organization', level: 'Level', position: 'Position', remark: 'Remarks' });
+        populateTable('seminarsTable', full.seminars, { year: 'Year', date: 'Date', venue: 'venue', seminar: 'Title of Seminar / Workshop', level: 'Level', remark: 'Remarks' });
+        populateTable('workTable', full.workHistories, { year: 'Year', date: 'Date', work_position: 'Position', company: 'Company', remark: 'Remarks' });
     }
 
-    searchInput.addEventListener('input', (e) => {
-        const value = e.target.value;
-        if (timer) clearTimeout(timer);
+    if (window.currentUserRole === 'coach' && window.currentCoachId) {
+        fetch(`${updateBase}/${window.currentCoachId}`, { headers: { 'Accept': 'application/json' } })
+        .then(r => r.json())
+        .then(full => { if (full) populateCoachData(full); })
+        .catch(err => console.error('Error auto-loading coach:', err));
+    }
 
-        if (!value?.trim()) {
-            if (selectedFromSearch) clearSelection();
-            clearResults();
-            return;
-        }
-
-        timer = setTimeout(() => {
-            fetch(`${searchUrl}?q=${encodeURIComponent(value.trim())}`, { 
-                headers: { 'Accept': 'application/json' } 
-            })
-            .then(r => r.json())
-            .then(data => renderResults(data || []))
-            .catch(err => {
-                console.error('Search error:', err);
-                clearResults();
-            });
-        }, 300);
-    });
-
-    // Click outside to close
-    document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target) && !resultsBox.contains(e.target)) {
-            clearResults();
-        }
-    });
-    })();
+    const urlParams = new URLSearchParams(window.location.search);
+    const coachEditId = urlParams.get('coach_id') || urlParams.get('id');
+    if (coachEditId && window.currentUserRole !== 'coach') {
+        const generalForm = byId('coachForm');
+        generalForm?.setAttribute('action', `${updateBase}/${coachEditId}`);
+        fetch(`${updateBase}/${coachEditId}`, { headers: { 'Accept': 'application/json' } })
+        .then(r => r.json())
+        .then(full => { if(full) populateCoachData(full); })
+        .catch(err => console.error('Error fetching coach URL:', err));
+    }
 
     // -----------------------
-    // TAB SWITCHING
+    // 6. LIVE SEARCH
     // -----------------------
-    (function initTabs() {
-        const tabs = document.querySelectorAll('.tab-link');
-        const contents = document.querySelectorAll('.tab-content');
+    const searchInput = byId('coach_search');
+    const resultsBox = byId('coach_searchResults');
+    if (searchInput && resultsBox) {
+        const searchUrl = '{{ route('coaches.search') }}';
+        let timer = null;
 
-        const defaultTab = document.querySelector('.tab-link[href="#coach-general-info"]');
-        if (defaultTab) {
-            tabs.forEach(t => t.classList.remove('border-b-2', 'border-green-600', 'text-green-600'));
-            contents.forEach(c => c.classList.add('hidden'));
-            defaultTab.classList.add('border-b-2', 'border-green-600', 'text-green-600');
-            document.querySelector('#coach-general-info')?.classList.remove('hidden');
-        }
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            if (timer) clearTimeout(timer);
+            if (!value?.trim()) { 
+                resultsBox.innerHTML = ''; resultsBox.classList.add('hidden'); 
+                byId('coach_cancelBtn')?.click(); return; 
+            }
 
-        tabs.forEach(tab => {
-            tab.addEventListener('click', e => {
-                e.preventDefault();
-                tabs.forEach(t => t.classList.remove('border-b-2', 'border-green-600', 'text-green-600'));
-                contents.forEach(c => c.classList.add('hidden'));
-                tab.classList.add('border-b-2', 'border-green-600', 'text-green-600');
-                document.querySelector(tab.getAttribute('href'))?.classList.remove('hidden');
-            });
+            timer = setTimeout(() => {
+                fetch(`${searchUrl}?q=${encodeURIComponent(value.trim())}`, { headers: { 'Accept': 'application/json' } })
+                .then(r => r.json())
+                .then(items => {
+                    if (!items?.length) { resultsBox.innerHTML = ''; resultsBox.classList.add('hidden'); return; }
+                    resultsBox.innerHTML = '';
+                    items.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm';
+                        const name = item.full_name?.trim() || `${item.coach_first_name || ''} ${item.coach_last_name || ''}`.trim();
+                        div.textContent = name + (item.id ? ` — ID: ${item.id}` : '');
+                        
+                        div.addEventListener('click', () => {
+                            if (byId('selected_coach_id')) byId('selected_coach_id').value = item.id;
+                            const generalForm = byId('coachForm');
+                            generalForm?.setAttribute('action', `${updateBase}/${item.id}`);
+
+                            fetch(`${updateBase}/${item.id}`, { headers: { 'Accept': 'application/json' } })
+                            .then(r => r.json())
+                            .then(full => { if(full) populateCoachData(full); })
+                            .catch(err => console.error('Error load:', err));
+
+                            resultsBox.innerHTML = '';
+                            resultsBox.classList.add('hidden');
+                        });
+                        resultsBox.appendChild(div);
+                    });
+                    resultsBox.classList.remove('hidden');
+                });
+            }, 300);
         });
-    })();
+
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !resultsBox.contains(e.target)) {
+                resultsBox.innerHTML = ''; resultsBox.classList.add('hidden');
+            }
+        });
+    }
 
     // -----------------------
-    // MODAL TOGGLES
+    // 7. MODAL TOGGLES & TABLES
     // -----------------------
-    window.toggleCoachAchievementModal = (show) => byId('coach-AchievementModal')?.classList.toggle('hidden', !show);
-    window.toggleScheduleModal = (show) => byId('scheduleModal')?.classList.toggle('hidden', !show);
-    window.toggleExpensesModal = (show) => byId('expensesModal')?.classList.toggle('hidden', !show);
-    window.toggleMembershipModal = (show) => byId('membershipModal')?.classList.toggle('hidden', !show);
-    window.toggleSeminarsModal = (show) => byId('seminarsModal')?.classList.toggle('hidden', !show);
-    window.toggleWorkHistoryModal = (show) => byId('workModal')?.classList.toggle('hidden', !show);
+    window.toggleCoachAchievementModal = (s) => byId('coach-AchievementModal')?.classList.toggle('hidden', !s);
+    window.toggleScheduleModal = (s) => byId('scheduleModal')?.classList.toggle('hidden', !s);
+    window.toggleExpensesModal = (s) => byId('expensesModal')?.classList.toggle('hidden', !s);
+    window.toggleMembershipModal = (s) => byId('membershipModal')?.classList.toggle('hidden', !s);
+    window.toggleSeminarsModal = (s) => byId('seminarsModal')?.classList.toggle('hidden', !s);
+    window.toggleWorkHistoryModal = (s) => byId('workModal')?.classList.toggle('hidden', !s);
 
-    // -----------------------
-    // TABLE POPULATOR
-    // -----------------------
     function populateTable(tableId, dataArray, fieldMap) {
         const tbody = byId(tableId);
-        if (!tbody) {
-            console.error(`❌ Table body not found: ${tableId}`);
-            return;
-        }
-
-        tbody.innerHTML = ''; // Clear existing
-
+        if (!tbody) return;
+        tbody.innerHTML = '';
         if (!Array.isArray(dataArray) || dataArray.length === 0) {
-            console.warn(`⚠️ No data for ${tableId}`);
-            const colCount = Object.keys(fieldMap).length;
-            tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center py-4 text-gray-500">No records found</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="${Object.keys(fieldMap).length}" class="text-center py-4 text-gray-500">No records found</td></tr>`;
             return;
         }
-
-        dataArray.forEach((item, index) => {
-            const row = document.createElement('tr');
-            row.className = 'border-b hover:bg-gray-50 text-center';
-            
-            const cells = Object.entries(fieldMap).map(([key, label]) => {
-                // Try multiple casing variations to handle different field names
-                let value = item[key] ?? 
-                           item[key.toLowerCase()] ?? 
-                           item[key.replace(/([A-Z])/g, '_$1').toLowerCase()] ?? 
-                           '-';
-                return `<td class="border px-4 py-2 text-sm">${value}</td>`;
+        dataArray.forEach((item) => {
+            const row = document.createElement('tr'); row.className = 'border-b hover:bg-gray-50 text-center';
+            row.innerHTML = Object.entries(fieldMap).map(([key, _]) => {
+                let val = item[key] ?? item[key.toLowerCase()] ?? item[key.replace(/([A-Z])/g, '_$1').toLowerCase()] ?? '-';
+                return `<td class="border px-4 py-2 text-sm">${val}</td>`;
             }).join('');
-            
-            row.innerHTML = cells;
             tbody.appendChild(row);
         });
-
-        console.log(`✅ Populated ${tableId} with ${dataArray.length} records`);
     }
 
-    // -----------------------
-    // MODULE FORM HANDLERS
-    // -----------------------
     function handleModuleForm(formId, tbodyId, dataKey, fieldMap) {
-        const form = byId(formId);
-        const tbody = byId(tbodyId);
+        const form = byId(formId); const tbody = byId(tbodyId);
         if (!form || !tbody) return;
-
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            
-            // Validate required fields (first field in map)
-            const firstRequiredField = Object.keys(fieldMap)[0];
-            if (!data[firstRequiredField]?.trim()) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-            
+            const data = Object.fromEntries(new FormData(e.target).entries());
+            if (!data[Object.keys(fieldMap)[0]]?.trim()) { alert('Fill required fields.'); return; }
             window.newCoachData[dataKey].push(data);
-            
-            const row = document.createElement('tr');
-            row.className = 'border-b hover:bg-gray-50';
-            const cells = Object.keys(fieldMap).map(key => 
-                `<td class="border px-4 py-2 text-sm">${data[key] || '-'}</td>`
-            ).join('');
-            row.innerHTML = cells;
-            tbody.appendChild(row);
-            
-            e.target.reset();
-            
-            // Close corresponding modal
-            const modalMap = {
-                achievements: 'coach-AchievementModal',
-                schedule: 'scheduleModal',
-                expenses: 'expensesModal',
-                memberships: 'membershipModal',
-                seminars: 'seminarsModal',
-                workHistory: 'workModal'
-            };
-            const modalId = modalMap[dataKey];
-            if (modalId) byId(modalId)?.classList.add('hidden');
+            const r = document.createElement('tr'); r.className = 'border-b hover:bg-gray-50';
+            r.innerHTML = Object.keys(fieldMap).map(k => `<td class="border px-4 py-2 text-sm">${data[k] || '-'}</td>`).join('');
+            tbody.appendChild(r); e.target.reset();
+            const modalMap = { achievements: 'coach-AchievementModal', schedule: 'scheduleModal', expenses: 'expensesModal', memberships: 'membershipModal', seminars: 'seminarsModal', workHistory: 'workModal'};
+            if (modalMap[dataKey]) byId(modalMap[dataKey])?.classList.add('hidden');
         });
     }
 
-    // Initialize all module forms
-    handleModuleForm('coach-achievementForm', 'coach-achievements-tbody', 'achievements', {
-        year: 'Year', month_day: 'Month-Day', sports_event: 'Sports Event', 
-        venue: 'Venue', award: 'Award', category: 'Category', remarks: 'Remarks'
-    });
-
-    handleModuleForm('ScheduleForm', 'scheduleTable', 'schedule', {
-        term: 'Term', academic_year: 'Academic Year', count_a: 'A',count_b: 'B',count_c: 'C', remarks: 'Remarks'
-    });
-
-    handleModuleForm('ExpensesForm', 'expensesTable', 'expenses', {
-        year: 'Year', date: 'Date', title: 'Title of Activity', estimate: 'Estimate Budget',
-        actual: 'Actual Budget', variance: 'Variance', remark: 'Remarks'
-    });
-
-    handleModuleForm('MembershipForm', 'membershipTable', 'memberships', {
-        year: 'Year', date: 'Date', venue: 'Venue',
-        organization: 'Name of Organization', level: 'Level', position: 'Position',
-        remark: 'Remarks'
-    });
-
-    handleModuleForm('SeminarsForm', 'seminarsTable', 'seminars', {
-        year: 'Year', date: 'Date', venue: 'venue', seminar: 'Title of Seminar / Workshop', level: 'Level', remark: 'Remarks'
-    });
-
-    handleModuleForm('WorkHistoryForm', 'workTable', 'workHistory', {
-        year: 'Year', date: 'Date', work_position: 'Position', company: 'Company', remark: 'Remarks'
-    });
+    handleModuleForm('coach-achievementForm', 'coach-achievements-tbody', 'achievements', { year: 'Year', month_day: 'Month-Day', sports_event: 'Sports Event', venue: 'Venue', award: 'Award', category: 'Category', remarks: 'Remarks' });
+    handleModuleForm('ScheduleForm', 'scheduleTable', 'schedule', { term: 'Term', academic_year: 'Academic Year', count_a: 'A',count_b: 'B',count_c: 'C', remarks: 'Remarks' });
+    handleModuleForm('ExpensesForm', 'expensesTable', 'expenses', { year: 'Year', date: 'Date', title: 'Title of Activity', estimate: 'Estimate Budget', actual: 'Actual Budget', variance: 'Variance', remark: 'Remarks' });
+    handleModuleForm('MembershipForm', 'membershipTable', 'memberships', { year: 'Year', date: 'Date', venue: 'Venue', organization: 'Name of Organization', level: 'Level', position: 'Position', remark: 'Remarks' });
+    handleModuleForm('SeminarsForm', 'seminarsTable', 'seminars', { year: 'Year', date: 'Date', venue: 'venue', seminar: 'Title of Seminar / Workshop', level: 'Level', remark: 'Remarks' });
+    handleModuleForm('WorkHistoryForm', 'workTable', 'workHistory', { year: 'Year', date: 'Date', work_position: 'Position', company: 'Company', remark: 'Remarks' });
 
     // -----------------------
-    // SAVE/UPDATE COACH
+    // 8. FINAL SAVE
     // -----------------------
     function performFinalSave(e) {
         if (e) e.preventDefault();
-        
-        // Collect general info from form
         const form = byId('coachForm');
         if (form) {
             form.querySelectorAll('input[name], select[name], textarea[name]').forEach(input => {
-                if (input.name && !['_method', '_token'].includes(input.name)) {
-                    window.newCoachData.generalInfo[input.name] = input.value;
-                }
+                if (input.name && !['_method', '_token'].includes(input.name)) { window.newCoachData.generalInfo[input.name] = input.value; }
             });
         }
 
         const selectedId = byId('selected_coach_id')?.value;
-        const updateBase = '{{ url('/coaches') }}';
-        const endpoint = selectedId ? `${updateBase}/${selectedId}` : updateBase;
+        const endpoint = selectedId ? `{{ url('/coaches') }}/${selectedId}` : '{{ url('/coaches') }}';
         const method = selectedId ? 'PUT' : 'POST';
         
-        const button = e?.target;
-        if (button) {
-            button.disabled = true;
-            button.textContent = 'Saving...';
-        }
-        
-        log('Sending data to server', { endpoint, method, data: window.newCoachData });
+        const btn = e?.target; if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
 
         fetch(endpoint, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json'
-            },
+            method: method, headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
             body: JSON.stringify(window.newCoachData)
         })
         .then(async r => {
-            const text = await r.text();
-            log('Raw server response', text);
-            let data = null;
-            try { data = JSON.parse(text); } catch (e) {}
-            if (!r.ok) throw new Error(r.status === 422 && data?.errors ? 
-                'Validation: ' + JSON.stringify(data.errors) : 
-                `Server ${r.status}: ${text}`);
-            return data;
+            const txt = await r.text(); let d = null; try{ d = JSON.parse(txt); }catch(err){}
+            if (!r.ok) throw new Error(r.status === 422 && d?.errors ? 'Validation: ' + JSON.stringify(d.errors) : `Server ${r.status}`);
+            return d;
         })
         .then(data => {
-            try {
-                const coachId = data?.coach?.id || data?.id;
-                
-                // For coach users, update UI without redirect
-                if (window.currentUserRole === 'coach') {
-                    if (coachId) {
-                        // Update form for future updates
-                        const updateBase = '{{ url('/coaches') }}';
-                        byId('coachForm')?.setAttribute('action', `${updateBase}/${coachId}`);
-                        byId('coach_method').value = 'PUT';
-                        byId('selected_coach_id').value = coachId;
-                        
-                        // Swap buttons: hide Save/Edit, show Update
-                        byId('coach_saveBtn')?.classList.add('hidden');
-                        byId('coach_editBtn')?.classList.add('hidden');
-                        byId('coach_updateBtn')?.classList.remove('hidden');
-                        
-                        // Update global coach ID
-                        window.currentCoachId = coachId;
-                        
-                        // Re-enable form controls after save
-                        byId('coachForm')?.querySelectorAll('input,select,textarea').forEach(el => {
-                            if (el.type !== 'hidden') el.disabled = false;
-                        });
-                        
-                        alert('✅ Profile saved successfully!');
-                        return; // Don't reload or redirect
-                    }
-                } else {
-                    // For admin users, redirect to show page if coach created
-                    if (coachId) {
-                        const target = '{{ url('/coach') }}' + '?coach_id=' + coachId;
-                        window.location.href = target;
-                        return;
-                    }
-                }
-            } catch (e) {
-                console.error('Error handling success response:', e);
-            }
-            
-            // Fallback: reload page
-            alert('✅ Coach saved successfully!');
-            location.reload();
+            alert('✅ Profile saved successfully!');
+            if (window.currentUserRole !== 'coach' && data?.id) { window.location.href = `{{ url('/coach') }}?coach_id=${data.id}`; } 
+            else { location.reload(); }
         })
-        .catch(err => {
-            console.error('❌ Save error:', err);
-            alert(`Save failed: ${err.message}`);
-        })
-        .finally(() => {
-            if (button) {
-                button.disabled = false;
-                button.textContent = selectedId ? 'Update Coach' : 'Save Coach';
-            }
-        });
+        .catch(err => { alert(`Save failed: ${err.message}`); })
+        .finally(() => { if (btn) { btn.disabled = false; btn.textContent = selectedId ? 'Update Coach' : 'Save Coach'; } });
     }
 
     byId('coach_saveBtn')?.addEventListener('click', performFinalSave);
     byId('coach_updateBtn')?.addEventListener('click', performFinalSave);
 });
 </script>
-
 @endsection

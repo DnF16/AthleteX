@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Sports'); ?>
 
-@section('title', 'Sports')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div id="tab-content" class="bg-white p-6 rounded w-full">
     <div class="space-y-6 w-full">
 
@@ -18,12 +16,12 @@
                 <option value="All">All Sports</option>
                 
                 <!-- DYNAMICALLY LOADED FROM YOUR 'sports' DATABASE TABLE -->
-                @foreach(\App\Models\Sport::orderBy('name', 'asc')->get() as $sport)
-                    @php
+                <?php $__currentLoopData = \App\Models\Sport::orderBy('name', 'asc')->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sport): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php
                         $sportValue = str_replace(' ', '_', $sport->name);
-                    @endphp
-                    <option value="{{ $sportValue }}">{{ $sport->name }}</option>
-                @endforeach
+                    ?>
+                    <option value="<?php echo e($sportValue); ?>"><?php echo e($sport->name); ?></option>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
             </select>
         </div>
@@ -98,4 +96,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp\htdocs\AthleteX\resources\views/features/sports.blade.php ENDPATH**/ ?>

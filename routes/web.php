@@ -19,6 +19,9 @@ use App\Http\Controllers\SportsController;
 use App\Http\Controllers\IncidentController;
 use App\Http\Controllers\BlockchainController;
 
+// New Global Achievements
+use App\Http\Controllers\AchievementController;
+
 // Coach Sub-Controllers
 use App\Http\Controllers\CoachAchievementController;
 use App\Http\Controllers\CoachScheduleController;
@@ -28,12 +31,8 @@ use App\Http\Controllers\CoachSeminarController;
 use App\Http\Controllers\CoachWorkHistoryController;
 
 use App\Http\Controllers\ApprovalController;
-
 use App\Http\Controllers\ReportController;
-
 use App\Http\Controllers\TryoutScheduleController;
-
-
 
 // ==============================================================
 // PUBLIC ROUTES (No Login Required)
@@ -49,11 +48,6 @@ Route::get('/login', function () {
     return view('log.login');
 })->name('login');
 
-// Home redirect to login
-// Route::get('/', function () {
-//     return redirect()->route('login');
-// });
-
 // Handle Login
 Route::post('/login', function (Request $request) {
     $credentials = $request->only('email', 'password');
@@ -64,22 +58,22 @@ Route::post('/login', function (Request $request) {
     return back()->withErrors(['email' => 'Invalid credentials.']);
 })->name('login');
 
-
 // ==============================================================
-// PUBLIC ALUMNI REGISTRATION (The "Public Form")
+// PUBLIC TRYOUT REGISTRATION (The "Public Form")
 // ==============================================================
-Route::get('/alumni-registration', [AthleteController::class, 'showPublicRegistrationForm'])->name('alumni.register.show');
-Route::post('/alumni-registration', [AthleteController::class, 'storePublicRegistration'])->name('alumni.register.submit');
-
+Route::get('/tryout-registration', [AthleteController::class, 'showPublicRegistrationForm'])->name('tryout.register.show');
+Route::post('/tryout-registration', [AthleteController::class, 'storePublicRegistration'])->name('tryout.register.submit');
 
 // ==============================================================
 // AUTHENTICATED ROUTES (Login Required)
 // ==============================================================
 
-
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // 🚀 NEW GLOBAL ACHIEVEMENTS ROUTE
+    Route::get('/achievements', [AchievementController::class, 'globalIndex'])->name('achievements.index');
 
     // Report Routes (accessible by both coach and admin)
     Route::get('/reports/{report}/download', [\App\Http\Controllers\ReportController::class, 'download'])
@@ -95,7 +89,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/student-athlete', [AthleteController::class, 'create'])->name('student.athlete');
 
     Route::get('/admin/security-ledger', [BlockchainController::class, 'index'])->name('admin.blockchain');
-
 
     // Student Athlete Logic
     Route::get('/student-athletes', [AthleteController::class, 'index'])->name('student.athletes');
@@ -116,10 +109,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/fees-discounts', [FeesDiscountController::class, 'store']);
     Route::get('/fees-discounts/{athlete_id}', [FeesDiscountController::class, 'show']);
 
-
     Route::post('/work-history', [WorkHistoryController::class, 'store']);
     Route::get('/work-history/{athlete_id}', [WorkHistoryController::class, 'show']);
-
 
     // Shared Attendance History for both Admin and Coach
     Route::get('/attendance/history', [AttendanceController::class, 'history'])->name('attendance.history');
@@ -161,15 +152,14 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/coach-seminars/{id}', [CoachSeminarController::class, 'update']);
     Route::delete('/coach-seminars/{id}', [CoachSeminarController::class, 'destroy']);
 
-
     Route::get('/coach-work-history/{coach_id}', [CoachWorkHistoryController::class, 'show']);
     Route::post('/coach-work-history', [CoachWorkHistoryController::class, 'store']);
     Route::put('/coach-work-history/{id}', [CoachWorkHistoryController::class, 'update']);
     Route::delete('/coach-work-history/{id}', [CoachWorkHistoryController::class, 'destroy']);
 
-        // Incident Router Endpoints
+    // Incident Router Endpoints
     Route::post('/incidents/report', [IncidentController::class, 'createReport'])->name('incidents.report');
-    Route::put('/incidents/approve/{report_id}', [IncidentController::class, 'approveTicket'])->name('incidents.approve')   ;
+    Route::put('/incidents/approve/{report_id}', [IncidentController::class, 'approveTicket'])->name('incidents.approve');
 
     // Coach Attendance Routes
     Route::prefix('coach')
@@ -188,8 +178,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/reports', [ReportController::class, 'coachStore'])
                 ->name('reports.store');
         });
-
-    });
+});
 
 // ==============================================================
 // ADMIN PANEL ROUTES (Protected)
@@ -209,11 +198,8 @@ Route::prefix('admin')
     Route::get('/grades', [AdminController::class, 'grades'])->name('grades');
     Route::get('/transactions', [AdminController::class, 'transactions'])->name('transactions');
 
-    // 2. APPROVALS (UPDATED: Using AthleteController to match your Blade file)
-    // This is the Page
+    // 2. APPROVALS (UPDATED: Using AthleteController to handle approvals)
     Route::get('/approvals', [AthleteController::class, 'showApprovals'])->name('approvals');
-    
-    // This is the View Profile button
     Route::get('/approvals/{id}/view', [AthleteController::class, 'show'])->name('approvals.show');
     Route::get('/athletes/print/{id}', [App\Http\Controllers\AthleteController::class, 'printProfile'])->name('athletes.print');
 
@@ -230,7 +216,11 @@ Route::prefix('admin')
     Route::post('/users/create-coach', [AdminController::class, 'createCoachUser'])->name('createCoachUser');
     Route::post('/add-holiday', [AdminController::class, 'addHoliday'])->name('addHoliday');
     Route::post('/add-certificate', [AdminController::class, 'addCertificate'])->name('addCertificate');
+    Route::delete('/users/{id}/delete', [AdminController::class, 'deleteUser'])->name('deleteUser');
 
+    Route::get('/sports-management', [SportsController::class, 'manageIndex'])->name('sports.manage');
+    Route::post('/sports-management/store', [SportsController::class, 'manageStore'])->name('sports.manage.store');
+    Route::post('/sports-management/{id}/delete', [SportsController::class, 'manageDestroy'])->name('sports.manage.destroy');
 
     // attendance route
     Route::get('/attendance', [AttendanceController::class, 'adminIndex'])
@@ -240,28 +230,17 @@ Route::prefix('admin')
     Route::get('/reports', [ReportController::class, 'adminIndex'])
         ->name('reports');
 
-
-    // tryouts route
-    Route::get('/tryouts', [TryoutScheduleController::class, 'index'])
-        ->name('tryouts.index');
-    Route::post('/tryouts', [TryoutScheduleController::class, 'store'])
-        ->name('tryouts.store');
-    Route::delete('/tryouts/{id}', [TryoutScheduleController::class, 'destroy'])
-        ->name('tryouts.destroy');
+    // ====================================================
+    // TRYOUTS ROUTE (Fully updated to POST to stop errors)
+    // ====================================================
+    Route::get('/tryouts', [TryoutScheduleController::class, 'index'])->name('tryouts.index');
+    Route::post('/tryouts', [TryoutScheduleController::class, 'store'])->name('tryouts.store');
+    
+    // These are forced to use POST so they don't break on Delete/Update
+    Route::post('/tryouts/{id}/update', [TryoutScheduleController::class, 'update'])->name('tryouts.update');
+    Route::post('/tryouts/{id}/delete', [TryoutScheduleController::class, 'destroy'])->name('tryouts.destroy');
 
     Route::get('/sports/filter/{sport}', [SportsController::class, 'filter'])->name('sports.filter');
-
-
 });
 
-// ================================================================================================================================
-// Note: Coach routes are now grouped under authenticated routes with 'auth' middleware above
-// Removed duplicate routes to prevent conflicts
-// ================================================================================================================================
-
-
-
-    Route::get('/sports/filter/{sport}', [SportsController::class, 'filter'])->name('sports.filter');
-    
-
-
+Route::get('/sports/filter/{sport}', [SportsController::class, 'filter'])->name('sports.filter');

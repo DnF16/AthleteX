@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Athlete;
 use App\Models\Coach;
 use App\Models\Achievement;
+use App\Models\TryoutSchedule;
+use App\Models\Sport;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -24,16 +26,12 @@ class DashboardController extends Controller
             if ($coachSport) {
                 $athleteQuery->where('sport_event', $coachSport);
             } else {
-                // If testing account has no sport assigned, force 0 results safely
                 $athleteQuery->whereNull('id'); 
             }
         }
 
         // 3. Now do the counts using the (clone) trick. 
-        $activeAthletesCount = (clone $athleteQuery)
-            ->where('status', 'Active')
-            ->where('classification', '!=', 'Tryout') 
-            ->count();
+        $activeAthletesCount = \App\Models\Athlete::where('status', 'Active')->count();
 
         $alumniCount = (clone $athleteQuery)
             ->where('status', 'Graduated') 
@@ -43,9 +41,14 @@ class DashboardController extends Controller
             ->where('status', 'Inactive')
             ->count();
 
-        // 4. Global Stats (Coaches and total achievements usually stay global)
+        // 4. Global Stats
         $coachesCount = Coach::count();
         $totalAchievements = Achievement::count();
+
+        // 🚀 METRICS FOR THE BALANCED DASHBOARD GRID (Counts ALL pending items: Tryouts + Student Requests)
+        $pendingApprovals = Athlete::where('approval_status', 'pending')->count();
+        
+        $activeSports = Sport::count(); 
 
         $achievementsMonthly = Achievement::select(
                 DB::raw('MONTH(created_at) as month'),
@@ -54,6 +57,15 @@ class DashboardController extends Controller
             ->groupBy('month')
             ->pluck('count', 'month');
 
-        return view('features.dashboard', compact('activeAthletesCount', 'alumniCount', 'coachesCount', 'inactive', 'totalAchievements', 'achievementsMonthly'));
+        return view('features.dashboard', compact(
+            'activeAthletesCount', 
+            'alumniCount', 
+            'coachesCount', 
+            'inactive', 
+            'totalAchievements', 
+            'achievementsMonthly',
+            'pendingApprovals',
+            'activeSports'
+        ));
     }
 }

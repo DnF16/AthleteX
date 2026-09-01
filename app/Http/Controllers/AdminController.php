@@ -148,6 +148,26 @@ class AdminController extends Controller
 
         return back()->with('success', "Coach user account '{$user->email}' created and linked to coach profile (ID: {$coach->id}) for {$validated['coach_sport']}.");
     }
+
+    // --- NEW: Delete User / Remove Coach Method ---
+    public function deleteUser($id)
+    {
+        $user = User::findOrFail($id);
+
+        // Prevent deleting your own currently logged-in account
+        if ($user->id === auth()->id()) {
+            return redirect()->back()->with('error', 'You cannot delete your own active administrator account.');
+        }
+
+        // If the user is a coach, also delete their linked coach profile
+        if ($user->role === 'coach' && $user->coach) {
+            $user->coach->delete();
+        }
+
+        $user->delete();
+
+        return redirect()->back()->with('success', 'User account successfully removed.');
+    }
     
     public function addClass(Request $request) {
         // Simplified creation for demonstration
@@ -238,9 +258,9 @@ class AdminController extends Controller
     }
 
     public function approvals() {
-    // This grabs EVERY athlete whose status is 'Pending' (Regulars, Alumni, and Tryouts!)
-    $pendingAthletes = \App\Models\Athlete::where('status', 'Pending')->get();
-    
-    return view('features.admin_approvals', compact('pendingAthletes'));
-}
+        // This grabs EVERY athlete whose status is 'Pending' (Regulars, Alumni, and Tryouts!)
+        $pendingAthletes = \App\Models\Athlete::where('status', 'Pending')->get();
+        
+        return view('features.admin_approvals', compact('pendingAthletes'));
+    }
 }

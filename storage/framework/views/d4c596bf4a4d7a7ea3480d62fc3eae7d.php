@@ -23,16 +23,26 @@
             <div id="searchResults" class="mt-2 w-64 bg-white border border-gray-200 rounded shadow-sm hidden"></div>
         </div>
         <div class="flex justify-center space-x-2 mt-4">
-            <button id="saveBtn" type="submit" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition cursor-pointer">
+            <!-- 🚀 NEW: Add New Athlete Button -->
+            <button id="addNewBtn" type="button" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition cursor-pointer">
+                + Add New Athlete
+            </button>
+
+            <button id="saveBtn" type="button" class="hidden px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition cursor-pointer">
                 Save Athlete
+            </button>
+
+            <!-- 🚀 Edit Button -->
+            <button id="editBtn" type="button" class="hidden px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600 transition cursor-pointer">
+                Edit Athlete
             </button>
 
             <button id="updateBtn" type="button" class="hidden px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition cursor-pointer">
                 Update Athlete
             </button>
 
-            <button type="button" onclick="resetForm()" class="px-4 py-2 rounded bg-gray-300 text-gray-800 hover:bg-gray-400 transition cursor-pointer">
-                Cancel New
+            <button id="cancelBtn" type="button" onclick="clearAthleteData()" class="hidden px-4 py-2 rounded bg-gray-300 text-gray-800 hover:bg-gray-400 transition cursor-pointer">
+                Cancel
             </button>
         </div>
     </div>
@@ -106,12 +116,19 @@
                                     oninput="this.value = this.value.replace(/[^a-zA-Z\s\-\.]/g, '')"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
+                            <div class="flex flex-col w-full">
                             <div class="flex items-center">
                                 <label for="student_id" class="w-1/3 text-gray-700 font-medium">Student ID</label>
                                 <input type="text" id="student_id" name="student_id" placeholder="XX-XXXX-XXX"
-                                    oninput="this.value = this.value.replace(/[^0-9-]/g, '')" maxlength="11"
-                                    class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                                    oninput="formatStudentID(this)" maxlength="11"
+                                    class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600 font-mono tracking-wider">
                             </div>
+                            <div class="flex justify-end">
+                                <span id="studentIdError" class="text-red-500 text-xs hidden w-2/3 text-left mt-1 font-bold">
+                                    ⚠️ Format must be XX-XXXX-XXX (11 characters)
+                                </span>
+                            </div>
+                        </div>
                         </div>
 
                         <div class="grid grid-cols-3 gap-4 mb-4">
@@ -361,16 +378,22 @@
 
                         <hr class="border-t-2 border-gray-400 my-2 w-[100%]">
 
-                        <div class="grid grid-cols-2 gap-4 mb-4">
+                        <!-- Polished Working Student / Trabaho Dati section -->
+                        <div class="grid grid-cols-2 gap-4 mb-4 bg-gray-50 p-4 rounded border border-gray-200 shadow-sm">
+                            <div class="col-span-2 mb-1 border-b pb-2">
+                                <h3 class="font-bold text-gray-700 text-sm uppercase tracking-wider">
+                                    <i class="bi bi-briefcase-fill me-1 text-green-700"></i> Working Student / Job Info (Trabaho Dati)
+                                </h3>
+                            </div>
                             <div class="flex items-center">
-                                <label for="current_work" class="w-1/3 text-gray-700 font-medium">Current Work</label>
-                                <input type="text" id="current_work" name="current_work" placeholder="Enter Current Work"
+                                <label for="current_work" class="w-1/3 text-gray-700 font-medium text-sm">Job Position</label>
+                                <input type="text" id="current_work" name="current_work" placeholder="e.g., Service Crew (Leave blank if none)"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
 
                             <div class="flex items-center">
-                                <label for="current_company" class="w-1/3 text-gray-700 font-medium">Current Company</label>
-                                <input type="text" id="current_company" name="current_company" placeholder="Enter Current Company"
+                                <label for="current_company" class="w-1/3 text-gray-700 font-medium text-sm">Company Name</label>
+                                <input type="text" id="current_company" name="current_company" placeholder="e.g., McDonald's"
                                     class="w-2/3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                             </div>
                         </div>
@@ -400,10 +423,10 @@
                             <div class="space-y-3 flex-1">
                                 <div class="flex items-center">
                                     <label class="w-1/3 text-sm font-medium text-gray-700">Sports Event</label>
-                                    <select name="sport_event" class="w-2/3 bg-blue-100 border border-gray-300 rounded px-2 py-1" required>
-                                        <option value="">-- Select Sport Event --</option>
-                                        <?php $__currentLoopData = $sports; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sport): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <option value="<?php echo e($sport->name); ?>" <?php echo e(old('sport_event') == $sport->name ? 'selected' : ''); ?>>
+                                    <select name="sport_event" class="form-select" required>
+                                        <option value="">Select Sport...</option>
+                                        <?php $__currentLoopData = \App\Models\Sport::orderBy('name', 'asc')->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sport): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e(str_replace(' ', '_', $sport->name)); ?>">
                                                 <?php echo e($sport->name); ?>
 
                                             </option>
@@ -761,27 +784,27 @@
 
         <div id="work-history" class="tab-pane hidden">
             <div class="bg-white rounded-lg shadow p-4">
-                <div class="bg-white p-6 shadow flex items-center justify-between">
-                    <h1 class="text-2xl font-bold text-gray-800">Work History</h1>
+                <div class="bg-white p-6 shadow flex items-center justify-between border-b-4 border-green-600">
+                    <h1 class="text-2xl font-bold text-gray-800"><i class="bi bi-person-workspace text-green-700 me-2"></i> Work History</h1>
 
                     <button onclick="toggleWorkModal(true)"
-                        class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow">
-                        + Add Work History
+                        class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow font-semibold">
+                        + Add Work Record
                     </button>
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full border border-gray-300 text-sm text-gray-700">
-                        <thead class="bg-green-600 text-white text-center">
+                    <table class="min-w-full border border-gray-300 text-sm text-gray-700 mt-4">
+                        <thead class="bg-gray-100 text-gray-700 text-center uppercase tracking-wider text-xs">
                             <tr>
-                                <th class="border border-gray-300 px-4 py-2 ">Year</th>
-                                <th class="border border-gray-300 px-4 py-2 ">Date</th>
-                                <th class="border border-gray-300 px-4 py-2 ">Work Position</th>
-                                <th class="border border-gray-300 px-4 py-2 ">Name of Company</th>
-                                <th class="border border-gray-300 px-4 py-2 ">Remarks</th>
+                                <th class="border px-4 py-3">Year / Term</th>
+                                <th class="border px-4 py-3">Date Hired</th>
+                                <th class="border px-4 py-3">Job Position</th>
+                                <th class="border px-4 py-3">Company / Employer</th>
+                                <th class="border px-4 py-3">Status / Remarks</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="workTable" class="text-gray-700 text-center">
                             
                         </tbody>
                     </table>
@@ -854,7 +877,7 @@
 
         </div>
         <div id="student-id" class="tab-pane hidden">
-            <p>Stuydents ID content goes here...</p>
+            <p>Students ID content goes here...</p>
         </div>
 
         <!-- PRINT PREVIEW MODAL (TELEPORTED) -->
@@ -882,616 +905,409 @@
             </div>
         </div>
     
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        
-        // TELEPORT MODAL TO THE FRONT OF THE WEBPAGE
-        const printModalEl = document.getElementById('printModal');
-        if (printModalEl) {
-            document.body.appendChild(printModalEl);
-        }
-        
-        // -----------------------
-        // Helpers
-        // -----------------------
-        const byId = id => document.getElementById(id);
-        const q = sel => document.querySelector(sel);
-
-        // Safe-get tbody or fallback selectors
-        const getAchievementsTbody = () => byId('achievementsTableBody') || byId('achievementsTable')?.querySelector('tbody') || q('#achievements table tbody');
-        const getGradesTbody = () => byId('gradesTable') || q('#academic-evolution table tbody');
-        const getFeesTbody = () => byId('fees-discounts-table-body') || q('#fees-discounts table tbody');
-        const getWorkTbody = () => q('#work-history table tbody');
-
-        // -----------------------
-        // Globals & initial state
-        // -----------------------
-        window.newAthleteData = {
-            generalInfo: {},
-            achievements: [],
-            academicRecords: [],
-            fees: [],
-            workHistory: []
-        };
-
-        // remember the default coach (if any) provided by the server
-        const coachDisplayEl = byId('coachDisplay');
-        const coachInputEl = byId('coach_id_input');
-        window.initialCoachId = coachInputEl ? coachInputEl.value : '';
-        window.initialCoachName = coachDisplayEl ? coachDisplayEl.textContent.trim() : '';
-
-        // Clear all form/UI state when no athlete is selected (or search is emptied)
-        function clearAthleteData() {
-            // reset form fields and mode
-            if (generalForm) {
-                generalForm.reset();
-            }
-            if (methodInput) {
-                methodInput.value = 'POST';
-            }
-            if (selectedIdInput) {
-                selectedIdInput.value = '';
-            }
-            if (saveBtn) {
-                saveBtn.classList.remove('hidden');
-            }
-            if (updateBtn) {
-                updateBtn.classList.add('hidden');
-            }
-
-            // reset display name
-            const selectedName = byId('selected_name');
-            if (selectedName) {
-                selectedName.textContent = 'No athlete selected';
-            }
-
-            // reset coach display & hidden input (retain default for coach users)
-            const coachDisplayEl = byId('coachDisplay');
-            const coachInputEl = byId('coach_id_input');
-            if (window.initialCoachId) {
-                // logged-in user is a coach: keep their info
-                if (coachDisplayEl) {
-                    coachDisplayEl.textContent = window.initialCoachName || 'No coach assigned';
-                }
-                if (coachInputEl) {
-                    coachInputEl.value = window.initialCoachId;
-                }
-            } else {
-                // admin or no default coach
-                if (coachDisplayEl) {
-                    coachDisplayEl.textContent = 'No coach assigned';
-                }
-                if (coachInputEl) {
-                    coachInputEl.value = '';
-                }
-            }
-
-            // reset picture preview
-            const preview = byId('picturePreview');
-            const noPic = byId('noPictureText');
-            if (preview) {
-                preview.src = '';
-                preview.classList.add('hidden');
-            }
-            if (noPic) {
-                noPic.classList.remove('hidden');
-            }
-
-            // Hide print button when clear
-            if (document.getElementById('printBtn')) document.getElementById('printBtn').classList.add('hidden');
-
-            // clear all dynamic tables
-            const achTbody = getAchievementsTbody();
-            if (achTbody) achTbody.innerHTML = '';
-            const gradesTbody = getGradesTbody();
-            if (gradesTbody) gradesTbody.innerHTML = '';
-            const feesTbody = getFeesTbody();
-            if (feesTbody) feesTbody.innerHTML = '';
-            const workTbody = getWorkTbody();
-            if (workTbody) workTbody.innerHTML = '';
-
-            // reset data object
-            window.newAthleteData = {
-                generalInfo: {},
-                achievements: [],
-                academicRecords: [],
-                fees: [],
-                workHistory: []
-            };
-        }
-
-        // -----------------------
-        // TAB SWITCHING
-        // -----------------------
-        (function initTabs(){
-            const tabs = document.querySelectorAll('.tab-link');
-            const contents = document.querySelectorAll('.tab-pane');    
-
-            const defaultTab = document.querySelector('.tab-link[href="#general-info"]');
-            const defaultContent = byId('general-info');
-
-            if (defaultTab && defaultContent) {
-                tabs.forEach(t => t.classList.remove('border-b-2', 'border-green-600', 'text-green-600'));
-                contents.forEach(c => c.classList.add('hidden'));
-                defaultTab.classList.add('border-b-2', 'border-green-600', 'text-green-600');
-                defaultContent.classList.remove('hidden');
-            }
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', e => {
-                    e.preventDefault();
-                    tabs.forEach(t => t.classList.remove('border-b-2', 'border-green-600', 'text-green-600'));
-                    contents.forEach(c => c.classList.add('hidden'));
-                    tab.classList.add('border-b-2', 'border-green-600', 'text-green-600');
-                    const target = document.querySelector(tab.getAttribute('href'));
-                    if (target) target.classList.remove('hidden');
-                });
-            });
-        })();
-
-        // -----------------------
-        // GENERAL INFO (collect only)
-        // -----------------------
-        const generalForm = byId('athleteForm');
-        const saveBtn = byId('saveBtn');
-        const updateBtn = byId('updateBtn');
-        const selectedIdInput = byId('selected_athlete_id');
-        const methodInput = byId('_method');
-
-        function collectGeneralInfo() {
-            if (!generalForm) return;
-            const inputs = generalForm.querySelectorAll('input[name], select[name], textarea[name]');
-            inputs.forEach(input => {
-                newAthleteData.generalInfo[input.name] = input.value;
-            });
-        }
-
-        // -----------------------
-        // LIVE SEARCH & LOAD LOGIC
-        // -----------------------
-        const searchInput = byId('search');
-        const resultsBox = byId('searchResults');
-        const updateBase = '<?php echo e(url('/athletes')); ?>';
-
-        // FUNCTION: LOAD ATHLETE DATA INTO FORM
-        window.loadAthleteData = function(id) {
-            if (!generalForm) return;
-
-            // Set form to "Update Mode"
-            generalForm.setAttribute('action', updateBase + '/' + id);
-            if (methodInput) methodInput.value = 'PUT';
-            if (selectedIdInput) selectedIdInput.value = id;
-            if (saveBtn) saveBtn.classList.add('hidden');
-            if (updateBtn) updateBtn.classList.remove('hidden');
-
-            // Show print button since athlete is loaded
-            if (document.getElementById('printBtn')) document.getElementById('printBtn').classList.remove('hidden');
-
-            // Fetch Data
-            fetch(updateBase + '/' + id, { headers: { 'Accept': 'application/json' } })
-                .then(r => r.json())
-                .then(full => {
-                    console.log("Loaded Data:", full);
-
-                    // 1. POPULATE INPUTS
-                    for (const key in full) {
-                        try {
-                            const el = generalForm.querySelector(`[name="${key}"]`);
-                            if (!el) continue;
-                            
-                            if (el.tagName === 'SELECT') {
-                                let val = String(full[key]).trim().toLowerCase();
-                                // Try exact match then partial match
-                                let found = false;
-                                for(let i=0; i<el.options.length; i++) {
-                                    if(el.options[i].value.toLowerCase() === val) {
-                                        el.selectedIndex = i; found = true; break;
-                                    }
-                                }
-                                if(!found) {
-                                    for(let i=0; i<el.options.length; i++) {
-                                        if(el.options[i].value.toLowerCase().includes(val)) {
-                                            el.selectedIndex = i; break;
-                                        }
-                                    }
-                                }
-                            } else if (el.type !== 'file') {
-                                el.value = full[key] ?? '';
-                            }
-                        } catch (err) {}
-                    }
-
-                    // Special Field Fixes
-                    if (full.birthdate) {
-                        const el = generalForm.querySelector('[name="birthdate"]');
-                        if(el) el.value = full.birthdate.split('T')[0];
-                    }
-                    if (full.picture_url) {
-                        const preview = byId('picturePreview');
-                        const noPic = byId('noPictureText');
-                        if (preview) { preview.src = full.picture_url; preview.classList.remove('hidden'); }
-                        if (noPic) noPic.classList.add('hidden');
-                    }
-                    const selectedName = byId('selected_name');
-                    if (selectedName) selectedName.textContent = full.full_name || full.first_name + ' ' + full.last_name;
-
-                    // update coach display (admin will rely on this because Auth user has no coach)
-                    const coachDisplayEl = byId('coachDisplay');
-                    if (coachDisplayEl) {
-                        let coachName = '';
-                        if (full.coach_name) {
-                            coachName = full.coach_name;
-                        } else if (full.coach && (full.coach.coach_first_name || full.coach.coach_last_name)) {
-                            coachName = `${full.coach.coach_first_name || ''} ${full.coach.coach_last_name || ''}`.trim();
-                        }
-                        coachDisplayEl.textContent = coachName || 'No coach assigned';
-                    }
-                    const coachInputEl = byId('coach_id_input');
-                    if (coachInputEl && full.coach_id) {
-                        coachInputEl.value = full.coach_id;
-                    }
-
-                    // 2. POPULATE TABLES
-                    // Achievements
-                    newAthleteData.achievements = full.achievements || [];
-                    const achTbody = getAchievementsTbody();
-                    if(achTbody) {
-                        achTbody.innerHTML = '';
-                        newAthleteData.achievements.forEach((a, idx) => {
-                            achTbody.innerHTML += `
-                                <tr class="${idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}">
-                                    <td class="px-6 py-3">${a.year || ''}</td>
-                                    <td class="px-6 py-3">${a.month_day || ''}</td>
-                                    <td class="px-6 py-3">${a.event || ''}</td>
-                                    <td class="px-6 py-3">${a.venue || ''}</td>
-                                    <td class="px-6 py-3 text-green-700 font-bold">${a.award || ''}</td>
-                                    <td class="px-6 py-3">${a.category || ''}</td>
-                                    <td class="px-6 py-3">${a.remarks || ''}</td>
-                                </tr>`;
-                        });
-                    }
-
-                    // Academics
-                    newAthleteData.academicRecords = full.academic_evaluations || [];
-                    const gradesTbody = getGradesTbody();
-                    if(gradesTbody) {
-                        gradesTbody.innerHTML = '';
-                        newAthleteData.academicRecords.forEach((r, idx) => {
-                            gradesTbody.innerHTML += `
-                                <tr class="${idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}">
-                                    <td class="px-6 py-3 text-center">${r.passed || ''}</td>
-                                    <td class="px-6 py-3 text-center">${r.enrolled || ''}</td>
-                                    <td class="px-6 py-3 text-center">${r.percentage || ''}</td>
-                                    <td class="px-6 py-3 text-center">${r.remark || ''}</td>
-                                </tr>`;
-                        });
-                    }
-
-                    // Fees
-                    newAthleteData.fees = full.fees_discounts || [];
-                    const feesTbody = getFeesTbody();
-                    if(feesTbody) {
-                        feesTbody.innerHTML = '';
-                        newAthleteData.fees.forEach((f, idx) => {
-                            feesTbody.innerHTML += `
-                                <tr class="text-center ${idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}">
-                                    <td class="border px-4 py-2">${f.academic_year || ''}</td>
-                                    <td class="border px-4 py-2">${f.total_units || ''}</td>
-                                    <td class="border px-4 py-2">${f.tuition_fee || ''}</td>
-                                    <td class="border px-4 py-2">${f.miscellaneous_fee || ''}</td>
-                                    <td class="border px-4 py-2">${f.other_charges || ''}</td>
-                                    <td class="border px-4 py-2">${f.total_assessment || ''}</td>
-                                    <td class="border px-4 py-2">${f.total_discount || ''}</td>
-                                    <td class="border px-4 py-2">${f.remarks || ''}</td>
-                                </tr>`;
-                        });
-                    }
-
-                    // Work
-                    newAthleteData.workHistory = full.work_histories || [];
-                    const workTbody = getWorkTbody();
-                    if(workTbody) {
-                        workTbody.innerHTML = '';
-                        newAthleteData.workHistory.forEach(w => {
-                            workTbody.innerHTML += `
-                                <tr class="bg-white">
-                                    <td class="border px-4 py-2">${w.year || ''}</td>
-                                    <td class="border px-4 py-2">${w.date || ''}</td>
-                                    <td class="border px-4 py-2">${w.position || ''}</td>
-                                    <td class="border px-4 py-2">${w.company || ''}</td>
-                                    <td class="border px-4 py-2">${w.remarks || ''}</td>
-                                </tr>`;
-                        });
-                    }
-
-                })
-                .catch(err => console.error("Error loading athlete:", err));
-        };
-
-        // SEARCH BAR LOGIC
-        if (searchInput && resultsBox) {
-            let timer = null;
-            const searchUrl = '<?php echo e(route('athletes.search')); ?>';
-
-            searchInput.addEventListener('input', (e) => {
-                const v = e.target.value.trim();
-                if (timer) clearTimeout(timer);
-
-                if (!v) {
-                    resultsBox.innerHTML = '';
-                    resultsBox.classList.add('hidden');
-                    clearAthleteData(); // <-- Clear everything here
-                    return;
-                }
-
-                timer = setTimeout(() => {
-                    fetch(searchUrl + '?q=' + encodeURIComponent(v), { headers: { 'Accept': 'application/json' } })
-                        .then(r => r.json())
-                        .then(items => {
-                            resultsBox.innerHTML = '';
-                            if(items.length === 0) { resultsBox.classList.add('hidden'); return; }
-                            
-                            items.forEach(item => {
-                                const div = document.createElement('div');
-                                div.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm';
-                                div.textContent = (item.full_name || item.first_name + ' ' + item.last_name) + ' (' + item.student_id + ')';
-                                div.onclick = () => {
-                                    loadAthleteData(item.id);
-                                    resultsBox.innerHTML = '';
-                                    resultsBox.classList.add('hidden');
-                                    searchInput.value = item.first_name + ' ' + item.last_name;
-                                };
-                                resultsBox.appendChild(div);
-                            });
-                            resultsBox.classList.remove('hidden');
-                        });
-                }, 300);
-            });
-        }
-
-        // -----------------------
-        // ** CHECK URL FOR ID ** (THIS FIXES THE EDIT BUTTON)
-        // -----------------------
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlId = urlParams.get('id');
-        if (urlId) {
-            console.log("Found ID in URL, loading:", urlId);
-            loadAthleteData(urlId);
-        }
-
-        // -----------------------
-        // ACHIEVEMENTS / ACADEMIC / FEES / WORK MODALS
-        // -----------------------
-        // Helper to toggle any modal
-        window.toggleModal = (id, show) => {
-            const m = byId(id);
-            if(m) m.classList.toggle('hidden', !show);
-        };
-        
-        window.toggleAchievementModal = (s) => toggleModal('AchievementModal', s);
-        window.toggleAcademicModal = (s) => toggleModal('academicModal', s);
-        window.toggleFeeModal = (s) => toggleModal('feeModal', s);
-        window.toggleWorkModal = (s) => toggleModal('workModal', s);
-
-        // SIMPLE FORM HANDLERS (Push to array & Update DOM)
-        // Achievements
-        const achForm = byId('achievementForm');
-        if(achForm) achForm.addEventListener('submit', e => {
-            e.preventDefault();
-            const data = {
-                year: byId('year').value,
-                monthDay: byId('month_day').value,
-                event: byId('event').value,
-                venue: byId('venue').value,
-                award: byId('award').value,
-                category: byId('category').value,
-                remarks: byId('remarks').value
-            };
-            newAthleteData.achievements.push(data);
-            // Refresh Table
-            const tbody = getAchievementsTbody();
-            if(tbody) tbody.innerHTML += `<tr><td class="px-6 py-3">${data.year}</td><td class="px-6 py-3">${data.monthDay}</td><td class="px-6 py-3">${data.event}</td><td class="px-6 py-3">${data.venue}</td><td class="px-6 py-3 text-green-700">${data.award}</td><td class="px-6 py-3">${data.category}</td><td class="px-6 py-3">${data.remarks}</td></tr>`;
-            achForm.reset(); toggleAchievementModal(false);
-        });
-
-        // Academics
-        const acForm = byId('academicForm');
-        if(acForm) acForm.addEventListener('submit', e => {
-            e.preventDefault();
-            const data = {
-                passed: acForm.querySelector('[name="Passed"]').value,
-                enrolled: acForm.querySelector('[name="enrolled"]').value,
-                percentage: acForm.querySelector('[name="percentage"]').value,
-                remark: acForm.querySelector('[name="remark"]').value
-            };
-            newAthleteData.academicRecords.push(data);
-            const tbody = getGradesTbody();
-            if(tbody) tbody.innerHTML += `<tr><td class="px-6 py-3 text-center">${data.passed}</td><td class="px-6 py-3 text-center">${data.enrolled}</td><td class="px-6 py-3 text-center">${data.percentage}</td><td class="px-6 py-3 text-center">${data.remark}</td></tr>`;
-            acForm.reset(); toggleAcademicModal(false);
-        });
-
-        // Fees
-        const feeForm = byId('feeForm');
-        if(feeForm) feeForm.addEventListener('submit', e => {
-            e.preventDefault();
-            const formData = new FormData(feeForm);
-            const data = Object.fromEntries(formData.entries());
-            newAthleteData.fees.push(data);
-            const tbody = getFeesTbody();
-            if(tbody) tbody.innerHTML += `<tr class="text-center"><td class="border px-4 py-2">${data.academic_year}</td><td class="border px-4 py-2">${data.total_units}</td><td class="border px-4 py-2">${data.tuition_fee}</td><td class="border px-4 py-2">${data.miscellaneous_fee}</td><td class="border px-4 py-2">${data.other_charges}</td><td class="border px-4 py-2">${data.total_assessment}</td><td class="border px-4 py-2">${data.total_discount}</td><td class="border px-4 py-2">${data.remarks}</td></tr>`;
-            feeForm.reset(); toggleFeeModal(false);
-        });
-
-        // Work
-        const workForm = byId('workForm');
-        if(workForm) workForm.addEventListener('submit', e => {
-            e.preventDefault();
-            const formData = new FormData(workForm);
-            const data = Object.fromEntries(formData.entries());
-            newAthleteData.workHistory.push(data);
-            const tbody = getWorkTbody();
-            if(tbody) tbody.innerHTML += `<tr class="bg-white"><td class="border px-4 py-2">${data.year}</td><td class="border px-4 py-2">${data.date}</td><td class="border px-4 py-2">${data.position}</td><td class="border px-4 py-2">${data.company}</td><td class="border px-4 py-2">${data.remarks}</td></tr>`;
-            workForm.reset(); toggleWorkModal(false);
-        });
-
-        // -----------------------
-        // FINAL SAVE
-        // -----------------------
-        function performFinalSave(e) {
-            e.preventDefault();
-            collectGeneralInfo(); // Update global object with inputs
-
-            // Determine URL (Create or Update)
-            const selectedId = selectedIdInput ? selectedIdInput.value : null;
-            const endpoint = selectedId ? (updateBase + '/' + selectedId) : updateBase;
-            const method = selectedId ? 'PUT' : 'POST';
-
-            fetch(endpoint, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(newAthleteData)
-            })
-            .then(async r => {
-                const data = await r.json();
-                if(!r.ok) throw data;
-                alert('Athlete saved successfully!');
-                window.location.href = "<?php echo e(route('athletes.index')); ?>"; // Redirect to list after save
-            })
-            .catch(err => {
-                console.error(err);
-                
-                // NEW LOGIC: Cleanly parse Laravel validation errors
-                if (err.errors) {
-                    let alertMessage = "Please fix the following errors:\n\n";
-                    for (const field in err.errors) {
-                        alertMessage += `❌ ${err.errors[field][0]}\n`;
-                    }
-                    alert(alertMessage);
-                } else if (err.message) {
-                    alert('Error saving: ' + err.message);
-                } else {
-                    alert('An unexpected error occurred. Please try again.');
-                }
-            });
-        }
-
-        if (saveBtn) {
-            saveBtn.removeEventListener('click', performFinalSave);
-            saveBtn.addEventListener('click', performFinalSave);
-        }
-        if (updateBtn) {
-            updateBtn.removeEventListener('click', performFinalSave);
-            updateBtn.addEventListener('click', performFinalSave);
-        }
-
-    }); // End DOMContentLoaded
-
-    // =======================================================
-    // NEW LOGIC: CHECK URL FOR ID AND AUTO-FILL
-    // =======================================================
-    const urlParams = new URLSearchParams(window.location.search);
-    const editId = urlParams.get('id'); // Get "5" from "?id=5"
-
-    if (editId) {
-        console.log("Edit Mode Detected for ID:", editId);
-        
-        // 1. Switch Form to "Update Mode"
-        const form = document.getElementById('athleteForm');
-        const saveBtn = document.getElementById('saveBtn');
-        const updateBtn = document.getElementById('updateBtn');
-        const methodInput = document.getElementById('_method');
-        const selectedIdInput = document.getElementById('selected_athlete_id');
-
-        if (form) {
-            // Update the form action to point to the update route
-            form.setAttribute('action', '/athletes/' + editId); 
-            if (methodInput) methodInput.value = 'PUT'; // Laravel needs this for updates
-            if (selectedIdInput) selectedIdInput.value = editId;
-            
-            // Swap Buttons
-            if (saveBtn) saveBtn.classList.add('hidden');
-            if (updateBtn) updateBtn.classList.remove('hidden');
-            
-            // Show print button since we have an ID
-            if (document.getElementById('printBtn')) document.getElementById('printBtn').classList.remove('hidden');
-        }
-
-        // 2. Fetch Data and Fill Inputs
-        fetch('/athlete/' + editId, { 
-            headers: { 'Accept': 'application/json' } 
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Loop through all data and fill matching inputs
-            for (const key in data) {
-                // Try to find input by name="key"
-                const input = document.querySelector(`[name="${key}"]`);
-                if (input) {
-                    if (input.type === 'date' && data[key]) {
-                        // Fix date format
-                        input.value = data[key].split('T')[0];
-                    } else if (input.tagName === 'SELECT') {
-                        // Select the correct option
-                        input.value = data[key];
-                    } else if (input.type !== 'file') {
-                        input.value = data[key];
-                    }
-                }
-            }
-            
-            // Special handling for Profile Picture Preview
-            if (data.picture_path) {
-                const preview = document.getElementById('picturePreview');
-                const noText = document.getElementById('noPictureText');
-                if(preview) {
-                    preview.src = '/storage/' + data.picture_path;
-                    preview.classList.remove('hidden');
-                }
-                if(noText) noText.classList.add('hidden');
-            }
-
-            // Fill the "Selected Name" box on the right
-            const nameDisplay = document.getElementById('selected_name');
-            if(nameDisplay) nameDisplay.textContent = data.first_name + ' ' + data.last_name;
-        })
-        .catch(error => console.error('Error fetching athlete:', error));
-    }
+<script>
+document.addEventListener('DOMContentLoaded', () => {
     
-    // =======================================================
-    // PRINT MODAL LOGIC
-    // =======================================================
-    window.printAthlete = function() {
-        const athleteId = document.getElementById('selected_athlete_id').value;
-        if (athleteId) {
-            document.getElementById('printIframe').src = '/athlete/' + athleteId + '/print';
-            togglePrintModal(true);
-        } else {
-            alert('Please select an athlete to print first!');
-        }
-    };
+    // -----------------------
+    // 1. TAB SWITCHING (Loaded first so it never breaks!)
+    // -----------------------
+    const tabs = document.querySelectorAll('.tab-link');
+    const contents = document.querySelectorAll('.tab-pane');    
 
-    window.togglePrintModal = function(show) {
-        const m = document.getElementById('printModal');
-        if(m) {
-            if(show) {
-                m.classList.remove('hidden');
-                m.classList.add('flex');
+    const defaultTab = document.querySelector('.tab-link[href="#general-info"]');
+    const defaultContent = document.getElementById('general-info');
+
+    if (defaultTab && defaultContent) {
+        tabs.forEach(t => t.classList.remove('border-b-2', 'border-green-600', 'text-green-600'));
+        contents.forEach(c => c.classList.add('hidden'));
+        defaultTab.classList.add('border-b-2', 'border-green-600', 'text-green-600');
+        defaultContent.classList.remove('hidden');
+    }
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', e => {
+            e.preventDefault();
+            tabs.forEach(t => t.classList.remove('border-b-2', 'border-green-600', 'text-green-600'));
+            contents.forEach(c => c.classList.add('hidden'));
+            tab.classList.add('border-b-2', 'border-green-600', 'text-green-600');
+            const target = document.querySelector(tab.getAttribute('href'));
+            if (target) target.classList.remove('hidden');
+        });
+    });
+
+    // -----------------------
+    // 2. HELPERS & GLOBALS
+    // -----------------------
+    const byId = id => document.getElementById(id);
+    const q = sel => document.querySelector(sel);
+
+    // -----------------------
+    // STUDENT ID AUTO-FORMATTER
+    // -----------------------
+    window.formatStudentID = function(input) {
+        // Strip everything except numbers
+        let val = input.value.replace(/\D/g, ''); 
+        
+        // Auto inject dashes
+        if (val.length > 2) val = val.slice(0, 2) + '-' + val.slice(2);
+        if (val.length > 7) val = val.slice(0, 7) + '-' + val.slice(7);
+        input.value = val;
+        
+        // Validation check
+        const err = document.getElementById('studentIdError');
+        if (err) {
+            // Show error if they stopped typing but it's not complete
+            if (val.length > 0 && val.length < 11) {
+                err.classList.remove('hidden');
+                input.classList.add('border-red-500', 'ring-red-500');
             } else {
-                m.classList.add('hidden');
-                m.classList.remove('flex');
+                err.classList.add('hidden');
+                input.classList.remove('border-red-500', 'ring-red-500');
             }
         }
     };
 
-    window.triggerIframePrint = function() {
-        const iframe = document.getElementById('printIframe');
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
+    const getAchievementsTbody = () => byId('achievementsTableBody') || q('#achievements table tbody');
+    const getGradesTbody = () => byId('gradesTable') || q('#academic-evolution table tbody');
+    const getFeesTbody = () => byId('fees-discounts-table-body') || q('#fees-discounts table tbody');
+    const getWorkTbody = () => byId('workTable') || q('#work-history table tbody');
+
+    window.newAthleteData = { generalInfo: {}, achievements: [], academicRecords: [], fees: [], workHistory: [] };
+
+    const coachDisplayEl = byId('coachDisplay');
+    const coachInputEl = byId('coach_id_input');
+    window.initialCoachId = coachInputEl ? coachInputEl.value : '';
+    window.initialCoachName = coachDisplayEl ? coachDisplayEl.textContent.trim() : '';
+
+    // -----------------------
+    // 3. LOCK/UNLOCK LOGIC
+    // -----------------------
+    function lockFormInitial() {
+        const form = byId('athleteForm');
+        if (form) {
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.type !== 'hidden' && el.id !== 'search') el.disabled = true;
+            });
+        }
+        byId('addNewBtn')?.classList.remove('hidden');
+        byId('saveBtn')?.classList.add('hidden');
+        byId('editBtn')?.classList.add('hidden');
+        byId('updateBtn')?.classList.add('hidden');
+        byId('cancelBtn')?.classList.add('hidden');
+    }
+
+    function unlockFormForNew() {
+        const form = byId('athleteForm');
+        if (form) {
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.type !== 'hidden' && el.id !== 'search') el.disabled = false;
+            });
+        }
+        byId('addNewBtn')?.classList.add('hidden');
+        byId('saveBtn')?.classList.remove('hidden');
+        byId('editBtn')?.classList.add('hidden');
+        byId('updateBtn')?.classList.add('hidden');
+        byId('cancelBtn')?.classList.remove('hidden');
+    }
+
+    function lockFormForViewing() {
+        const form = byId('athleteForm');
+        if (form) {
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.type !== 'hidden' && el.id !== 'search') el.disabled = true;
+            });
+        }
+        byId('addNewBtn')?.classList.add('hidden');
+        byId('saveBtn')?.classList.add('hidden');
+        byId('updateBtn')?.classList.add('hidden');
+        byId('editBtn')?.classList.remove('hidden');
+        byId('cancelBtn')?.classList.remove('hidden');
+    }
+
+    function unlockFormForEditing() {
+        const form = byId('athleteForm');
+        if (form) {
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.type !== 'hidden' && el.id !== 'search') el.disabled = false;
+            });
+        }
+        byId('addNewBtn')?.classList.add('hidden');
+        byId('editBtn')?.classList.add('hidden');
+        byId('updateBtn')?.classList.remove('hidden');
+        byId('cancelBtn')?.classList.remove('hidden');
+    }
+
+    // Trigger initial lock!
+    lockFormInitial();
+
+    // -----------------------
+    // 4. BUTTON LISTENERS
+    // -----------------------
+    byId('addNewBtn')?.addEventListener('click', unlockFormForNew);
+    byId('editBtn')?.addEventListener('click', unlockFormForEditing);
+    
+    // Wire up the Cancel Button dynamically
+    byId('cancelBtn')?.addEventListener('click', () => {
+        const form = byId('athleteForm');
+        if (form) form.reset();
+        
+        if (byId('_method')) byId('_method').value = 'POST';
+        if (byId('selected_athlete_id')) byId('selected_athlete_id').value = '';
+        if (byId('search')) byId('search').value = '';
+        
+        const selectedName = byId('selected_name');
+        if (selectedName) selectedName.textContent = 'No athlete selected';
+
+        if (window.initialCoachId) {
+            if (coachDisplayEl) coachDisplayEl.textContent = window.initialCoachName || 'No coach assigned';
+            if (coachInputEl) coachInputEl.value = window.initialCoachId;
+        } else {
+            if (coachDisplayEl) coachDisplayEl.textContent = 'No coach assigned';
+            if (coachInputEl) coachInputEl.value = '';
+        }
+
+        const preview = byId('picturePreview');
+        const noPic = byId('noPictureText');
+        if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+        if (noPic) noPic.classList.remove('hidden');
+
+        byId('printBtn')?.classList.add('hidden');
+
+        if (getAchievementsTbody()) getAchievementsTbody().innerHTML = '';
+        if (getGradesTbody()) getGradesTbody().innerHTML = '';
+        if (getFeesTbody()) getFeesTbody().innerHTML = '';
+        if (getWorkTbody()) getWorkTbody().innerHTML = '';
+
+        window.newAthleteData = { generalInfo: {}, achievements: [], academicRecords: [], fees: [], workHistory: [] };
+
+        // Lock it all back up to initial state!
+        lockFormInitial();
+    });
+
+    // -----------------------
+    // 5. LOAD ATHLETE DATA
+    // -----------------------
+    const updateBase = '<?php echo e(url('/athletes')); ?>';
+    const generalForm = byId('athleteForm');
+    
+    function collectGeneralInfo() {
+        if (!generalForm) return;
+        generalForm.querySelectorAll('input[name], select[name], textarea[name]').forEach(input => {
+            newAthleteData.generalInfo[input.name] = input.value;
+        });
+    }
+
+    window.loadAthleteData = function(id) {
+        if (!generalForm) return;
+
+        generalForm.setAttribute('action', updateBase + '/' + id);
+        if (byId('_method')) byId('_method').value = 'PUT';
+        if (byId('selected_athlete_id')) byId('selected_athlete_id').value = id;
+        byId('printBtn')?.classList.remove('hidden');
+
+        fetch(updateBase + '/' + id, { headers: { 'Accept': 'application/json' } })
+            .then(r => r.json())
+            .then(full => {
+                lockFormForViewing();
+
+                for (const key in full) {
+                    try {
+                        const el = generalForm.querySelector(`[name="${key}"]`);
+                        if (!el) continue;
+                        
+                        if (el.tagName === 'SELECT') {
+                            let val = String(full[key]).trim().toLowerCase();
+                            let found = false;
+                            for(let i=0; i<el.options.length; i++) {
+                                if(el.options[i].value.toLowerCase() === val) { el.selectedIndex = i; found = true; break; }
+                            }
+                            if(!found) {
+                                for(let i=0; i<el.options.length; i++) {
+                                    if(el.options[i].value.toLowerCase().includes(val)) { el.selectedIndex = i; break; }
+                                }
+                            }
+                        } else if (el.type !== 'file') {
+                            el.value = full[key] ?? '';
+                        }
+                    } catch (err) {}
+                }
+
+                if (full.birthdate) {
+                    const el = generalForm.querySelector('[name="birthdate"]');
+                    if(el) el.value = full.birthdate.split('T')[0];
+                }
+                if (full.picture_url) {
+                    const preview = byId('picturePreview');
+                    const noPic = byId('noPictureText');
+                    if (preview) { preview.src = full.picture_url; preview.classList.remove('hidden'); }
+                    if (noPic) noPic.classList.add('hidden');
+                }
+                const selectedName = byId('selected_name');
+                if (selectedName) selectedName.textContent = full.full_name || full.first_name + ' ' + full.last_name;
+
+                if (coachDisplayEl) {
+                    let coachName = full.coach_name || (full.coach ? `${full.coach.coach_first_name || ''} ${full.coach.coach_last_name || ''}`.trim() : '');
+                    coachDisplayEl.textContent = coachName || 'No coach assigned';
+                }
+                if (coachInputEl && full.coach_id) coachInputEl.value = full.coach_id;
+
+                // POPULATE TABLES
+                newAthleteData.achievements = full.achievements || [];
+                const achTbody = getAchievementsTbody();
+                if(achTbody) {
+                    achTbody.innerHTML = '';
+                    newAthleteData.achievements.forEach((a, idx) => {
+                        achTbody.innerHTML += `<tr class="${idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}"><td class="px-6 py-3">${a.year || ''}</td><td class="px-6 py-3">${a.month_day || ''}</td><td class="px-6 py-3">${a.event || ''}</td><td class="px-6 py-3">${a.venue || ''}</td><td class="px-6 py-3 text-green-700 font-bold">${a.award || ''}</td><td class="px-6 py-3">${a.category || ''}</td><td class="px-6 py-3">${a.remarks || ''}</td></tr>`;
+                    });
+                }
+
+                newAthleteData.academicRecords = full.academic_evaluations || [];
+                const gradesTbody = getGradesTbody();
+                if(gradesTbody) {
+                    gradesTbody.innerHTML = '';
+                    newAthleteData.academicRecords.forEach((r, idx) => {
+                        gradesTbody.innerHTML += `<tr class="${idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}"><td class="px-6 py-3 text-center">${r.passed || ''}</td><td class="px-6 py-3 text-center">${r.enrolled || ''}</td><td class="px-6 py-3 text-center">${r.percentage || ''}</td><td class="px-6 py-3 text-center">${r.remark || ''}</td></tr>`;
+                    });
+                }
+
+                newAthleteData.fees = full.fees_discounts || [];
+                const feesTbody = getFeesTbody();
+                if(feesTbody) {
+                    feesTbody.innerHTML = '';
+                    newAthleteData.fees.forEach((f, idx) => {
+                        feesTbody.innerHTML += `<tr class="text-center ${idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}"><td class="border px-4 py-2">${f.academic_year || ''}</td><td class="border px-4 py-2">${f.total_units || ''}</td><td class="border px-4 py-2">${f.tuition_fee || ''}</td><td class="border px-4 py-2">${f.miscellaneous_fee || ''}</td><td class="border px-4 py-2">${f.other_charges || ''}</td><td class="border px-4 py-2">${f.total_assessment || ''}</td><td class="border px-4 py-2">${f.total_discount || ''}</td><td class="border px-4 py-2">${f.remarks || ''}</td></tr>`;
+                    });
+                }
+
+                newAthleteData.workHistory = full.work_histories || [];
+                const workTbody = getWorkTbody();
+                if(workTbody) {
+                    workTbody.innerHTML = '';
+                    newAthleteData.workHistory.forEach(w => {
+                        workTbody.innerHTML += `<tr class="bg-white"><td class="border px-4 py-2">${w.year || ''}</td><td class="border px-4 py-2">${w.date || ''}</td><td class="border px-4 py-2">${w.position || ''}</td><td class="border px-4 py-2">${w.company || ''}</td><td class="border px-4 py-2">${w.remarks || ''}</td></tr>`;
+                    });
+                }
+            })
+            .catch(err => console.error("Error loading athlete:", err));
     };
+
+    // -----------------------
+    // 6. LIVE SEARCH LOGIC
+    // -----------------------
+    const searchInput = byId('search');
+    const resultsBox = byId('searchResults');
+    if (searchInput && resultsBox) {
+        let timer = null;
+        const searchUrl = '<?php echo e(route('athletes.search')); ?>';
+
+        searchInput.addEventListener('input', (e) => {
+            const v = e.target.value.trim();
+            if (timer) clearTimeout(timer);
+            if (!v) { resultsBox.innerHTML = ''; resultsBox.classList.add('hidden'); byId('cancelBtn')?.click(); return; }
+
+            timer = setTimeout(() => {
+                fetch(searchUrl + '?q=' + encodeURIComponent(v), { headers: { 'Accept': 'application/json' } })
+                    .then(r => r.json())
+                    .then(items => {
+                        resultsBox.innerHTML = '';
+                        if(items.length === 0) { resultsBox.classList.add('hidden'); return; }
+                        
+                        items.forEach(item => {
+                            const div = document.createElement('div');
+                            div.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm';
+                            div.textContent = (item.full_name || item.first_name + ' ' + item.last_name) + ' (' + item.student_id + ')';
+                            div.onclick = () => {
+                                window.loadAthleteData(item.id);
+                                resultsBox.innerHTML = '';
+                                resultsBox.classList.add('hidden');
+                                searchInput.value = item.first_name + ' ' + item.last_name;
+                            };
+                            resultsBox.appendChild(div);
+                        });
+                        resultsBox.classList.remove('hidden');
+                    });
+            }, 300);
+        });
+    }
+
+    // -----------------------
+    // 7. URL ID CHECK
+    // -----------------------
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get('id');
+    if (editId) window.loadAthleteData(editId);
+
+    // -----------------------
+    // 8. MODALS & FORMS
+    // -----------------------
+    window.toggleModal = (id, show) => { const m = byId(id); if(m) m.classList.toggle('hidden', !show); };
+    window.toggleAchievementModal = (s) => toggleModal('AchievementModal', s);
+    window.toggleAcademicModal = (s) => toggleModal('academicModal', s);
+    window.toggleFeeModal = (s) => toggleModal('feeModal', s);
+    window.toggleWorkModal = (s) => toggleModal('workModal', s);
+
+    const achForm = byId('achievementForm');
+    if(achForm) achForm.addEventListener('submit', e => { e.preventDefault(); const d = {year: byId('year').value, monthDay: byId('month_day').value, event: byId('event').value, venue: byId('venue').value, award: byId('award').value, category: byId('category').value, remarks: byId('remarks').value}; newAthleteData.achievements.push(d); getAchievementsTbody().innerHTML += `<tr><td class="px-6 py-3">${d.year}</td><td class="px-6 py-3">${d.monthDay}</td><td class="px-6 py-3">${d.event}</td><td class="px-6 py-3">${d.venue}</td><td class="px-6 py-3 text-green-700">${d.award}</td><td class="px-6 py-3">${d.category}</td><td class="px-6 py-3">${d.remarks}</td></tr>`; achForm.reset(); toggleAchievementModal(false); });
+
+    const acForm = byId('academicForm');
+    if(acForm) acForm.addEventListener('submit', e => { e.preventDefault(); const d = {passed: acForm.querySelector('[name="Passed"]').value, enrolled: acForm.querySelector('[name="enrolled"]').value, percentage: acForm.querySelector('[name="percentage"]').value, remark: acForm.querySelector('[name="remark"]').value}; newAthleteData.academicRecords.push(d); getGradesTbody().innerHTML += `<tr><td class="px-6 py-3 text-center">${d.passed}</td><td class="px-6 py-3 text-center">${d.enrolled}</td><td class="px-6 py-3 text-center">${d.percentage}</td><td class="px-6 py-3 text-center">${d.remark}</td></tr>`; acForm.reset(); toggleAcademicModal(false); });
+
+    const feeForm = byId('feeForm');
+    if(feeForm) feeForm.addEventListener('submit', e => { e.preventDefault(); const d = Object.fromEntries(new FormData(feeForm).entries()); newAthleteData.fees.push(d); getFeesTbody().innerHTML += `<tr class="text-center"><td class="border px-4 py-2">${d.academic_year}</td><td class="border px-4 py-2">${d.total_units}</td><td class="border px-4 py-2">${d.tuition_fee}</td><td class="border px-4 py-2">${d.miscellaneous_fee}</td><td class="border px-4 py-2">${d.other_charges}</td><td class="border px-4 py-2">${d.total_assessment}</td><td class="border px-4 py-2">${d.total_discount}</td><td class="border px-4 py-2">${d.remarks}</td></tr>`; feeForm.reset(); toggleFeeModal(false); });
+
+    const workForm = byId('workForm');
+    if(workForm) workForm.addEventListener('submit', e => { e.preventDefault(); const d = Object.fromEntries(new FormData(workForm).entries()); newAthleteData.workHistory.push(d); getWorkTbody().innerHTML += `<tr class="bg-white"><td class="border px-4 py-2">${d.year}</td><td class="border px-4 py-2">${d.date}</td><td class="border px-4 py-2">${d.position}</td><td class="border px-4 py-2">${d.company}</td><td class="border px-4 py-2">${d.remarks}</td></tr>`; workForm.reset(); toggleWorkModal(false); });
+
+    // -----------------------
+    // 9. FINAL SAVE
+    // -----------------------
+    function performFinalSave(e) {
+        e.preventDefault();
+        collectGeneralInfo();
+        const selectedId = byId('selected_athlete_id') ? byId('selected_athlete_id').value : null;
+        const endpoint = selectedId ? (updateBase + '/' + selectedId) : updateBase;
+        const method = selectedId ? 'PUT' : 'POST';
+
+        fetch(endpoint, {
+            method: method,
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Accept': 'application/json' },
+            body: JSON.stringify(newAthleteData)
+        })
+        .then(async r => { const data = await r.json(); if(!r.ok) throw data; alert('Athlete saved successfully!'); window.location.href = "<?php echo e(route('athletes.index')); ?>"; })
+        .catch(err => {
+            if (err.errors) {
+                let msg = "Please fix the following errors:\n\n";
+                for (const f in err.errors) msg += `❌ ${err.errors[f][0]}\n`;
+                alert(msg);
+            } else if (err.message) alert('Error: ' + err.message);
+            else alert('Unexpected error.');
+        });
+    }
+
+    byId('saveBtn')?.addEventListener('click', performFinalSave);
+    byId('updateBtn')?.addEventListener('click', performFinalSave);
+
+    // TELEPORT PRINT MODAL TO BODY
+    const printModalEl = document.getElementById('printModal');
+    if (printModalEl) document.body.appendChild(printModalEl);
+});
+
+// -----------------------
+// 10. PRINT LOGIC
+// -----------------------
+window.printAthlete = function() {
+    const athleteId = document.getElementById('selected_athlete_id').value;
+    if (athleteId) { document.getElementById('printIframe').src = '/athlete/' + athleteId + '/print'; togglePrintModal(true); } 
+    else alert('Please select an athlete to print first!');
+};
+window.togglePrintModal = function(show) {
+    const m = document.getElementById('printModal');
+    if(m) { m.classList.toggle('hidden', !show); m.classList.toggle('flex', show); }
+};
+window.triggerIframePrint = function() {
+    const iframe = document.getElementById('printIframe');
+    iframe.contentWindow.focus(); iframe.contentWindow.print();
+};
 </script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp\htdocs\AthleteX\resources\views/features/student_athlete.blade.php ENDPATH**/ ?>

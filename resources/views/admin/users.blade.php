@@ -22,6 +22,14 @@
                 </div>
             @endif
 
+            <!-- Error Message -->
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <!-- Create New Coach User Section -->
             <div class="card shadow-sm border border-secondary rounded-0 mb-4">
                 <div class="card-header bg-info text-white fw-bold p-3">
@@ -104,18 +112,19 @@
 
             <!-- Existing Users Table -->
             <div class="card shadow-sm border border-secondary rounded-0">
-                <div class="card-header bg-secondary text-white fw-bold p-3">
-                    <i class="fas fa-users"></i> Manage User Security Rights
+                <div class="card-header bg-secondary text-white fw-bold p-3 d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-users"></i> Manage User Security Rights & Accounts</span>
                 </div>
                 <div class="card-body p-0">
-                    <form action="{{ route('admin.updateUserPermissions') }}" method="POST">
+                    <form action="{{ route('admin.updateUserPermissions') }}" method="POST" id="permissionsForm">
                         @csrf
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover text-center mb-0" style="font-size: 0.85rem;">
-                                <thead class="align-middle">
+                            <table class="table table-bordered table-hover text-center mb-0 align-middle" style="font-size: 0.85rem;">
+                                <thead>
                                     <tr>
                                         <th rowspan="2" class="bg-light" style="width: 15%;">USER DETAILS</th>
                                         <th colspan="10" class="text-white" style="background-color: #4F6228;">SECURITY RIGHTS</th>
+                                        <th rowspan="2" class="bg-light" style="width: 10%;">ACTION</th>
                                     </tr>
                                     <tr style="background-color: #C4D79B;">
                                         <th>Admin</th><th>Athletes</th><th>Coaches</th><th>Sched</th><th>Achieve</th><th>Classes</th><th>Exams</th><th>Trans</th><th>Notifs</th><th>Dash</th>
@@ -143,10 +152,21 @@
                                             </select>
                                         </td>
                                         @endforeach
+                                        
+                                        <!-- DELETE / REMOVE USER ACTION -->
+                                        <td class="bg-white">
+                                            @if($user->id !== auth()->id())
+                                                <button type="button" class="btn btn-danger btn-sm px-2 py-1 text-white fw-bold" onclick="confirmDelete('{{ route('admin.deleteUser', $user->id) }}', '{{ $user->name }}')">
+                                                    <i class="fas fa-trash-alt me-1"></i> Delete
+                                                </button>
+                                            @else
+                                                <span class="text-muted small fst-italic">Current</span>
+                                            @endif
+                                        </td>
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="11" class="text-center text-muted p-3">No users found</td>
+                                        <td colspan="12" class="text-center text-muted p-3">No users found</td>
                                     </tr>
                                     @endforelse
                                 </tbody>
@@ -156,10 +176,26 @@
                             <button type="submit" class="btn btn-success fw-bold"><i class="fas fa-save"></i> Update Security Rights</button>
                         </div>
                     </form>
+
+                    <!-- Hidden Delete Form -->
+                    <form id="deleteUserForm" method="POST" style="display: none;">
+                        @csrf
+                        @method('DELETE')
+                    </form>
                 </div>
             </div>
             <div class="mt-3 text-muted small"><i class="fas fa-info-circle"></i> <b>Edit:</b> Can add/modify data. <b>View:</b> Read-only access. <b>Hidden:</b> Module disappears from menu.</div>
         </div>
     </div>
 </div>
+
+<script>
+    function confirmDelete(deleteUrl, userName) {
+        if (confirm('Are you sure you want to remove user "' + userName + '"? This action cannot be undone.')) {
+            var form = document.getElementById('deleteUserForm');
+            form.action = deleteUrl;
+            form.submit();
+        }
+    }
+</script>
 @endsection

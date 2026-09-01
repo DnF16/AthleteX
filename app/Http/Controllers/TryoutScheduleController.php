@@ -38,7 +38,24 @@ class TryoutScheduleController extends Controller
         return redirect()->back()->with('success', 'Tryout schedule added successfully!');
     }
 
-    // 3. Delete a schedule (Using POST to avoid the DELETE method error we had before!)
+    // 3. Update an existing schedule (NEW EDIT FEATURE)
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'sport_event' => 'required|string',
+            'tryout_date' => 'required|date',
+            'tryout_time' => 'required',
+            'venue'       => 'required|string',
+            'notes'       => 'nullable|string',
+        ]);
+
+        $schedule = TryoutSchedule::findOrFail($id);
+        $schedule->update($request->all());
+
+        return redirect()->back()->with('success', 'Tryout schedule updated successfully!');
+    }
+
+    // 4. Delete a schedule (Using POST to avoid the DELETE method error we had before!)
     public function destroy($id)
     {
         TryoutSchedule::findOrFail($id)->delete();
